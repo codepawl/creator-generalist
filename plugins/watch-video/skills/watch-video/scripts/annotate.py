@@ -163,6 +163,11 @@ def wrap(draw, text, font, width):
     return lines
 
 
+def worth_showing(text):
+    """Stray one or two character reads ("7", "|") are OCR noise, not text a viewer can check."""
+    return sum(character.isalnum() for character in text) >= 3
+
+
 class Painter:
     """Draws one state of the annotations. With a panel, only thin OCR boxes and claim boxes touch the picture;
     every word goes in the panel under it, so nothing covers what the video shows."""
@@ -176,7 +181,7 @@ class Painter:
         self.unit = unit
         self.text_font = load_font(TEXT_FONTS, round(30 * unit))
         self.small_font = load_font(TEXT_FONTS, round(22 * unit))
-        self.mono_font = load_font(MONO_FONTS, round(19 * unit))
+        self.mono_font = load_font(MONO_FONTS, round(22 * unit))
 
     def overlay(self, ocr_record, fallback_frame, notes, spans, caption):
         image = Image.new("RGBA", (self.width, self.canvas_height), (0, 0, 0, 0))
@@ -308,8 +313,8 @@ class Painter:
                                    column_width, NOTE_COLOUR, 2)
         if caption:
             y = self.draw_labelled(draw, "speech", caption, column_left, y, column_width, KIND_COLOURS["heard"], 2)
-        if ocr_record and ocr_record["lines"]:
-            read = " · ".join(line["text"] for line in ocr_record["lines"])
+        if ocr_record and any(worth_showing(line["text"]) for line in ocr_record["lines"]):
+            read = " · ".join(line["text"] for line in ocr_record["lines"] if worth_showing(line["text"]))
             self.draw_labelled(draw, "on screen (OCR)", read, column_left, y, column_width, OCR_COLOUR, 2,
                                font=self.mono_font)
 
