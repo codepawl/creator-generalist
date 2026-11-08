@@ -91,11 +91,11 @@ words, tone table and picture together. Read names and numbers from full-size fr
 against the audio. Never name a person from their face alone. Posting about someone else's video: credit the creator,
 add your own angle, by default do not re-upload their footage (re-uploading: name the copyright and X monetization
 risk once and ask). Link a moment as `https://youtu.be/<id>?t=<seconds>`; keep a transcript in
-`{{WORK_DIR}}/transcripts/`; delete media.
+`{{WORK_DIR}}/transcripts/`; delete media unless the user wants it annotated.
+Show the reading so it can be checked: claims as `[mm:ss.s]` lines (or `notes.json` with spans and 0-1 boxes), then `scripts/annotate.py <video> --notes <file> --screen screen/screen.jsonl --words words.json --out annotated.mp4`.
 
 ## 5. Learn it so it can be remade
 
 When the user wants a video like this one, or its recipe for another product: read
 `references/recipe.md` whole and follow it: a checked `recipe.json` (example in `references/`), animatic, build per beat.
-Tests with known answers: `uv run --no-project --with numpy python {{SKILL_DIR}}/tests/test_watch_video.py`.
-Run them after any change here. Not covered: naming short sounds (CLAP on Demucs stems scored 0.0 to 0.25, measured 2026-11-02), genres. Frame reading: `tests/frame_eval.py make|score` builds a fresh known-answer video for a blind reader.
+Tests: `uv run --no-project --with numpy --with pillow python {{SKILL_DIR}}/tests/test_watch_video.py` after any change. Not covered: naming short sounds (CLAP 0.0 to 0.25, 2026-11-02), genres. `tests/frame_eval.py make|score` builds a known-answer video for a blind reader.

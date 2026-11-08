@@ -64,7 +64,7 @@ those on its own too.
 
 | Skill | Ask for | You get |
 |---|---|---|
-| **[watch-video](plugins/watch-video/skills/watch-video/SKILL.md)** | watching a video, copying its style, or turning a tutorial channel into a skill | Frame sheets, cuts, spectrograms and a sound timeline, transcripts in many languages, a remake recipe, and a channel-to-skill pipeline that checks names against the installed software, reads values from full-size frames and compares with current docs |
+| **[watch-video](plugins/watch-video/skills/watch-video/SKILL.md)** | watching a video, copying its style, or turning a tutorial channel into a skill | Frame sheets, cuts, spectrograms and a sound timeline, transcripts in many languages, a remake recipe, and a channel-to-skill pipeline that checks names against the installed software, reads values from full-size frames and compares with current docs. It can also draw what it read and concluded onto the video (OCR boxes, timestamped claims, speech) so you can check it |
 
 **Sound skill**
 

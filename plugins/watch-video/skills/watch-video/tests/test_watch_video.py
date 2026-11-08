@@ -722,5 +722,49 @@ class WatchEntry(unittest.TestCase):
         self.assertIsNone(self.watch.upload_age_days(None))
 
 
+class Annotating(Workspace):
+    def setUp(self):
+        super().setUp()
+        self.annotate = load_script_module("annotate")
+
+    def test_text_notes_keep_the_words_and_read_the_kind(self):
+        path = self.folder / "notes.md"
+        path.write_text("Intro line\n- [01:02.5] Callout: \"Tango delta\" heard\n- [00:03.0] hard cut — measured\n",
+                        encoding="utf-8")
+        points, spans = self.annotate.parse_notes(path)
+        self.assertEqual([note["t"] for note in points], [3.0, 62.5])
+        self.assertEqual(points[1]["text"], "Callout: \"Tango delta\" heard")
+        self.assertEqual(points[1]["kind"], "heard")
+        self.assertEqual(spans, [])
+
+    def test_json_notes_carry_spans_and_boxes(self):
+        path = self.folder / "notes.json"
+        path.write_text(json.dumps([{"t": 5, "text": "rover hangs", "kind": "seen", "box": [0.1, 0.1, 0.4, 0.5]},
+                                    {"start": 31.5, "end": 165, "text": "camera: down-look"}]), encoding="utf-8")
+        points, spans = self.annotate.parse_notes(path)
+        self.assertEqual(points[0]["box"], [0.1, 0.1, 0.4, 0.5])
+        self.assertEqual(spans[0]["end"], 165.0)
+
+    def test_ocr_boxes_undo_crop_and_upscale(self):
+        record = {"frame": [800, 400], "source": [1920, 1080], "crop": [100, 200, 400, 200]}
+        line = {"x0": 400, "y0": 200, "x1": 800, "y1": 400}
+        fraction = self.annotate.box_to_fraction(line, record, [1280, 720])
+        self.assertAlmostEqual(fraction[0], 300 / 1920)
+        self.assertAlmostEqual(fraction[3], 400 / 1080)
+        self.assertAlmostEqual(self.annotate.box_to_fraction(line, {}, [1600, 800])[2], 0.5)
+
+    def test_captions_break_on_pauses(self):
+        words = [{"start": 0.0, "end": 0.3, "text": "Heat"}, {"start": 0.3, "end": 0.6, "text": "shield&nbsp;"},
+                 {"start": 2.0, "end": 2.4, "text": "sep."}]
+        lines = self.annotate.caption_lines(words)
+        self.assertEqual([line["text"] for line in lines], ["Heat shield", "sep."])
+
+    def test_notes_move_away_from_text(self):
+        record = {"frame": [100, 100], "lines": [{"x0": 0, "y0": 0, "x1": 40, "y1": 20}]}
+        self.assertTrue(self.annotate.Painter.text_heavier_on_left(record, [100, 100]))
+        record["lines"][0].update({"x0": 60, "x1": 100})
+        self.assertFalse(self.annotate.Painter.text_heavier_on_left(record, [100, 100]))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

@@ -26,7 +26,7 @@ Writes:
   first_seen.txt     "03:05  Gradient Texture": every text line the first time it appears (new nodes, menus,
                      objects, chart titles and percentages; bare numbers are left to value_changes.txt)
   sources.md         names that point at where assets came from (CGTrader, Unsplash, Poly Haven, Sketchfab, .blend paths)
-  screen.jsonl       every read frame: time and its text lines with boxes and scores
+  screen.jsonl       every read frame: time, text lines with boxes and scores, frame/source size and crop
   crops/             the line crop each source name was read from
 OCR misreads letters (Beech -> Beect, l -> i): check a value you rely on in one full-size frame or crop.
 """
@@ -257,6 +257,13 @@ def recheck_names(clusters):
                     cluster["readings"].append((best, VLM_WEIGHT))
 
 
+def video_size(video):
+    probe = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                            "-of", "csv=p=0", str(video)], capture_output=True, text=True, check=True)
+    width, height = probe.stdout.strip().split(",")[:2]
+    return [int(width), int(height)]
+
+
 def extract_frames(video, folder, every, start, end, crop, upscale):
     filters = [f"fps=1/{every}"]
     if crop:
@@ -294,6 +301,9 @@ def main():
     crop_folder = out_folder / "crops"
     crop_folder.mkdir(exist_ok=True)
     engine = make_engine(arguments.tier, arguments.cpu)
+    # Saved with every frame so annotate.py can map the boxes onto any copy of the video.
+    source_size = video_size(arguments.video)
+    crop_box = [float(part) for part in arguments.crop.split(":")] if arguments.crop else None
     last_values = {}
     seen_text = set()
     changes, first_seen, clusters = [], [], []
@@ -330,7 +340,9 @@ def main():
                               "x1": float(x1) + region[0], "y1": float(y1) + region[1], "score": round(float(score), 3)})
             screen_lines = kept + fresh
             lines = screen_lines
-            screen_log.write(json.dumps({"seconds": seconds, "lines": lines}, ensure_ascii=False) + "\n")
+            record = {"seconds": seconds, "lines": lines, "frame": [image.width, image.height],
+                      "source": source_size, "crop": crop_box}
+            screen_log.write(json.dumps(record, ensure_ascii=False) + "\n")
             for label, value in pair_fields(lines, image.width).items():
                 if value is None:
                     continue
