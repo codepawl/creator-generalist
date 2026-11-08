@@ -3,7 +3,11 @@
 Usage:
   uv run --no-project --with numpy --with pillow python annotate.py <video> --out annotated.mp4
       [--screen screen/screen.jsonl] [--notes notes.md|notes.json] [--words words.json]
-      [--from <s>] [--to <s>] [--note-seconds 3.5] [--no-ocr] [--crf 20] [--text-scale 1.4]
+      [--from <s>] [--to <s>] [--note-seconds 3.5] [--no-ocr] [--panel 0.45] [--crf 20] [--text-scale 1.4]
+
+By default every word goes in a panel under the video (--panel 0.45 of its height), so no label covers what the
+video shows: the picture keeps only thin boxes around the text OCR read and around a claim's box. --panel 0 draws
+the cards, banner and subtitles over the picture instead.
 
 Layers, each optional:
   OCR boxes    every text line read_screen.py found, boxed, with the text it read and its score, held until the
@@ -36,6 +40,7 @@ KIND_COLOURS = {"seen": (127, 180, 232), "heard": (232, 194, 106), "measured": (
 NOTE_COLOUR = (217, 222, 229)
 OCR_COLOUR = (64, 224, 208)
 PANEL = (20, 25, 32, 205)
+PANEL_BACKGROUND = (27, 34, 44)
 STAMP = re.compile(r"\[(\d+):(\d+(?:\.\d+)?)\]\s*(.+)")
 KIND_WORD = re.compile(r"\b(seen|heard|measured)\b", re.IGNORECASE)
 TEXT_FONTS = ["C:/Windows/Fonts/msyh.ttc", "C:/Windows/Fonts/segoeui.ttf", "/System/Library/Fonts/Hiragino Sans GB.ttc",
@@ -159,35 +164,49 @@ def wrap(draw, text, font, width):
 
 
 class Painter:
-    def __init__(self, width, height, text_scale=1.0):
-        self.width, self.height = width, height
-        unit = height / 1080 * text_scale
+    """Draws one state of the annotations. With a panel, only thin OCR boxes and claim boxes touch the picture;
+    every word goes in the panel under it, so nothing covers what the video shows."""
+
+    def __init__(self, width, video_height, panel_height, text_scale=1.0):
+        self.width = width
+        self.video_height = video_height
+        self.panel_height = panel_height
+        self.canvas_height = video_height + panel_height
+        unit = video_height / 1080 * text_scale
         self.unit = unit
         self.text_font = load_font(TEXT_FONTS, round(30 * unit))
         self.small_font = load_font(TEXT_FONTS, round(22 * unit))
         self.mono_font = load_font(MONO_FONTS, round(19 * unit))
 
     def overlay(self, ocr_record, fallback_frame, notes, spans, caption):
-        image = Image.new("RGBA", (self.width, self.height), (0, 0, 0, 0))
+        image = Image.new("RGBA", (self.width, self.canvas_height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(image)
         if ocr_record:
-            self.draw_ocr(draw, ocr_record, fallback_frame)
+            self.draw_ocr_boxes(draw, ocr_record, fallback_frame, labels=self.panel_height == 0)
         for note in notes:
             if note.get("box"):
                 self.draw_note_box(draw, note)
-        notes_on_right = self.text_heavier_on_left(ocr_record, fallback_frame)
-        self.draw_spans(draw, spans, on_right=not notes_on_right)
-        self.draw_notes(draw, notes, on_right=notes_on_right)
-        if caption:
-            self.draw_caption(draw, caption)
+        if self.panel_height:
+            self.draw_panel(draw, ocr_record, notes, spans, caption)
+        else:
+            notes_on_right = self.text_heavier_on_left(ocr_record, fallback_frame)
+            self.draw_spans_over(draw, spans, on_right=not notes_on_right)
+            self.draw_cards(draw, notes, self.width - round(24 * self.unit) - self.width * 0.46 if notes_on_right
+                            else round(24 * self.unit), round(24 * self.unit), self.width * 0.46, 5)
+            if caption:
+                self.draw_caption_over(draw, caption)
         return image
 
-    def draw_ocr(self, draw, record, fallback_frame):
+    # On the picture
+
+    def draw_ocr_boxes(self, draw, record, fallback_frame, labels):
         line_width = max(2, round(2 * self.unit))
         for line in record["lines"]:
             x0, y0, x1, y1 = box_to_fraction(line, record, fallback_frame)
-            box = (x0 * self.width, y0 * self.height, x1 * self.width, y1 * self.height)
+            box = (x0 * self.width, y0 * self.video_height, x1 * self.width, y1 * self.video_height)
             draw.rectangle(box, outline=OCR_COLOUR + (255,), width=line_width)
+            if not labels:
+                continue
             label = f"{line['text']}  {line['score']:.2f}"
             label_width = draw.textlength(label, font=self.mono_font)
             label_height = self.mono_font.size + 6
@@ -198,12 +217,12 @@ class Painter:
     def draw_note_box(self, draw, note):
         colour = KIND_COLOURS.get(note["kind"], NOTE_COLOUR)
         x0, y0, x1, y1 = note["box"]
-        draw.rectangle((x0 * self.width, y0 * self.height, x1 * self.width, y1 * self.height), outline=colour + (255,),
-                       width=max(3, round(4 * self.unit)))
+        draw.rectangle((x0 * self.width, y0 * self.video_height, x1 * self.width, y1 * self.video_height),
+                       outline=colour + (255,), width=max(3, round(4 * self.unit)))
 
     @staticmethod
     def text_heavier_on_left(record, fallback_frame):
-        """True when the read text in the top half sits more on the left, so the note cards go top right."""
+        """True when the read text in the top half sits more on the left, so overlay cards go top right."""
         if not record:
             return False
         left_area, right_area = 0.0, 0.0
@@ -216,30 +235,51 @@ class Painter:
             right_area += area * max(0.0, x1 - max(x0, 0.5)) / max(x1 - x0, 1e-6)
         return left_area > right_area
 
-    def draw_spans(self, draw, spans, on_right):
+    def draw_spans_over(self, draw, spans, on_right):
         margin = round(24 * self.unit)
         y = margin
         for span in spans:
-            text = span["text"]
-            text_width = draw.textlength(text, font=self.small_font)
+            text_width = draw.textlength(span["text"], font=self.small_font)
             box_width = text_width + 24 * self.unit
             x = self.width - margin - box_width if on_right else margin
             draw.rounded_rectangle((x, y, x + box_width, y + self.small_font.size + 18 * self.unit),
                                    radius=8 * self.unit, fill=PANEL)
-            draw.text((x + 12 * self.unit, y + 8 * self.unit), text, font=self.small_font, fill=NOTE_COLOUR + (255,))
+            draw.text((x + 12 * self.unit, y + 8 * self.unit), span["text"], font=self.small_font,
+                      fill=NOTE_COLOUR + (255,))
             y += self.small_font.size + 28 * self.unit
 
-    def draw_notes(self, draw, notes, on_right):
-        margin = round(24 * self.unit)
-        card_width = self.width * 0.46
-        left = self.width - margin - card_width if on_right else margin
-        y = margin
-        for note in notes[-2:]:
+    def draw_caption_over(self, draw, caption):
+        lines = wrap(draw, caption, self.text_font, self.width * 0.7)[:2]
+        line_height = self.text_font.size * 1.3
+        bottom = self.video_height * (1 - CAPTION_LIFT)
+        top = bottom - line_height * len(lines) - 16 * self.unit
+        widest = max(draw.textlength(line, font=self.text_font) for line in lines)
+        left = (self.width - widest) / 2
+        draw.rounded_rectangle((left - 18 * self.unit, top, left + widest + 18 * self.unit, bottom),
+                               radius=10 * self.unit, fill=(10, 10, 12, 190))
+        for index, line in enumerate(lines):
+            line_width = draw.textlength(line, font=self.text_font)
+            draw.text(((self.width - line_width) / 2, top + 8 * self.unit + index * line_height), line,
+                      font=self.text_font, fill=(245, 245, 245, 255))
+
+    # Shared
+
+    def card_height(self, lines):
+        return 22 * self.unit + self.small_font.size + 8 * self.unit + self.text_font.size * 1.25 * len(lines) + 12 * self.unit
+
+    def draw_cards(self, draw, notes, left, top, card_width, max_lines, bottom=None):
+        laid_out = [(note, wrap(draw, note["text"], self.text_font, card_width - 40 * self.unit)[:max_lines])
+                    for note in notes[-2:]]
+        if bottom is not None:
+            # The newest claim always shows; an older one stays only while both fit.
+            while len(laid_out) > 1 and sum(self.card_height(lines) + 12 * self.unit for _, lines in laid_out) > bottom - top:
+                laid_out.pop(0)
+        y = top
+        for note, lines in laid_out:
             colour = KIND_COLOURS.get(note["kind"], NOTE_COLOUR)
             stamp = f"[{int(note['t'] // 60):02d}:{note['t'] % 60:04.1f}]"
-            lines = wrap(draw, note["text"], self.text_font, card_width - 40 * self.unit)[:5]
             line_height = self.text_font.size * 1.25
-            card_height = 20 * self.unit + self.small_font.size + 8 * self.unit + line_height * len(lines) + 14 * self.unit
+            card_height = self.card_height(lines)
             draw.rounded_rectangle((left, y, left + card_width, y + card_height), radius=12 * self.unit, fill=PANEL)
             header_y = y + 14 * self.unit
             dot = 7 * self.unit
@@ -253,22 +293,44 @@ class Painter:
                 text_y += line_height
             y += card_height + 12 * self.unit
 
-    def draw_caption(self, draw, caption):
-        lines = wrap(draw, caption, self.text_font, self.width * 0.7)[:2]
-        line_height = self.text_font.size * 1.3
-        bottom = self.height * (1 - CAPTION_LIFT)
-        top = bottom - line_height * len(lines) - 16 * self.unit
-        widest = max(draw.textlength(line, font=self.text_font) for line in lines)
-        left = (self.width - widest) / 2
-        label = "speech"
-        draw.rounded_rectangle((left - 18 * self.unit, top, left + widest + 18 * self.unit, bottom), radius=10 * self.unit,
-                               fill=(10, 10, 12, 190))
-        draw.text((left - 18 * self.unit, top - self.small_font.size - 6 * self.unit), label, font=self.small_font,
-                  fill=KIND_COLOURS["heard"] + (255,))
-        for index, line in enumerate(lines):
-            line_width = draw.textlength(line, font=self.text_font)
-            draw.text(((self.width - line_width) / 2, top + 8 * self.unit + index * line_height), line,
-                      font=self.text_font, fill=(245, 245, 245, 255))
+    # The panel under the picture
+
+    def draw_panel(self, draw, ocr_record, notes, spans, caption):
+        margin = 24 * self.unit
+        top = self.video_height + margin
+        notes_width = self.width * 0.56
+        self.draw_cards(draw, notes, margin, top, notes_width - margin, 3, bottom=self.canvas_height - 20 * self.unit)
+        column_left = notes_width + margin
+        column_width = self.width - column_left - margin
+        y = top
+        for span in spans:
+            y = self.draw_labelled(draw, "camera / layout", span["text"].removeprefix("camera: "), column_left, y,
+                                   column_width, NOTE_COLOUR, 2)
+        if caption:
+            y = self.draw_labelled(draw, "speech", caption, column_left, y, column_width, KIND_COLOURS["heard"], 2)
+        if ocr_record and ocr_record["lines"]:
+            read = " · ".join(line["text"] for line in ocr_record["lines"])
+            self.draw_labelled(draw, "on screen (OCR)", read, column_left, y, column_width, OCR_COLOUR, 2,
+                               font=self.mono_font)
+
+    def draw_labelled(self, draw, label, text, left, top, width, colour, max_lines, font=None):
+        font = font or self.text_font
+        bottom_limit = self.canvas_height - 30 * self.unit
+        if top + self.small_font.size > bottom_limit:
+            return top
+        draw.text((left, top), label, font=self.small_font, fill=colour + (255,))
+        y = top + self.small_font.size + 6 * self.unit
+        line_height = font.size * 1.25
+        lines = wrap(draw, text, font, width)
+        if len(lines) > max_lines:
+            lines = lines[:max_lines]
+            lines[-1] = lines[-1].rstrip() + " …"
+        for line in lines:
+            if y + line_height > bottom_limit:
+                break
+            draw.text((left, y), line, font=font, fill=NOTE_COLOUR + (255,))
+            y += line_height
+        return y + 14 * self.unit
 
 
 def blend(frame, overlay_rgb, overlay_alpha):
@@ -303,11 +365,15 @@ def main():
     parser.add_argument("--note-seconds", type=float, default=3.5, help="how long a point note stays up")
     parser.add_argument("--ocr-frame", default="1280x720", help="OCR frame size for old screen.jsonl files without one")
     parser.add_argument("--no-ocr", action="store_true")
+    parser.add_argument("--panel", type=float, default=0.45,
+                        help="height of the notes panel under the video, as a share of the video height; 0 draws over it")
     parser.add_argument("--crf", type=int, default=20)
     parser.add_argument("--text-scale", type=float, default=1.0, help="1.4 when the video will be shown small")
     arguments = parser.parse_args()
 
-    width, height, frame_rate, duration = probe(arguments.video)
+    width, video_height, frame_rate, duration = probe(arguments.video)
+    panel_height = int(video_height * arguments.panel) // 2 * 2
+    canvas_height = video_height + panel_height
     end = arguments.end if arguments.end is not None else duration
     fallback_frame = [int(part) for part in arguments.ocr_frame.split("x")]
     records = read_screen_log(arguments.screen) if arguments.screen and not arguments.no_ocr else []
@@ -315,16 +381,18 @@ def main():
     for note in points:
         note["end"] = note["t"] + arguments.note_seconds
     captions = caption_lines(json.loads(Path(arguments.words).read_text(encoding="utf-8"))) if arguments.words else []
-    painter = Painter(width, height, arguments.text_scale)
+    painter = Painter(width, video_height, panel_height, arguments.text_scale)
 
     decoder = subprocess.Popen(["ffmpeg", "-v", "error", "-ss", str(arguments.start), "-to", str(end), "-i",
                                 arguments.video, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
     encoder = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s",
-                                f"{width}x{height}", "-r", f"{frame_rate}", "-i", "-", "-ss", str(arguments.start),
+                                f"{width}x{canvas_height}", "-r", f"{frame_rate}", "-i", "-", "-ss", str(arguments.start),
                                 "-to", str(end), "-i", arguments.video, "-map", "0:v", "-map", "1:a?", "-c:v", "libx264",
                                 "-preset", "veryfast", "-crf", str(arguments.crf), "-pix_fmt", "yuv420p", "-c:a", "aac",
                                 "-b:a", "192k", "-shortest", arguments.out], stdin=subprocess.PIPE)
-    frame_bytes = width * height * 3
+    frame_bytes = width * video_height * 3
+    canvas = numpy.empty((canvas_height, width, 3), dtype=numpy.uint8)
+    canvas[video_height:] = PANEL_BACKGROUND
     cached_state, overlay_rgb, overlay_alpha = None, None, None
     frame_index = 0
     while True:
@@ -349,18 +417,18 @@ def main():
             else:
                 overlay_rgb, overlay_alpha = None, None
             cached_state = state
-        frame = numpy.frombuffer(chunk, dtype=numpy.uint8).reshape(height, width, 3)
-        frame = blend(frame, overlay_rgb, overlay_alpha)
+        canvas[:video_height] = numpy.frombuffer(chunk, dtype=numpy.uint8).reshape(video_height, width, 3)
+        canvas[video_height:] = PANEL_BACKGROUND
+        frame = blend(canvas, overlay_rgb, overlay_alpha)
         if points:
-            frame = numpy.ascontiguousarray(frame)
             draw_timeline(frame, points, seconds, arguments.start, end)
         encoder.stdin.write(frame.tobytes())
         frame_index += 1
     encoder.stdin.close()
     encoder.wait()
     decoder.wait()
-    print(f"wrote {arguments.out}: {frame_index} frames, {len(records)} OCR reads, {len(points)} notes, "
-          f"{len(spans)} spans, {len(captions)} caption lines")
+    print(f"wrote {arguments.out}: {frame_index} frames, {width}x{canvas_height}, {len(records)} OCR reads, "
+          f"{len(points)} notes, {len(spans)} spans, {len(captions)} caption lines")
 
 
 if __name__ == "__main__":

@@ -759,6 +759,16 @@ class Annotating(Workspace):
         lines = self.annotate.caption_lines(words)
         self.assertEqual([line["text"] for line in lines], ["Heat shield", "sep."])
 
+    def test_panel_keeps_words_off_the_picture(self):
+        painter = self.annotate.Painter(640, 360, 162)
+        record = {"frame": [640, 360], "lines": [{"text": "LVS valid", "score": 0.99, "x0": 100, "y0": 50, "x1": 300, "y1": 90}]}
+        note = {"t": 107.4, "text": "Callout: \"LVS valid\" heard", "kind": "heard", "box": None}
+        image = numpy.asarray(painter.overlay(record, [640, 360], [note], [], "LVS valid"))
+        picture_alpha = image[:360, :, 3]
+        self.assertEqual(int(picture_alpha[60:80, 120:280].max()), 0)
+        self.assertGreater(int(picture_alpha[50:53, 100:300].max()), 0)
+        self.assertGreater(int((image[360:, :, 3] > 0).sum()), 1000)
+
     def test_notes_move_away_from_text(self):
         record = {"frame": [100, 100], "lines": [{"x0": 0, "y0": 0, "x1": 40, "y1": 20}]}
         self.assertTrue(self.annotate.Painter.text_heavier_on_left(record, [100, 100]))
