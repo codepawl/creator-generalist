@@ -1,6 +1,6 @@
 # Foley generated from the picture (HunyuanVideo-Foley)
 
-Reading map: When, Command (local, the default), Hosted on fal (when the GPU stays busy), Install, Resources, Limits, Licence, Why this model, ElevenLabs instead.
+Reading map: When, Command (local, the default), Prompts and shot lists, Hosted on fal (when the GPU stays busy), Install, Resources, Limits, Licence, Why this model, ElevenLabs instead.
 
 ## When
 
@@ -27,6 +27,38 @@ Reading map: When, Command (local, the default), Hosted on fal (when the GPU sta
   `heard_nothing` (80% or more of the half-second windows under -80 dB). On `heard_nothing` it prints a warning: that
   film goes to `foley.py` with its event list.
 - Then treat `foley.wav` like any stem: `listen.py` for onsets, `mix.py` for loudness and the phone check.
+
+## Prompts and shot lists
+
+The model takes the video and the text together in one pass: SigLIP2 reads the frames (what is in the shot),
+Synchformer reads the motion (when contact happens) and CLAP reads the prompt (checked in the installed repo's
+`feature_utils.py`, 2026-11-08). The picture already gives the timing; the prompt settles what the picture leaves
+open. Always write one.
+
+- Name the material, the object and the action: "wooden paddle stirring thick soap paste in a clay pot", not "stirring".
+  CGI surfaces look alike (ash and sand, wet mud and dry earth, wood and plastic), and the prompt is how the model
+  tells them apart.
+- Add the texture of the sound in two or three words: "soft wet slosh", "dry gravel rattle", "dull wooden thud".
+- Say what is off screen but heard, when it matters: "steady light rain on the road".
+- Keep music, voice and named meme sounds out of the prompt; put "music, speech" in `--neg`, plus anything the model
+  keeps adding (a whine, crowd noise, wind).
+- English, one short sentence; a list of ten nouns blurs the result.
+
+One call takes one prompt, so a film whose shots change material needs one prompt per shot. Give a shot list
+(`--shots shots.json`, format in `scripts/foley_shots.py`): each shot has `start`, an optional `end` and `neg`, and its
+`prompt`. Shots longer than `--chunk` still split into pieces with the `--overlap` crossfade; at a cut between shots the
+pieces overlap by only `--cut-fade` (0.08 s), so one shot's sound does not bleed across the cut. A stretch with no
+shot gets silence. Take shot times from the film's own timeline or cut list, not by eye.
+
+```json
+[
+  {"start": 0.0, "prompt": "rubber boots squelching in deep wet mud, soft sucking steps"},
+  {"start": 6.4, "prompt": "gravel tipped from a wheelbarrow onto mud, stones rattling"},
+  {"start": 14.0, "prompt": "steel shovel scraping gravel, steady light rain on a dirt road", "neg": "music, speech, wind"}
+]
+```
+
+- A/B a new prompt on one shot before running the whole film (`--seed` for a second take of the same prompt).
 
 ## Hosted on fal
 

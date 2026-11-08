@@ -55,8 +55,8 @@ Scripts live in `scripts/` next to this file; run them with absolute paths and n
 - `NET generate_elevenlabs.py credits | sfx "<prompt>" --folder X [--seconds S] [--variants 2] [--loop] |
   plan "<prompt>" --seconds S --out plan.json | music "<prompt>" --folder X --seconds S --instrumental |
   music --plan plan.json --folder X | stems <file> --folder X [--six] | video-music <mp4> --folder X [--separate]`
-- `<model venv python> video_foley.py film.mp4 --prompt "<what sounds>" --out foley.wav [--mux out.mp4]` local,
-  9 GB VRAM; `fal_foley.py` same flags on fal (`FAL_KEY`, `--with fal-client`) when the card stays busy.
+- `<model venv python> video_foley.py film.mp4 --prompt "<material, object, action>" | --shots s.json --out f.wav` reads
+  video + prompt together, 9 GB VRAM (prompt rules: references/video-foley.md); `fal_foley.py` same flags on fal.
 - `PY listen.py <wav> [--expect "label@seconds"]... [--window 1.0]`; `PY eval.py` the 30-query search benchmark.
 - `PY foley.py events.json --out foley.wav [--report r.csv]` the effects stem (prints licence warnings).
 - `PY fit_music.py <track> --duration S [--cues cues.json] --out music.wav` a real track edited to the cut.

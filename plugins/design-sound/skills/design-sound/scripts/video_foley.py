@@ -3,8 +3,10 @@
 Runs inside the model's own venv (install steps: references/video-foley.md):
   <model root>/repo/.venv/Scripts/python.exe video_foley.py film.mp4 \
       --prompt "furniture dropped on a wooden floor, soft thuds" --out foley.wav [--mux out.mp4]
+  ... video_foley.py film.mp4 --shots shots.json --out foley.wav     one prompt per shot (format: foley_shots.py)
 
-The model root defaults to ~/models/hunyuanvideo-foley (set HUNYUAN_FOLEY_ROOT to move it). Films longer than --chunk
+The model hears the frames and reads the prompt together: the prompt names what makes the sound (material, object,
+action), the picture gives where and when. The model root defaults to ~/models/hunyuanvideo-foley (set HUNYUAN_FOLEY_ROOT to move it). Films longer than --chunk
 seconds are generated in overlapping pieces (the model takes at most 15 s) joined with an equal-power crossfade.
 Prints and writes <out>.report.json: time, real-time factor, peak VRAM, peak RAM, CPU use, and whether the model
 heard nothing (near-silent output), which means the film needs hand-placed foley instead.
@@ -19,6 +21,8 @@ import tempfile
 import threading
 import time
 from pathlib import Path
+
+from foley_shots import fade_lengths, load_shots, plan_pieces, single_prompt_pieces
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -120,20 +124,6 @@ def probe_duration(video_path):
     return float(output.strip())
 
 
-def plan_chunks(duration, chunk_seconds, overlap_seconds):
-    if duration <= chunk_seconds:
-        return [(0.0, duration)]
-    chunks = []
-    start = 0.0
-    while start < duration:
-        end = min(start + chunk_seconds, duration)
-        chunks.append((start, end))
-        if end >= duration:
-            break
-        start = end - overlap_seconds
-    return chunks
-
-
 def cut_clip(video_path, start, end, folder, index):
     clip_path = os.path.join(folder, f"chunk_{index:03d}.mp4")
     subprocess.run(
@@ -144,24 +134,26 @@ def cut_clip(video_path, start, end, folder, index):
     return clip_path
 
 
-def join_with_crossfade(pieces, sample_rate, chunks, overlap_seconds, total_seconds):
+def join_with_crossfade(audio_pieces, sample_rate, pieces, total_seconds):
+    """Lays each piece at its start time; equal-power fades over the real overlap with each neighbour."""
     import torch
 
     total_samples = int(round(total_seconds * sample_rate))
-    channels = pieces[0].shape[0]
+    channels = audio_pieces[0].shape[0]
     output = torch.zeros(channels, total_samples)
-    fade_samples = int(round(overlap_seconds * sample_rate))
-    for index, (piece, (start, _end)) in enumerate(zip(pieces, chunks)):
-        piece = piece.clone()
-        if index > 0 and fade_samples > 0:
-            ramp = torch.linspace(0, 1, fade_samples)
-            piece[:, :fade_samples] *= torch.sin(ramp * torch.pi / 2)
-        if index < len(pieces) - 1 and fade_samples > 0:
-            ramp = torch.linspace(1, 0, fade_samples)
-            piece[:, -fade_samples:] *= torch.sin(ramp * torch.pi / 2)
-        offset = int(round(start * sample_rate))
-        length = min(piece.shape[1], total_samples - offset)
-        output[:, offset:offset + length] += piece[:, :length]
+    for audio, piece, (fade_in, fade_out) in zip(audio_pieces, pieces, fade_lengths(pieces)):
+        audio = audio.clone()
+        fade_in_samples = min(int(round(fade_in * sample_rate)), audio.shape[1])
+        fade_out_samples = min(int(round(fade_out * sample_rate)), audio.shape[1])
+        if fade_in_samples > 0:
+            ramp = torch.linspace(0, 1, fade_in_samples)
+            audio[:, :fade_in_samples] *= torch.sin(ramp * torch.pi / 2)
+        if fade_out_samples > 0:
+            ramp = torch.linspace(1, 0, fade_out_samples)
+            audio[:, -fade_out_samples:] *= torch.sin(ramp * torch.pi / 2)
+        offset = int(round(piece["start"] * sample_rate))
+        length = min(audio.shape[1], total_samples - offset)
+        output[:, offset:offset + length] += audio[:, :length]
     return output
 
 
@@ -176,7 +168,9 @@ def mux(video_path, audio_path, out_path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("video")
-    parser.add_argument("--prompt", required=True, help="what makes the sound, in plain words")
+    parser.add_argument("--prompt", default=None, help="what makes the sound, in plain words (whole film)")
+    parser.add_argument("--shots", default=None, help="JSON shot list, one prompt per shot (see foley_shots.py)")
+    parser.add_argument("--cut-fade", type=float, default=0.08, help="crossfade at a cut between shots, seconds")
     parser.add_argument("--neg", default=None, help="negative prompt (model default: 'noisy, harsh')")
     parser.add_argument("--out", required=True, help="output WAV (48 kHz)")
     parser.add_argument("--mux", default=None, help="also write the video with this audio as AAC")
@@ -188,6 +182,8 @@ def main():
     parser.add_argument("--model-size", choices=["xl", "xxl"], default="xl")
     parser.add_argument("--no-offload", action="store_true", help="only with 16+ GB free")
     arguments = parser.parse_args()
+    if not arguments.prompt and not arguments.shots:
+        parser.error("give --prompt, --shots, or both (--prompt then fills shots without one)")
 
     lower_own_priority()
     started = time.time()
@@ -215,7 +211,13 @@ def main():
 
     duration = probe_duration(arguments.video)
     chunk_seconds = min(arguments.chunk, MODEL_MAX_SECONDS)
-    chunks = plan_chunks(duration, chunk_seconds, arguments.overlap)
+    if arguments.shots:
+        shots = load_shots(arguments.shots, duration, arguments.prompt, arguments.neg)
+        pieces_plan = plan_pieces(shots, duration, chunk_seconds, arguments.overlap, arguments.cut_fade)
+    else:
+        shots = None
+        pieces_plan = single_prompt_pieces(duration, arguments.prompt, arguments.neg, chunk_seconds, arguments.overlap)
+    whole_film = len(pieces_plan) == 1 and pieces_plan[0]["start"] == 0.0 and pieces_plan[0]["end"] >= duration
     # The offload manager unloads its models after every call. Hold them for the whole film instead: all feature
     # passes first (encoders resident), release, then all denoise passes (generator and VAE resident), release.
     manager = getattr(model_dict, "manager", None)
@@ -230,10 +232,13 @@ def main():
     features = []
     with tempfile.TemporaryDirectory() as folder:
         hold_models(True)
-        for index, (start, end) in enumerate(chunks):
-            clip_path = arguments.video if len(chunks) == 1 else cut_clip(arguments.video, start, end, folder, index)
-            features.append(feature_process(clip_path, arguments.prompt, model_dict, config, neg_prompt=arguments.neg))
-            print(f"features {index + 1}/{len(chunks)} done at {time.time() - started:.0f} s")
+        for index, piece in enumerate(pieces_plan):
+            if whole_film:
+                clip_path = arguments.video
+            else:
+                clip_path = cut_clip(arguments.video, piece["start"], piece["end"], folder, index)
+            features.append(feature_process(clip_path, piece["prompt"], model_dict, config, neg_prompt=piece["neg"]))
+            print(f"features {index + 1}/{len(pieces_plan)} done at {time.time() - started:.0f} s")
         hold_models(False)
         if offloading:
             manager.release_feature_models()
@@ -244,16 +249,17 @@ def main():
                 guidance_scale=arguments.guidance, num_inference_steps=arguments.steps,
             )
             pieces.append(audio[0].float().cpu())
-            start, end = chunks[index]
-            print(f"chunk {index + 1}/{len(chunks)} {start:.1f}-{end:.1f} s done at {time.time() - started:.0f} s")
+            piece = pieces_plan[index]
+            print(f"piece {index + 1}/{len(pieces_plan)} {piece['start']:.1f}-{piece['end']:.1f} s "
+                  f"\"{piece['prompt'][:50]}\" done at {time.time() - started:.0f} s")
         hold_models(False)
         if offloading:
             manager.release_inference_models()
 
-    if len(pieces) == 1:
+    if whole_film:
         track = pieces[0]
     else:
-        track = join_with_crossfade(pieces, sample_rate, chunks, arguments.overlap, duration)
+        track = join_with_crossfade(pieces, sample_rate, pieces_plan, duration)
     os.makedirs(os.path.dirname(os.path.abspath(arguments.out)), exist_ok=True)
     soundfile.write(arguments.out, track.numpy().T, sample_rate, subtype="PCM_24")
     finished = time.time()
@@ -267,8 +273,9 @@ def main():
     report = {
         "video": arguments.video,
         "prompt": arguments.prompt,
+        "shots": shots,
         "video_seconds": round(duration, 2),
-        "chunks": len(chunks),
+        "chunks": len(pieces_plan),
         "steps": arguments.steps,
         "load_seconds": round(loaded - started, 1),
         "generation_seconds": round(generation_seconds, 1),
