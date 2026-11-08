@@ -42,8 +42,8 @@ or several separate objects. Say so before starting.
 
 - Prompt as an orbit: "the camera has orbited 45 degrees to the RIGHT, so we see more of the side that was on the
   right", same subject, pose, proportions, lens and distance, whole subject in frame, plain light grey, no shadow.
-- In this house, views come from Tripo Studio image generation in An's Chrome (a prompt plus the front image as
-  input) or from renders of our own block-out. Real photos of the object beat generated views.
+- Generate views with an image model given a prompt plus the front image as input, or render your own block-out.
+  Real photos of the object beat generated views. Which generator to use is in `local.md` when it exists.
 - Look at every view before using it: reject a changed pose, an extra or missing limb, a crop, a shadow joined to
   the mask, a scar or emblem on the wrong side.
 
@@ -86,7 +86,7 @@ opening (removes webs and specks thinner than twice the radius), polish.
 - Never blur normal targets; let stage stiffness limit detail. Where no view is sure, keep the current normal.
 - Solving against raw marching-cubes facets makes staircases; displacing the smoothed copy shaves curves.
 - Keep the distance field exact (exact triangle distances in a band, a distance transform beyond). Offsets, blends
-  and mirrored fields turn into voxel staircases and moiré rings.
+  and mirrored fields turn into voxel staircases and moire rings.
 - Closing fills the gaps you want open: use opening for webs, a silhouette cut for gaps.
 - Cut with generated outlines only inside a chosen region; they disagree by pixels and shred fingers.
 - A region that keeps failing needs a new view that looks into it (`-30:25` for armpits, `0:-20` under a chin),
@@ -114,5 +114,5 @@ but the held-out view stops. Show before/after crops of the same box before clai
 
 The upstream repo ships a full CLI (registration, carving, fitting, Blender replay, films) that calls paid fal
 models (about $2 a case for standard views). Where a local copy sits is in `local.md`; it is reading material
-only. Running it is An's call: ask once, naming the fal cost. Without it, apply sections 2, 3
+only. Running it is the user's call: ask once, naming the fal cost. Without it, apply sections 2, 3
 and 6 by hand in Blender (camera per view, silhouette overlay, `scripts/check_sculpt.py` for the mesh checks).
