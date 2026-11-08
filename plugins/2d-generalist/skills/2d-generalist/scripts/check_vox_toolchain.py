@@ -344,6 +344,8 @@ def format_markdown_report(report: dict[str, Any]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(
         description="Audit installed and optional free 2D/3D tools for Vox-style motion graphics."
     )

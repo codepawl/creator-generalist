@@ -80,7 +80,7 @@ Use this when you build a chart with dozens of bars of different heights.
 
 From the well-known music analysis series **Vox Earworm**:
 1. **Audio Spectrum / Waveform visuals.**
-   - Use real audio amplitude data (`Audio Waveform` / `Audio Spectrum` in AE, the `Bake Sound to F-Curves` modifier on Geometry Nodes in Blender, or `useAudioData()` + `visualizeAudio()` in `@remotion/media-utils`).
+   - Use real audio amplitude data (`Audio Waveform` / `Audio Spectrum` in AE, in Blender the Graph Editor operator Channel > Sound to Samples (`graph.sound_to_samples`) on a keyed property, which a Geometry Nodes input then reads, or `useAudioData()` + `visualizeAudio()` in `@remotion/media-utils`).
    - Set the display to **Digital Bars** or **Segmented Dots**. Give each instrument its own colour (for example kick drum orange-red `#F77F00`, bass blue `#4CC9F0`, vocals yellow `#FFE600`) on a dark `#182026` background.
 2. **True-scale staff scroll / Piano Roll.**
    - Follow the Timeline rule (#65). Place the notes or lyric syllables on a true-scale time grid (beat/bar grid). A playhead line sweeps across, or the camera slides sideways with the drum beat. Light up each note block (`Glow` + a slight scale to `110%`) at the exact moment its sound plays.
