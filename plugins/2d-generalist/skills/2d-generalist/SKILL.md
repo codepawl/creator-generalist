@@ -8,6 +8,8 @@ license: MIT
 
 Use this skill to design, animate, texture, and composite editorial motion graphics in the style of **Vox** (*Atlas*, *By Design*, *Earworm*, *Missing Chapter*) and **Flat Pack FX** across **2D, 2.5D, and 3D** using tools already installed on the user's machine (or recommending free tools when missing).
 
+Before building a look, pick the named technique instead of brute force: the 3D skill's `references/technique-atlas.md` (symptom to technique, numbers, recipe across 2D, 3D, editing and sound) and `references/depth-parallax-and-atmosphere.md` (parallax speeds, haze maths for layers). Machine paths (Krita, OpenToonz): `local.md` next to this file when it exists.
+
 ## Mode Routing
 
 | Mode | Scope (2D / 2.5D / 3D) | Primary Reference |

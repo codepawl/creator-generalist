@@ -24,6 +24,7 @@ Paths use `{{WORK_DIR}}` for the project folder and `{{SKILL_DIR}}` for this ski
 
 For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NLA, bpy), load the `use-3d-software` skill for the exact nodes and current 5.x names. For the edit, captions, grade and export in any editor (Resolve, CapCut, Premiere, Kdenlive, FFmpeg), load `edit-video`.
 Craft skills for single steps: `animate-characters` (keys, timing, cycles, acting in 2D and 3D), `rig-characters` (bones, weights, IK/FK, face rigs, engine export), `draw-and-paint-art` (turnarounds, style frames, painted textures) and `paint-stylized-backgrounds` (backdrops, paint-over, parallax).
+**Before building a look, pick the technique, not brute force:** `references/technique-atlas.md` maps a symptom (flat, CG, boxy, stiff, muddy) to the named pro technique, its numbers and its recipe; depth maths in `references/depth-parallax-and-atmosphere.md`. Machine paths (Krita, OpenToonz, Blender): `local.md` next to this file when it exists.
 
 **Before step 1, run the intent brief** (`references/intent-brief.md`): fill purpose, format, subject, look and constraints from the request, ask only about what is missing (at most 4 questions, options with a recommended default), write `brief.md`, show a cheap preview before the first expensive step, and check the result against the brief before delivery. A piece that misses the user's goal is a failed piece.
 
