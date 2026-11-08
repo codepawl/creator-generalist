@@ -34,8 +34,7 @@ More than about five pictures go through a subagent. Read one full-size frame fo
 3. **Paper and ink, not plastic:** grain and paper are visible, cutouts have their torn border, halftone is felt and not
    seen.
 4. **Nothing pops:** every element eases in and out; nothing appears or vanishes between two frames.
-5. **No stiff repeats:** judged by eye on an 8 fps stretch of each group entrance. No two neighbouring elements share the exact size, angle and timing (see the variation rules
-   in `vox-psychology-and-design.md` and the 3D skill's variation section).
+5. **No stiff repeats:** judged by eye on an 8 fps stretch of each group entrance. No two neighbouring elements share the exact size, angle and timing (the No Stiff Repeats law in SKILL.md).
 6. **Picture before word:** each highlight or zoom lands 4 to 8 frames before the word it shows.
 7. **Sound per event:** each stroke, pop, wipe and stamp has its own sound at its frame (`design-sound`).
 
