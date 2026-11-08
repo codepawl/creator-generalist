@@ -36,11 +36,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-KIND_COLOURS = {"seen": (127, 180, 232), "heard": (232, 194, 106), "measured": (140, 203, 140)}
-NOTE_COLOUR = (217, 222, 229)
-OCR_COLOUR = (64, 224, 208)
-PANEL = (20, 25, 32, 205)
-PANEL_BACKGROUND = (27, 34, 44)
+KIND_COLOURS = {"seen": (157, 184, 214), "heard": (227, 185, 100), "measured": (163, 196, 142)}
+NOTE_COLOUR = (240, 238, 230)
+OCR_COLOUR = (217, 119, 87)
+PANEL = (38, 38, 36, 215)
+PANEL_BACKGROUND = (31, 30, 29)
 STAMP = re.compile(r"\[(\d+):(\d+(?:\.\d+)?)\]\s*(.+)")
 KIND_WORD = re.compile(r"\b(seen|heard|measured)\b", re.IGNORECASE)
 TEXT_FONTS = ["C:/Windows/Fonts/msyh.ttc", "C:/Windows/Fonts/segoeui.ttf", "/System/Library/Fonts/Hiragino Sans GB.ttc",
