@@ -48,6 +48,11 @@ times. Words describe steps. Only the creator's files and full-size frames show 
    search. When the build is a test of watching, the deliverable is the understanding and the lessons, not a pixel
    match: stop and report once the cause of each mismatch is known. A 90-minute fog loop on 2026-11-07 was stopped
    by the user as too slow; understanding the causes was what they wanted.
+   **Watch and do** when the user wants it followed like a person (in the app's own window, with clicks and keys):
+   get the video and captions once, then per chapter run `perceive.py --from <s> --to <e>`, read that window, do it,
+   screenshot beside the frame at the chapter's end, fix, next. Never run `watch.py` on the whole video first: on
+   2026-11-08 a full pass on a 31 min tutorial left Blender idle for minutes and looked frozen; chapter by
+   chapter, all 11 donut chapters were done in Blender by mouse and keyboard in 34 minutes.
 7. **Compare, never display.** A reference image is for checking, not for the final picture or banner. Every review
    round has one comparison sheet: the reference crop, your render at the same angle and size, and the creator's render
    from step 2, plus a 50% overlay of yours on the reference. A round goes to the user only after you have read it.
