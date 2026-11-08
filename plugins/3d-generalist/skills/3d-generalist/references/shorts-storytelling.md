@@ -2,6 +2,17 @@
 
 `@BarelyInvented`).
 
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [High-Retention 3D Shorts Storytelling (`shorts-storytelling.md`)](#high-retention-3d-shorts-storytelling-shorts-storytellingmd)
+- [1. Premise selection (what gets 20M vs what flops at 20k)](#1-premise-selection-what-gets-20m-vs-what-flops-at-20k)
+- [2. The 60-second script recipe (~230 words at 3.4 to 3.6 words/s)](#2-the-60-second-script-recipe-230-words-at-34-to-36-wordss)
+- [2b. A story, not a list of build steps](#2b-a-story-not-a-list-of-build-steps)
+- [2c. Narrated 30 s fact Shorts: what the views measured](#2c-narrated-30-s-fact-shorts-what-the-views-measured)
+- [3. On-screen UI, 3D labels, captions and sound](#3-on-screen-ui-3d-labels-captions-and-sound)
+<!-- skill-navigation:end -->
+
 ## 1. Premise selection (what gets 20M vs what flops at 20k)
 
 - **Start from a mess or everyday thing everyone knows, end on a basic human need:**
@@ -63,6 +74,26 @@ and third-person "He / She / They" openings only 22M against 26M.
 - **Title with a small story:** put the viewer in it ("in your hand"), say what is wrong with the start ("a bad
   design hut"), or give the start a job ("your wet cloth helps build"). A bare "How a X Becomes a Y" reads empty.
 - Read the script aloud as a stranger: if any 5 s holds no new question or surprise, rewrite it.
+
+## 2c. Narrated 30 s fact Shorts: what the views measured
+
+Measured on 2,589 narrated 3D fact Shorts (about 85 words, 30 s each; top tenth 65M median views, bottom tenth 11M).
+Length, words per minute, title words and opener grammar barely move views; premise and the first 40 words do.
+Older videos carry more views, so treat gaps under about 15% as noise.
+
+1. **Pick "what happens if", not "what would it take".** Hypotheticals ("what happens if you…") are 29% of the top 80
+   and 9% of the bottom 80. Build-it-yourself scripts ("you would need…") lean the other way (8% top, 14% bottom).
+2. **Name the wrong belief in the first 40 words, then break it:** "most people think… but actually". It appears in
+   19 of the top 80 and 0 of the bottom 80; the 232 videos that do it have a 25M median against 20M.
+3. **Do not open on a past-tense recount** ("He built…", "In 1950 a man…"): 21% of the bottom 80 against 8% of the top,
+   340 videos at 18M against 21M. Person stories are the weakest topic class (17.5M).
+4. **Do not open with a recipe in the imperative** ("Place the… Wrap the…"): 12% of the bottom against 2% of the top.
+5. **Put the viewer's body in it:** "you" in the first 25 words (68% top, 39% bottom) and a named body part ("your
+   blood vessels"). The gap fades in the newer videos, so test it on our own format.
+6. **Topic matters less than the premise:** 13 of 14 topic classes sit between 17.5M and 23M. Magic and tricks
+   (30M, 51 videos) is the one outlier.
+7. **Do not tune what did not measure:** twist position (first turn word at about 25% of the script in both groups),
+   digits, gross words, scale comparisons, closer type and length do not separate hits from misses.
 
 ## 3. On-screen UI, 3D labels, captions and sound
 
