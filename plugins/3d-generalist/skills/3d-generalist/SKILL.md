@@ -70,5 +70,8 @@ Do these steps in order. Do not start a step before the one above it is written 
   fields, brick, tiles, dirt and far crowds come from a scanned PBR set, displacement, scattered instances or
   alpha cards, never thousands of modelled pieces. Ladder and examples:
   `references/assets-and-kitbash.md`, "Detail ladder".
+- **Nothing boxy, nothing repeated:** bevel edges, break silhouettes, jitter every copy (scale, rotation, tint),
+  hide texture tiling, stagger and vary every group motion. Rules:
+  `references/assets-and-kitbash.md`, "Variation and imperfection".
 - **Clean enters and exits:** nothing pops on or vanishes in 1 frame. Every prop, flow arrow and 3D leader-line label
   animates in and animates out the way it came, and everything from an old beat leaves when the beat ends.

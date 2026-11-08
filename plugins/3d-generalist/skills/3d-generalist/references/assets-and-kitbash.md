@@ -90,3 +90,32 @@ Examples: railway ballast is a gravel scan with displacement and a few dozen ins
 modelled stones. A lawn is a grass scan far, instanced Poly Haven clumps near, a few hero tufts at the lens. A brick
 wall is a brick set with normal and height, not bricks. Before building any field of repeated small things, name the
 rung in the build notes, and check the result in a close still and a wide still.
+
+## Variation and imperfection: nothing boxy, nothing repeated
+
+An, 2026-11-09: many shapes, effects and animations looked stiff, boxy and repeated. Real things are worn, uneven and
+out of step. Check a still and a moving clip for each rule below before a preview.
+
+**Shapes**
+- Bevel every hard edge that light catches (Blender Bevel modifier 2 to 10 mm with 2 to 3 segments; web: rounded box
+  geometry or a bevelled GLB). A perfect 90 degree edge reads as a toy.
+- Break the silhouette: a slight lean, sag or bulge, chipped corners, clutter on ledges, cables, signs. Worn things
+  are darker in creases and lighter on edges (AO and curvature masks driving dirt and edge wear).
+
+**Repeats**
+- Never one mesh copied in a grid. Use 3 to 5 variants, then per-instance jitter: scale ±10 to 20%, rotation, a small
+  hue and value shift (±5%), mirrored copies. Real grids (windows, tiles, seats) keep the grid but vary what is in
+  each cell: lights on or off, curtains, stains, a missing tile.
+- Hide texture tiling: a large-scale noise overlay on colour and roughness, UVs rotated and offset per Voronoi cell,
+  decals (stains, cracks, leaks, posters) placed by hand where water and people would leave them.
+
+**Motion**
+- Nothing in a group starts or stops on the same frame: stagger by 2 to 6 frames with a little random spread, and give
+  each copy its own speed (±10%). Identical cycles in sync read as a screensaver.
+- Ease every move (never linear), move on arcs, overlap and follow through (`acting-and-motion.md`). Loose parts
+  (cables, leaves, cloth, hair, signs) sway on low-amplitude noise, each at its own phase.
+- Effects (dust, sparks, smoke, rain) vary size, speed, lifetime and opacity per particle, and come in bursts and
+  lulls, not a steady emitter rate.
+
+**Light**
+- Break flat light: a cookie or gobo (leaves, window frames), uneven falloff, one warm practical against a cool fill.

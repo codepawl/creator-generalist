@@ -12,6 +12,8 @@ Use this skill to design, animate, texture, and composite editorial motion graph
 
 | Mode | Scope (2D / 2.5D / 3D) | Primary Reference |
 | --- | --- | --- |
+| `script` | Title, hook, explainer structure, voice pace, beat table, captions | [`references/explainer-script.md`](references/explainer-script.md) |
+| `qa` | Render gate on the preview and final: measured checks plus contact sheet | [`references/qa-and-gates.md`](references/qa-and-gates.md) |
 | `audit` | Check installed free 2D/3D tools vs optional downloads | [`references/2d-3d-toolchain-matrix.md`](references/2d-3d-toolchain-matrix.md) |
 | `design` | Visual hierarchy, asymmetric scale, Blueprint Aesthetic, palettes | [`references/vox-psychology-and-design.md`](references/vox-psychology-and-design.md) |
 | `map` | 2D vector/satellite maps, 2.5D embossed/extruded layers, 3D terrain and GeoJSON routes (convert KML with `ogr2ogr`) | [`references/maps-and-geodata-2d-3d.md`](references/maps-and-geodata-2d-3d.md) |
@@ -25,6 +27,8 @@ Use this skill to design, animate, texture, and composite editorial motion graph
 
 ## End-to-End Workflow
 
+0. **Script and beats (`script`)**
+   - Write `script.md` (sources at the top) and `beats.md` per `references/explainer-script.md` before any frame.
 1. **Audit Toolchain (`audit`)**
    - Run `uv run --no-project python scripts/check_vox_toolchain.py` to detect installed 2D/3D tools (**Blender**, **DaVinci Resolve / Fusion**, **Remotion + Three.js/SVG**, **FFmpeg**) and list 1-line free install commands (`winget`) for any missing optional tools (**QGIS**, **Inkscape**, **Krita**).
 2. **Establish Hierarchy & Surface (`design`)**
@@ -43,6 +47,10 @@ Use this skill to design, animate, texture, and composite editorial motion graph
 For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NLA, bpy), load the `use-3d-software` skill for the exact nodes and current 5.x names. For the edit, captions, retime, transitions, grade and export in any editor (Resolve, CapCut, Premiere, Kdenlive, FFmpeg), load `edit-video`. For SFX, music and the mix, load `design-sound`: every visible stroke, pop and wipe gets its own sound at its frame.
 Craft skills for single steps: `draw-and-paint-art` (drawing, figures, painting in Krita), `paint-stylized-backgrounds` (backgrounds, paint-over, parallax, moving foliage and water), `animate-characters` (character motion, frame by frame, cut-out) and `rig-characters` (cut-out puppets).
 
+6. **Render gate before any preview (`qa`)**
+   - Run `uv run --no-project --with numpy python scripts/check_render.py <preview.mp4>` and look at its contact sheet
+     per `references/qa-and-gates.md`. Send the 540p preview with sound only when both pass; full render after approval.
+
 ## Core Vox Visual Laws (Non-Negotiable)
 
 - **No Sterile Digital Canvas:** Never use pure `#FFFFFF` or `#000000` backgrounds. Use warm paper (`#F4F1EA`), archival cream (`#EFECE6`), or blueprint slate (`#1B222C`, or another deep desaturated slate or navy) with static grain.
@@ -52,6 +60,9 @@ Craft skills for single steps: `draw-and-paint-art` (drawing, figures, painting 
 - **Dual Highlighter Law:**
   - *Digital/Screen Text:* Clean `#FFE600` stroke, `Multiply` blend mode, stroke height **shorter than letter cap-height** (~75–85%), non-highlighted text dimmed to `~30%` opacity.
   - *Archival/Book Page:* 3-pass roughened edges (horizontal marker streaks + border + rough edge) + `Bulge` turbulent displacement, placed in 3D space with a `35mm` camera and shallow Depth of Field tracking the line.
+- **No Stiff Repeats:** hand-made wobble on every shape (2 to 4 fps boil, Roughen Edges, slight rotation), no two
+  neighbouring elements with the same size, angle and timing: stagger entrances by 2 to 6 frames, vary scale
+  ±10%, and hide any repeating pattern with a large-scale noise or paper variation.
 - **Camera Speed Graph:** All 2D/3D camera pans and zooms must use a `35mm` focal length equivalent, Null controller parenting, and a **Continuous Bezier** bell-curve speed graph (slow ease-in -> fast snap -> slow settle), never linear keyframes. An infinite zoom is the one exception: exponential scale, so the zoom speed looks constant.
 
 ## Scripts & References
