@@ -13,7 +13,7 @@ uv run --no-project --with numpy python scripts/check_render.py <preview.mp4> [-
 | Gate | Threshold | What it catches |
 | --- | --- | --- |
 | Sterile frame | No frame over 60% near-pure white (luma 250+) or black (5 or under) | A digital canvas with no paper, grain or slate |
-| Dead air | No stretch over 1.5 s with no change in the picture | A held still while the voice talks, a stalled render |
+| Dead air | No stretch over 1.5 s with no change in the picture | A held still while the voice talks, a stalled render. `vox-now` holds are meant to be still: use `--max-hold 3` there, and every hold must end in a hard cut |
 | Loudness | Integrated -14 ±1.5 LUFS, true peak at or under -1 dB | A mix too quiet on a phone, clipping after AAC encode |
 | Silence | No silence over 0.4 s | A voice stall, a gap between cues |
 | Duration | Inside the brief's range | A cut that ran long |
