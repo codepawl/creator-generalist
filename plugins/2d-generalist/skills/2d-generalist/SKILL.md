@@ -58,7 +58,7 @@ Craft skills for single steps: `draw-and-paint-art` (drawing, figures, painting 
 - **Print Citation Halftones:** Apply crossed `+45°` / `-45°` halftone dot luma mattes (split into highlight and shadow mattes) dialed down to the threshold of perception (`8%–18%` opacity) so modern news cutouts feel printed and fact-checked.
 - **Pre-Drawn Ruler Timeline Law:** Never space unequal time intervals evenly. Draw an evenly spaced ruler/tick scale first, then place events at their true proportional coordinates so clusters and gaps tell the story.
 - **Dual Highlighter Law:**
-  - *Digital/Screen Text:* Clean `#FFE600` stroke, `Multiply` blend mode, stroke height **shorter than letter cap-height** (~75–85%), non-highlighted text dimmed to `~30%` opacity.
+  - *Digital/Screen Text:* Clean `#FFE600` stroke (the one exception to No Stiff Repeats wobble), `Multiply` blend mode, stroke height **shorter than letter cap-height** (~75–85%), non-highlighted text dimmed to `~30%` opacity.
   - *Archival/Book Page:* 3-pass roughened edges (horizontal marker streaks + border + rough edge) + `Bulge` turbulent displacement, placed in 3D space with a `35mm` camera and shallow Depth of Field tracking the line.
 - **No Stiff Repeats:** hand-made wobble on every shape (2 to 4 fps boil, Roughen Edges, slight rotation), no two
   neighbouring elements with the same size, angle and timing: stagger entrances by 2 to 6 frames, vary scale

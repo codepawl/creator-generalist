@@ -41,6 +41,8 @@ Every line adds a fact, a reason or a surprise. Cut lines that only describe wha
 One row per line: time, spoken words, the picture (mode from the SKILL table: map, chart, archival, type), the one
 focal element, the camera move, the sound cue. The picture lands 4 to 8 frames before the word it shows
 (`vox-psychology-and-design.md`, "Show-Before-Tell"). A beat with no new picture in 1.5 s fails the dead-air gate.
+With no voiceover, the on-screen text carries the story: one short line per beat, each line read in full before the
+next arrives, and a music or room-tone bed under the whole piece, since the silence gate fails without one.
 
 ## 5. Captions
 

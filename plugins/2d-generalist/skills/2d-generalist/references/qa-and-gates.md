@@ -26,13 +26,15 @@ The report and a 1 fps contact sheet go to `<video>_gate/`. Exit code 1 means a 
 
 More than about five pictures go through a subagent. Read one full-size frame for any small text.
 
-1. **Text reads on a phone:** the smallest word stays legible at 360 px wide; nothing sits in the outer 5% (title safe)
-   or under platform UI (bottom 15% and right edge on vertical video).
+1. **Text reads on a phone:** any text meant to be read has a cap height of at least 5% of the frame height (about
+   54 px at 1080p); labels at 44 to 48 px were too small on a phone in the first pilot (2026-11-09). Smaller text is
+   decoration only. Nothing sits in the outer 5% (title safe) or under platform UI (bottom 15% and right edge on
+   vertical video). On-screen text holds at least 0.5 s plus 0.3 s per word.
 2. **One focal point per frame:** the eye lands on one thing; a highlight, arrow or zoom points at it.
 3. **Paper and ink, not plastic:** grain and paper are visible, cutouts have their torn border, halftone is felt and not
    seen.
 4. **Nothing pops:** every element eases in and out; nothing appears or vanishes between two frames.
-5. **No stiff repeats:** no two neighbouring elements share the exact size, angle and timing (see the variation rules
+5. **No stiff repeats:** judged by eye on an 8 fps stretch of each group entrance. No two neighbouring elements share the exact size, angle and timing (see the variation rules
    in `vox-psychology-and-design.md` and the 3D skill's variation section).
 6. **Picture before word:** each highlight or zoom lands 4 to 8 frames before the word it shows.
 7. **Sound per event:** each stroke, pop, wipe and stamp has its own sound at its frame (`design-sound`).
