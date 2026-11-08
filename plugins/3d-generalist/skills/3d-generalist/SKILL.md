@@ -51,6 +51,7 @@ Do these steps in order. Do not start a step before the one above it is written 
    5 to 8 frames apart, keep a soft fill light tracking the character's spine inside dark interiors, lock Depth of Field
    on the active subject, and finish with 6-subframe 180-degree shutter motion blur, bloom, vignette and grain. See
    `references/camera-and-lighting.md`.
+   Drawn 2D effects on a 3D shot (explosions, smoke, impacts, speed lines, smears): `references/hybrid-2d-3d-fx.md`.
 7. **Voice, captions and foley:** generate steady narration, trim tail silences over 0.12 s, align one-word centred
    captions within ±0.05 s of spoken audio, and layer soft real SFX for every visible event at -14 LUFS.
 8. **Run the QA gate before any preview:** run all 10 gates in `references/qa-and-gates.md`.
