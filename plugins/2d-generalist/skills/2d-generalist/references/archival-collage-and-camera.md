@@ -12,6 +12,11 @@
 - [6. The Master Vox Finishing Stack](#6-the-master-vox-finishing-stack)
 <!-- skill-navigation:end -->
 
+> **Measured against real Vox, 2026-11-09:** 2.5D parallax (§3) is confirmed: keystoned planes, background defocus,
+> the camera moving every frame at 24 fps. A slow ease-in newspaper push is confirmed, but the accelerating
+> 15-to-3-frame flicker stack (§1A), the 3D slide projector (§4) and torn paper (§2) were not seen in six videos.
+> Newspaper shots cut 1.75-5.5 s apart. Treat the unseen effects as stylised options, not the Vox look.
+
 ## 1. Historical Newspapers: Flickering Zoom, Hand-Drawn Circles and Magnifier (#01, #29, #46, #66)
 
 ### A. Flickering Newspaper Keyword Zoom (#29)

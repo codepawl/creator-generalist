@@ -13,6 +13,15 @@
 - [7. Colour Palettes, Typography and Editing Rhythm from Famous Vox Videos](#7-colour-palettes-typography-and-editing-rhythm-from-famous-vox-videos)
 <!-- skill-navigation:end -->
 
+> **Measured against real Vox, 2026-11-09** (six 2018-2021 collage-era videos plus four 2026 ones; notes in
+> `vox-modern-measured.md` and `local.md`). Sections 3 and 4 below (torn borders, added halftone) and the
+> 12 fps posterised wobble were **not seen** in any of them: keep them for a stylised piece, never call them Vox.
+> Corrections: paper cards are flat, luma std 0-1, no grain. The marker band is **135-150% of cap height**
+> (5.8-9.6% of frame height), yellow `#E8E030` to `#F2EB28`, rounded ends, Multiply, the sweep takes **1.0-1.4 s**
+> slow-fast-slow, and other text is **never dimmed**. Holds are still (0.00-0.03 of 255 change per 0.125 s).
+> Photo tilt 2-8 degrees with a thin white print border and a faint shadow. Red appears only as map fills and red
+> ellipses or underlines on documents.
+
 ## 1. Visual Hierarchy and Asymmetric Scale Contrast
 
 From an in-depth analysis (#61, *Why Amateur Motion Graphics All Look the Same*):
@@ -51,7 +60,7 @@ To trigger the "trust the record" reflex, every Vox 2D/3D frame stands on **3 Pi
 
 ---
 
-## 3. Deliberate Imperfection: The Two-Layer Torn Paper Border (#63)
+## 3. Deliberate Imperfection: The Two-Layer Torn Paper Border (#63) (stylised option, not seen in Vox)
 
 When you put a cutout photo of a person or object (cutout PNG) on a detailed map or newspaper background, the photo sinks in or looks like a cheap composite. The Vox solution is a **hand-cut / torn white paper border (Torn Paper Cutout Border)**.
 
@@ -71,7 +80,7 @@ When you put a cutout photo of a person or object (cutout PNG) on a detailed map
 
 ---
 
-## 4. Print Citation: The Hidden Halftone Effect (#64, #54)
+## 4. Print Citation: The Hidden Halftone Effect (#64, #54) (stylised option, not seen in Vox)
 
 When Vox cites a modern web article or a digital news photo, it still puts a layer of **1950s halftone print dots** over it, at a level that is almost impossible to notice consciously (`Sub-perceptual Print Citation`).
 

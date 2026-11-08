@@ -46,7 +46,7 @@ uv run --no-project --with pillow --with numpy python scripts/rework_image.py <i
 | --- | --- | --- |
 | Clean colour photo on torn paper | `--grain 0.05 --torn 20` | Proof shots: the real train, the real place |
 | Duotone in the palette | `--duotone "<dark>,<light>"` | Background photos that must not compete with the subject |
-| Print and halftone | `--duotone ... --halftone 6` | Newspaper, archival, Vox collage |
+| Print and halftone | `--duotone ... --halftone 6` | A stylised print look (not seen in measured Vox; Vox uses plain B&W scans: `--duotone "#1a1a1a,#f2f2f2"` only) |
 | Posterized | `--posterize 4` | Stepped, graphic frames |
 
 Then in the edit: cut the subject out when it must move on its own (a PNG cut-out, a hand-placed mask path in
