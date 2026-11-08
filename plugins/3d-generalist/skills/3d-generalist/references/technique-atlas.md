@@ -25,6 +25,7 @@ Read section 0, then only the families the shot needs, then the linked recipe.
 | Text hard to read | Size and hold minimums, scrim, safe areas, no scale shimmer | 12 |
 | Sound thin or fake | One sound per event, layers by size, ducking, room tone | 13 |
 | A drawn effect on a 3D shot | Hybrid 2D and 3D FX | 7 |
+| A real thing drawn badly from shapes (train, person, building, logo) | A real photo or scan found online, reworked into the look: `../2d-generalist/references/real-images.md`; in 3D a sourced model (`references/assets-and-kitbash.md`) | 8, 9 |
 
 ## 1. Composition
 

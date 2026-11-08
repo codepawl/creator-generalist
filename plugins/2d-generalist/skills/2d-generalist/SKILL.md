@@ -20,6 +20,7 @@ Before building a look, pick the named technique instead of brute force: the 3D 
 | `design` | Visual hierarchy, asymmetric scale, Blueprint Aesthetic, palettes | [`references/vox-psychology-and-design.md`](references/vox-psychology-and-design.md) |
 | `map` | 2D vector/satellite maps, 2.5D embossed/extruded layers, 3D terrain and GeoJSON routes (convert KML with `ogr2ogr`) | [`references/maps-and-geodata-2d-3d.md`](references/maps-and-geodata-2d-3d.md) |
 | `chart-timeline` | Pre-drawn ruler timelines, 2D/3D bar/line graphs, dot-matrix repeaters, waveforms | [`references/charts-timelines-and-data.md`](references/charts-timelines-and-data.md) |
+| `photos` | Find real photos, scans, cut-outs and documents online, pick from a numbered sheet, rework into the piece's look, credits | [`references/real-images.md`](references/real-images.md) |
 | `archival-collage` | Dual highlighters, newspaper zoom/flicker, torn borders, 2.5D parallax, 3D slide projector | [`references/archival-collage-and-camera.md`](references/archival-collage-and-camera.md); highlighters and torn borders in [`references/vox-psychology-and-design.md`](references/vox-psychology-and-design.md) §3 and §6 |
 | `thumbnail` | Vector thumbnails in Inkscape, brand logos as sticker outlines with soft shadows | [`references/inkscape-thumbnails-and-logos.md`](references/inkscape-thumbnails-and-logos.md) |
 | `texture-look` | Grain, paper, halftone, dither, CRT, VHS, colour misregistration, engraving, boil, flat shading, stacked shadows and glows, colour split | [`references/textures-retro-and-shading.md`](references/textures-retro-and-shading.md) |
@@ -55,6 +56,7 @@ Craft skills for single steps: `draw-and-paint-art` (drawing, figures, painting 
 
 ## Core Vox Visual Laws (Non-Negotiable)
 
+- **Real Pictures, Reworked:** every real-world thing on screen (vehicle, person, place, product, document, logo) is a real photo or scan found online with `scripts/fetch_images.py` and reworked with `scripts/rework_image.py` (duotone, halftone, grain, torn paper); never redrawn from SVG shapes. Draw only arrows, rulers, charts and ideas with no picture, and name the search when nothing was found ([`references/real-images.md`](references/real-images.md)).
 - **No Sterile Digital Canvas:** Never use pure `#FFFFFF` or `#000000` backgrounds. Use warm paper (`#F4F1EA`), archival cream (`#EFECE6`), or blueprint slate (`#1B222C`, or another deep desaturated slate or navy) with static grain.
 - **Dual-Pass Torn Paper Borders:** Cutouts on busy backgrounds require an off-white paper border (`Simple Choker` / morphological dilate) roughened with **two passes**: Pass 1 (`Spiky` / large scale scissor cuts) + Pass 2 (`Roughen` / fine paper fiber edge) + `Hard Light` fabric/paper texture clipped to the cutout.
 - **Print Citation Halftones:** Apply crossed `+45°` / `-45°` halftone dot luma mattes (split into highlight and shadow mattes) dialed down to the threshold of perception (`8%–18%` opacity) so modern news cutouts feel printed and fact-checked.
