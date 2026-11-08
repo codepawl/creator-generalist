@@ -7,9 +7,25 @@ cheated or borrowed instead of brute-forced, and whenever a frame looks flat, CG
 Marks: **[P]** physics or a published standard, **[R]** a rule of thumb professionals quote (start there, judge by
 eye), **[H]** a house rule. Paths are relative to the 3d-generalist skill folder; `../<skill>/` points into a sibling skill.
 
-Reading map: 0 symptom to technique, 1 composition, 2 lighting, 3 colour and grade, 4 depth, 5 camera, 6 animation,
-7 VFX and compositing, 8 materials, 9 environment, 10 NPR and stylized looks, 11 editing, 12 type on screen, 13 sound.
-Read section 0, then only the families the shot needs, then the linked recipe.
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Technique atlas: the advanced craft, one index (`technique-atlas.md`)](#technique-atlas-the-advanced-craft-one-index-technique-atlasmd)
+- [0. Symptom to technique](#0-symptom-to-technique)
+- [1. Composition](#1-composition)
+- [2. Lighting](#2-lighting)
+- [3. Colour and grade](#3-colour-and-grade)
+- [4. Depth](#4-depth)
+- [5. Camera](#5-camera)
+- [6. Animation](#6-animation)
+- [7. VFX and compositing](#7-vfx-and-compositing)
+- [8. Materials and surfaces](#8-materials-and-surfaces)
+- [9. Environment](#9-environment)
+- [10. NPR and stylized looks](#10-npr-and-stylized-looks)
+- [11. Editing](#11-editing)
+- [12. Type on screen](#12-type-on-screen)
+- [13. Sound](#13-sound)
+<!-- skill-navigation:end -->
 
 ## 0. Symptom to technique
 

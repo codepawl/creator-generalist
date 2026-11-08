@@ -87,6 +87,8 @@ Reading map
 
 ## Sculpt notes
 
+Full sculpting craft, the 5.x toolset, retopo, bake and the check script: the `sculpt-models` skill.
+
 - **Sculpt workflow**: Poly model the base with Skin and subdivided boxes, then Dynamic Topology and Grab or Snake Hook for big shapes, Draw and Inflate for bulbs, Clay Strips flat (Ctrl subtracts), Crease between, Smooth with Shift (Mode Surface cleans topology). Voxel Remesh Shift+R. Mask, invert, draw to pop details, smooth afterwards. Make toppings and eyes separate objects. Remesh dense meshes before Dirty Vertex Colors. Sculpt in perspective. Alpha brushes for surface texture. Multires + Radial Symmetry 12 for ridges. Alt+D linked instances save memory.
 - **Speed modelling practice**: Time-boxed household objects, big shapes first, details later, textures last.
 
