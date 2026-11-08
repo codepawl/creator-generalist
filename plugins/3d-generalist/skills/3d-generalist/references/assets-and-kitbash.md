@@ -68,3 +68,25 @@ In Blender, Godot, Unity or Unreal, import the `engine/` tier: it keeps PNG and 
 - **Every built geometry needs normals:** a custom `BufferGeometry` without `normal` attributes renders `NaN` under PBR
   lighting, which turns half the screen pure black once a half-float motion-blur or bloom pass runs. Always call
   `geometry.computeVertexNormals()`.
+
+## Detail ladder: the cheapest method that looks best
+
+An, 2026-11-09: some pieces modelled a pile of grass or gravel when another method was cheaper and looked better.
+Pick the first rung that holds up at the closest distance the camera reaches, and climb only where it fails:
+
+1. **Texture only:** a scanned PBR set (Poly Haven, ambientCG, Quixel) with base colour, roughness and normal at
+   real texel density. Enough for ground, walls, brick, tiles, asphalt and ballast seen from more than a few metres.
+2. **Displacement or parallax:** the same set's height map. Blender: Subdivision plus Displacement (Cycles adaptive
+   when it is close). Web (67js, three.js): a parallax or height-driven normal, or a displaced grid for the near patch only.
+3. **Scattered instances:** a few sourced rocks, tufts or debris pieces (5 to 20 variants) instanced over the textured
+   ground. Blender Geometry Nodes Distribute Points on Faces plus Instance on Points, or hair particles Render As
+   Collection; web `InstancedMesh`. Density mask by distance and clumps. Thousands of instances cost one mesh.
+4. **Cards and impostors:** alpha-cut planes for far grass, foliage and crowds, billboard or octahedral impostors for
+   far trees and buildings, a painted backdrop or HDRI beyond that.
+5. **Real modelled geometry:** only hero pieces the camera touches or reads in silhouette: the stone a foot lands on,
+   the tuft in front of the lens, a rail profile at eye level.
+
+Examples: railway ballast is a gravel scan with displacement and a few dozen instanced stones at the rail edge, not
+modelled stones. A lawn is a grass scan far, instanced Poly Haven clumps near, a few hero tufts at the lens. A brick
+wall is a brick set with normal and height, not bricks. Before building any field of repeated small things, name the
+rung in the build notes, and check the result in a close still and a wide still.

@@ -40,7 +40,7 @@ Use this skill to design, animate, texture, and composite editorial motion graph
    - Add subtle 35mm Depth of Field (or feathered adjustment-layer focus mask), radial Chromatic Aberration, Vignette, static grain, a light unsharp pass and Posterize Time cadence.
    - Run `uv run --no-project python scripts/validate_vox_recipe.py --spec <recipe.json>` to verify compliance with all Vox visual laws.
 
-For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NLA, bpy), load the `use-3d-software` skill for the exact nodes and current 5.x names. For the edit, captions, retime, transitions, grade and export in any editor (Resolve, CapCut, Premiere, Kdenlive, FFmpeg), load `edit-video`.
+For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NLA, bpy), load the `use-3d-software` skill for the exact nodes and current 5.x names. For the edit, captions, retime, transitions, grade and export in any editor (Resolve, CapCut, Premiere, Kdenlive, FFmpeg), load `edit-video`. For SFX, music and the mix, load `design-sound`: every visible stroke, pop and wipe gets its own sound at its frame.
 Craft skills for single steps: `draw-and-paint-art` (drawing, figures, painting in Krita), `paint-stylized-backgrounds` (backgrounds, paint-over, parallax, moving foliage and water), `animate-characters` (character motion, frame by frame, cut-out) and `rig-characters` (cut-out puppets).
 
 ## Core Vox Visual Laws (Non-Negotiable)

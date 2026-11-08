@@ -66,5 +66,9 @@ Do these steps in order. Do not start a step before the one above it is written 
   touches them. Hands sit within 3 cm of the gripped surface with low, natural elbows.
 - **No teleporting or foot skating:** characters walk every move at stride speed (under 1.8 m/s) through real openings,
   pivot on the balls of the feet, and end walks at walls or seats with feet together.
+- **Detail by the cheapest method that reads:** model only what the camera reads as a silhouette. Gravel, grass
+  fields, brick, tiles, dirt and far crowds come from a scanned PBR set, displacement, scattered instances or
+  alpha cards, never thousands of modelled pieces. Ladder and examples:
+  `references/assets-and-kitbash.md`, "Detail ladder".
 - **Clean enters and exits:** nothing pops on or vanishes in 1 frame. Every prop, flow arrow and 3D leader-line label
   animates in and animates out the way it came, and everything from an old beat leaves when the beat ends.
