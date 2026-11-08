@@ -41,6 +41,29 @@ Write `script.md` as a beat table (`| id | role (hook/hold/close) | narration | 
      with its instrumental riff playing quietly (-2 dB under the main music, panned and low-passed to the character's
      position on screen while the main music keeps playing).
 
+## 2b. A story, not a list of build steps
+
+Measured on 1,960 top science-explainer Shorts with view counts (median 25M): openings with "if you / when you" have a
+28M median against 24M, a "you might think / most people think" line 28M against 25M, a question title 28M against 25M,
+and third-person "He / She / They" openings only 22M against 26M.
+
+- **Line 1 puts the viewer in trouble** ("If you're...", "Imagine you...") with a cost the body feels: hunger, smoke in
+  the eyes, a flooded bed. Never open on a neutral object ("A paper pinwheel is a tiny windmill" drew 295 views; "If
+  you're thirsty..." drew 44k on the same channel the same week).
+- **Open one question early and answer it late:** a wrong belief ("most people would just..."), or a tease of the flip
+  ("what finally fixes it is the stuff you throw away"). Pay it off in the last third, never sooner.
+- **The character wants something and pays for each failure** (coughs, burns a hand, loses the dinner). Every "But" is
+  worse than the round before, not just different.
+- **Break one expectation** mid-video ("you'd think a bigger fire helps, but it eats twice the wood").
+- **Picture and voice carry different things:** the picture shows the failure a beat before the voice names it, or a
+  small gag the voice ignores.
+- **Cut lines that only list parts or materials.** Each line adds a problem, a fix, a reason or a surprise.
+- **End where it began:** the last image echoes the first so the loop invites a rewatch.
+- **Give the comments one hook:** a pun, a claim people argue with, a number they will check.
+- **Title with a small story:** put the viewer in it ("in your hand"), say what is wrong with the start ("a bad
+  design hut"), or give the start a job ("your wet cloth helps build"). A bare "How a X Becomes a Y" reads empty.
+- Read the script aloud as a stranger: if any 5 s holds no new question or surprise, rewrite it.
+
 ## 3. On-screen UI, 3D labels, captions and sound
 
 - **3D leader-line part chips only:** when the voice names a technical part (`ADOBE`, `COLD TRAP`, `U-BEND`), extend a
