@@ -1,0 +1,30 @@
+{
+  "name": "creator-generalist",
+  "description": "creator-generalist: AI agent skills to be professional at 2D and 3D",
+  "owner": {
+    "name": "CodePawl",
+    "url": "https://codepawl.com"
+  },
+  "plugins": [
+    {
+      "name": "3d-generalist",
+      "source": "./plugins/3d-generalist",
+      "description": "Full-pipeline 3D generalist studio for content creators: kitbashed scans, rigged characters, character modeling in any style, Blender, three.js and game engine steps, perspective cutaways, expressive acting, camera/lighting and anti-slop QA gates"
+    },
+    {
+      "name": "2d-generalist",
+      "source": "./plugins/2d-generalist",
+      "description": "2D and 2.5D editorial motion graphics in the Vox, Johnny Harris and WSJ explainer look: maps, charts, true-scale timelines, archival collage, torn paper, halftone and paper texture, across Blender, DaVinci Resolve Fusion, Remotion and FFmpeg."
+    },
+    {
+      "name": "watch-video",
+      "source": "./plugins/watch-video",
+      "description": "Watch a video or a whole tutorial channel like a viewer: frames, cuts, sound timeline, transcripts in many languages, tone of voice. Learn a video into a remake recipe, or a channel into a skill with a required verify pass."
+    },
+    {
+      "name": "design-sound",
+      "source": "./plugins/design-sound",
+      "description": "Sound design for videos, games and reels: a sound library searched by meaning, web and ElevenLabs fetching, foley generated from a silent film with a local video-to-audio model, music fitted to the cut, and a mix to platform loudness checked for sync, masking and phone audibility."
+    }
+  ]
+}

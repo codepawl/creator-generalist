@@ -1,0 +1,13 @@
+---
+description: Build 3D Shorts, cutaways, worlds, characters and assets with the 3d-generalist skill
+---
+
+Load the 3d-generalist skill and follow it from the start for this request:
+
+$ARGUMENTS
+
+If the request is empty or is "help", list the five modes below and ask what 3D content the user wants to build. Otherwise, if the first word is a mode, use that mode and drop the word from the subject.
+
+Modes: cutaway (60 s perspective cutaway Short built problem by problem), story (character-driven 3D storytelling Short with expressive acting and slapstick timing), world (rich 3D environment or diorama with scanned PBR materials and ambient life), character (rigged 3D character with grounded IK and retargeted clips), asset (hero 3D model, kitbashed prop or reference-matched PBR material exported to GLB).
+
+Before building, run the intent brief in the skill (references/intent-brief.md): ask only about the purpose, format, subject, look or constraints the request leaves open, at most 4 questions with options and a recommended default, then restate the goal and show a cheap preview before the expensive step.
