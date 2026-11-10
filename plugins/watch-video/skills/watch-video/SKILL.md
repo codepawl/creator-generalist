@@ -97,5 +97,5 @@ Show the reading so it can be checked: claims as `[mm:ss.s]` lines (or `notes.js
 ## 5. Learn it so it can be remade
 
 When the user wants a video like this one, or its recipe for another product: read
-`references/recipe.md` whole and follow it: a checked `recipe.json` (example in `references/`), animatic, build per beat.
+`references/recipe.md` whole and follow it: a checked `recipe.json` (example in `references/`), animatic, build per beat. Matching a reference picture: first its numbered build list on the frames (`scripts/build_list.py`, recipe.md section 5).
 Tests: `uv run --no-project --with numpy --with pillow python {{SKILL_DIR}}/tests/test_watch_video.py` after any change. Not covered: naming short sounds (CLAP 0.0 to 0.25, 2026-11-02), genres. `tests/frame_eval.py make|score` builds a known-answer video for a blind reader.

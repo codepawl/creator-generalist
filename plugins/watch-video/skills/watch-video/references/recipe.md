@@ -81,6 +81,27 @@ One file owns every time. Whatever renders the pictures, beats and cues come fro
 Sound: the `design-sound` skill. Each `kind` becomes one cue; levels and silences come from
 the brief.
 
+### Build list on the reference frames
+
+Before building any picture that must match a reference (a film shot, a tutorial result, a client frame), turn the
+reference into a numbered build list drawn on its own frames. Without it the
+first build comes out as flat boxes, because nobody listed what the frame holds.
+
+1. Pull 3 to 5 full-size frames that together show every part: a wide, a mid, a close, and one per distinct set.
+2. Have a subagent describe each frame part by part (ground, structures, debris, atmosphere, light
+   direction and colour, effects), with a rough 0-1 box for each part, sizes relative to something known, and colours
+   in plain words. It lists what is there, not what to do.
+3. Write `notes.json` (boxes, a category word, one short line per part in the user's language, with diacritics) and
+   run `scripts/build_list.py notes.json <out> --frames <folder>`. Each frame comes back with numbered boxes and a
+   legend under it; a category keeps one colour across frames.
+4. Read one sheet yourself: boxes sit on the right things, no legend line is cut. Send the sheets to the user before
+   building. They correct a wrong reading in seconds, and each number becomes a task.
+5. Build from the list, then put your render beside the same frame and go down the numbers one by one. A number
+   with nothing matching it in the render is not done. Report by number.
+
+Keep each line to what must be built (material, count, size, colour), never a mood word. At most about 12 boxes a
+frame; split a busier frame into two crops.
+
 ## 6. Verify the remake
 
 1. `perceive.py` on the finished video, then `recipe.py check brief.json <final>/perception.json rebuild`.
