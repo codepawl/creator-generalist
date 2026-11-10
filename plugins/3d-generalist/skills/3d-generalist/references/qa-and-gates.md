@@ -2,12 +2,15 @@
 
 Never trust a single preview or code change by eye alone. Numbers miss what a frame shows, and a single still misses
 what happens between frames. Every 3D video must pass **both** automated numerical checks at 30 fps and visual contact
-sheet inspection before the user sees a preview.
+sheet inspection before the user sees a preview. This is step 8 of `pipeline-spine.md`: it runs after the build and
+the sound, never in place of the look gate at step 4.
 
-## 1. The 10-point Preview Gate
+## 1. The Preview Gate
 
 Run these checks across the entire film at 30 fps (`window.placeTime(t)` for fast geometry checks without rendering, and
-real page renders for visibility checks). **One failure blocks the preview.**
+real page renders for visibility checks). **One failure blocks the preview.** `scripts/check_contact_and_slip.mjs`
+measures gates 1 to 4 only; grip, clearance, exits, chips and caption sync need the project's own checks. Gates 8
+and 9 apply to narrated pieces with label chips.
 
 | Gate | Threshold / Rule | What it catches |
 |---|---|---|
@@ -21,6 +24,9 @@ real page renders for visibility checks). **One failure blocks the preview.**
 | **8. Chip Hygiene** | Every on-screen label chip is a technical part name actually spoken in the narration, shown for at least 1 s and hidden 1.5–2 s after the word. | Number chips (`"62 BC"`), place chips (`"HAWAII"`), or a card naming the final object at the end. |
 | **9. Caption & Voice Sync** | Every spoken word's caption appears within **±0.05 s** of the mean of 3 ASR transcriptions. Zero internal voice silences >0.4 s. Duration is 55 to 65 s for Shorts. | Drifting captions, ElevenLabs trailing 1.5 s full-stop stalls, padded waits (*"6 months later..."*). |
 | **10. Contact Sheet Visual Review** | Inspect `scripts/contact-sheet.sh` grids at 1 fps (and per-shot stills) to verify silhouettes, elbow angles, pour alignment, water levels and lighting. | Backward carts, backwards arms, black `NaN` water patches, dark faces inside cutaways. |
+| **11. Look Match** | `scripts/compare_look.py --style <picked style frame> <preview>`: mean luma within 20 of 255, mean saturation within 0.08, mean hue turned under 20 degrees, on every sampled second. Light direction and lens checked by eye on one still per shot against `LOOK.md`. | Shots rendered darker, greyer or in another colour cast than the look the user picked; parallel shots drifting apart in grade. |
+| **12. Phone Check** | The contact sheet looked at 360 px wide: the subject reads in every shot, the hero is separated from the background by value, and readable text is at least 5% of frame height and clear of the platform UI (bottom 15%, right edge on vertical video). | Subjects lost in a busy set, labels too small on a phone, captions under the like button. |
+| **13. Brief Drift** | `brief.md` compared slot by slot with the preview: purpose, format, length, subject beats, look, constraints. | A film that is well made but is not what was asked for. |
 
 ## 2. Keeping QA checks fast (<30 seconds)
 

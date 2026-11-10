@@ -27,33 +27,25 @@ Before building a look, pick the named technique instead of brute force: the 3D 
 | `texture-look` | Grain, paper, halftone, dither, CRT, VHS, colour misregistration, engraving, boil, flat shading, stacked shadows and glows, colour split | [`references/textures-retro-and-shading.md`](references/textures-retro-and-shading.md) |
 | `fx-type` | Goo, smoke, fire, liquid, rain, loops, infinite zoom, kaleidoscopes, mattes, transitions, kinetic type, graphics into footage | [`references/2d-fx-type-and-compositing.md`](references/2d-fx-type-and-compositing.md); drawn FX blended into 3D shots: the 3D skill's `references/hybrid-2d-3d-fx.md` |
 
-**Before step 1, run the intent brief** (`references/intent-brief.md`): fill purpose, format, subject, look and constraints from the request, ask only about what is missing (at most 4 questions, options with a recommended default), write `brief.md`, show a cheap preview before the first expensive step, and check the result against the brief before delivery. A piece that misses the user's goal is a failed piece.
+## End-to-End Workflow: the production spine
 
-## End-to-End Workflow
+Run the eight steps of `~/.claude/skills/3d-generalist/references/pipeline-spine.md` in order, for every mode. Each
+step writes its file and its line under `## Progress` in `brief.md`; start a step only from the files of the one
+above it. The user decides twice: the look at step 4 and the preview at step 8.
 
-0. **Script and beats (`script`)**
-   - Write `script.md` (sources at the top) and `beats.md` per `references/explainer-script.md` before any frame.
-1. **Audit Toolchain (`audit`)**
-   - Run `uv run --no-project python scripts/check_vox_toolchain.py` to detect installed 2D/3D tools (**Blender**, **DaVinci Resolve / Fusion**, **Remotion + Three.js/SVG**, **FFmpeg**) and list 1-line free install commands (`winget`) for any missing optional tools (**QGIS**, **Inkscape**, **Krita**).
-2. **Establish Hierarchy & Surface (`design`)**
-   - Apply **Asymmetric Scale Tension** (one dominant anchor, generous off-white `#F4F1EA` or blueprint slate `#1B222C` negative space, connecting path). Perform the *Look-Away / Look-Back Test* before animating.
-   - Build the **3 Pillars of Visual Authority**: **Surface** (warm paper fibers + static grain), **Ink** (`Multiply` / `Color Burn` bleed + luma matte + roughen edges + `0.5–1.5px` softness), and **Life** (`Posterize Time` at `8–12 fps` for graphical elements or `2–4 fps` background texture boil; a `texture-look` or `fx-type` recipe may set its own rate, and camera moves are never posterized).
-3. **Generate Procedural Assets (`scripts/generate_vox_assets.py`)**
-   - Run `uv run --no-project python scripts/generate_vox_assets.py` to generate SVG filter definitions (dual-pass torn paper borders, ink bleed, crossed 45° halftone luma mattes, paper grain) and proportional ruler timeline layouts.
-4. **Build Scene in Chosen 2D / 2.5D / 3D Engine (`map`, `chart-timeline`, `archival-collage`)**
-   - **Code / Web 2D & 3D:** Remotion + SVG filters (`<feTurbulence>` + `<feDisplacementMap>`) + Three.js / React Three Fiber (`35mm` camera, DOF, Z-planes).
-   - **Node Compositor 2D & 2.5D:** DaVinci Resolve Fusion (`FastNoise` + `Displace`, `sRender` repeaters, `Paint` trim strokes, `ImagePlane3D` + `Camera3D`).
-   - **Full 3D & 2D-in-3D:** Blender 5.2 (Grease Pencil strokes with `Noise`/`Build` modifiers, Geometry Nodes proportional timelines/bar charts, 3D displaced terrain maps, Cycles/EEVEE `35mm` Depth of Field + Compositor lens/grain pass).
-5. **Apply Finishing Pass & Validate (`scripts/validate_vox_recipe.py`)**
-   - Add subtle 35mm Depth of Field (or feathered adjustment-layer focus mask), radial Chromatic Aberration, Vignette, static grain, a light unsharp pass and Posterize Time cadence.
-   - Run `uv run --no-project python scripts/validate_vox_recipe.py --spec <recipe.json>` to verify compliance with all Vox visual laws.
+| Step | Writes | 2D rules for the step |
+| --- | --- | --- |
+| 1. Brief | `brief.md` | `references/intent-brief.md`; run `scripts/check_vox_toolchain.py` and mention only missing tools |
+| 2. Reference | `refs/`, `refs/NOTES.md` | real photos, scans, documents and footage via `scripts/fetch_images.py` (`references/real-images.md`); real data for maps and charts; a Vox look starts from `references/vox-modern-measured.md` |
+| 3. Script and beats | `script.md`, `beats.md`, scratch voice, cue list | `references/explainer-script.md` |
+| 4. Look gate | style frames A/B/C, animatic of the beats, then `LOOK.md`, `recipe.json` | the user picks; one anchor with asymmetric scale and the Look-Away / Look-Back Test (`references/vox-psychology-and-design.md`); default flat paper and print borders, grain, ink bleed, torn edges and halftone only when the pick is a stylised option (`references/textures-retro-and-shading.md`); then `scripts/validate_vox_recipe.py --spec recipe.json` |
+| 5. Assets and check | `assets/`, `CREDITS.md` | `scripts/rework_image.py` for cut-outs, `scripts/generate_vox_assets.py` for the filters and ruler timelines the recipe uses; every picture sourced or the search named |
+| 6. Build and animate | scenes | Remotion + SVG filters + Three.js, Fusion (`ImagePlane3D`, `Camera3D`) or Blender Grease Pencil per `references/2d-3d-toolchain-matrix.md`; mode references above; graphics on 8 to 12 fps posterize, camera never posterized; finish with 35mm DoF, vignette and a light unsharp, grain and chromatic aberration only if `LOOK.md` says |
+| 7. Sound | final voice, SFX, music, mix | `design-sound`: every visible stroke, pop and wipe gets its own sound at its frame |
+| 8. QA, preview, final | gate report, 540p preview with sound | `scripts/check_render.py` and the contact sheet per `references/qa-and-gates.md`, look match with `~/.claude/skills/3d-generalist/scripts/compare_look.py`; the user approves the preview before the full render |
 
-For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NLA, bpy), load the `use-3d-software` skill for the exact nodes and current 5.x names. For the edit, captions, retime, transitions, grade and export in any editor (Resolve, CapCut, Premiere, Kdenlive, FFmpeg), load `edit-video`. For SFX, music and the mix, load `design-sound`: every visible stroke, pop and wipe gets its own sound at its frame.
+For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NLA, bpy), load the `use-3d-software` skill for the exact nodes and current 5.x names. For the edit, captions, retime, transitions, grade and export in any editor (Resolve, CapCut, Premiere, Kdenlive, FFmpeg), load `edit-video`.
 Craft skills for single steps: `draw-and-paint-art` (drawing, figures, painting in Krita), `paint-stylized-backgrounds` (backgrounds, paint-over, parallax, moving foliage and water), `animate-characters` (character motion, frame by frame, cut-out) and `rig-characters` (cut-out puppets).
-
-6. **Render gate before any preview (`qa`)**
-   - Run `uv run --no-project --with numpy python scripts/check_render.py <preview.mp4>` and look at its contact sheet
-     per `references/qa-and-gates.md`. Send the 540p preview with sound only when both pass; full render after approval.
 
 ## Core Vox Visual Laws (Non-Negotiable)
 

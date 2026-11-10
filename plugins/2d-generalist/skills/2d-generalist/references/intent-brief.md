@@ -27,7 +27,7 @@ first step of any build. It costs one short round of questions and saves a full 
 | Format | Aspect ratio, length, resolution, file type | 9:16 vertical 30 to 60 s, 16:9 2 to 5 min, 1:1 still, GLB model, PNG set |
 | Subject | Exactly what is shown and the facts or story beats that must be in it | the named object, place, period, character, the one moment that must land |
 | Look | Style, references, palette, mood | Vox editorial paper and ink, clean flat infographic, archival collage, blueprint; a link or image the user likes |
-| Constraints | Must-haves, must-nots, tools, voice and music, language, deadline | "no voiceover", "use my logo", "Blender only", "Vietnamese captions", "by Friday" |
+| Constraints | Must-haves, must-nots, tools, voice and music, language, deadline; whether real people, brands or owned characters appear (name the risk once, follow the answer) | "no voiceover", "use my logo", "Blender only", "Vietnamese captions", "by Friday" |
 
 ## How to ask
 
@@ -50,16 +50,18 @@ Write `brief.md` in the project folder, 5 to 8 lines:
 - Goal in the user's own words, then one line on what done looks like (for example "a 45 s 9:16 MP4 with captions").
 - The five slots, each marked given, answered or default.
 - Out of scope: what you will not make.
+- A `## Progress` section, one line per step of the production spine (`~/.claude/skills/3d-generalist/references/pipeline-spine.md`),
+  filled as each step finishes.
 
 Show the brief to the user in one short message and start work. Stop only if the user changes something.
 
 ## Checkpoints while building
 
-- Before the first expensive step (full animation, final map or chart build, final render), show the cheapest proof of the look and
-  the subject: a style frame, a still, a 5 to 10 s low-resolution animatic, a static map or chart frame. Ask one question: does
-  this match what you want?
-- When the user gives notes, update `brief.md` first, then change the work. Notes that change the purpose or format
-  restart the brief.
+- The checkpoints are the production spine's two user gates (`~/.claude/skills/3d-generalist/references/pipeline-spine.md`): the look gate before
+  the first expensive step (style frames A/B/C plus a blockout or animatic, the user picks, `LOOK.md` is written) and
+  the fast preview before the full render. Every other step checks itself.
+- When the user gives notes, update `brief.md` (or `LOOK.md`) first, then change the work. Notes that change the
+  purpose or format restart the brief.
 - Keep previews fast and small. The user judges direction from them, not polish.
 
 ## Drift check before delivery

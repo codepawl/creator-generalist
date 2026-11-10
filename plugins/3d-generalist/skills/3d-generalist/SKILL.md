@@ -26,39 +26,22 @@ For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NL
 Craft skills for single steps: `animate-characters` (keys, timing, cycles, acting in 2D and 3D), `rig-characters` (bones, weights, IK/FK, face rigs, engine export), `sculpt-models` (organic forms, creatures, rocks, terrain, retopo and bake), `draw-and-paint-art` (turnarounds, style frames, painted textures) and `paint-stylized-backgrounds` (backdrops, paint-over, parallax).
 **Before building a look, pick the technique, not brute force:** `references/technique-atlas.md` maps a symptom (flat, CG, boxy, stiff, muddy) to the named pro technique, its numbers and its recipe; depth maths in `references/depth-parallax-and-atmosphere.md`. Machine paths (Krita, OpenToonz, Blender): `local.md` next to this file when it exists.
 
-**Before step 1, run the intent brief** (`references/intent-brief.md`): fill purpose, format, subject, look and constraints from the request, ask only about what is missing (at most 4 questions, options with a recommended default), write `brief.md`, show a cheap preview before the first expensive step, and check the result against the brief before delivery. A piece that misses the user's goal is a failed piece.
+## Order of work: the production spine
 
-## Order of work for every 3D video
+Run the eight steps of `references/pipeline-spine.md` in order, in every mode. Each step writes its file into
+`{{WORK_DIR}}` and its line under `## Progress` in `brief.md`; start a step only from the files of the one above it.
+The user decides twice: the look at step 4 and the preview at step 8. The spine says which steps shrink per mode.
 
-Do these steps in order. Do not start a step before the one above it is written down.
-
-1. **Story script (`script.md`):** write the hook (0 to 3 s, picture already moving), the middle rounds (5 to 7 pairs of
-   `But <visible failure> -> So <one fix built in place>`, each opening a new question), a flip where the problem helps,
-   a final stress test, and the closer. List verified factual sources at the top. See `references/shorts-storytelling.md`.
-2. **Voice and visual scripts:** split `script.md` into exact spoken lines and a per-beat visual table (sourced 3D models,
-   character actions, 3D leader-line part labels, camera framing and SFX cues).
-3. **Source and kitbash assets first:** pull real CC0 / CC BY scans and models (Poly Haven, ambientCG, Sketchfab,
-   BlenderKit, Quaternius) before modelling anything from primitives. Fit every mesh on its real vertex bounds
-   (`Box3.setFromObject(model, true)`), scale the world to the character, and record credits in `CREDITS.md`. See
-   `references/assets-and-kitbash.md`.
-4. **Build the world and cutaway:** stage one continuous set with a real place and period, dressed across foreground,
-   midground and background with moving ambient life (trees swaying, birds, water caustics, passing vehicles). Use an
-   object-driven shader or double-sided section plane for cutaways. See `references/worlds-and-cutaways.md`.
-5. **Animate character acting and physics:** drive the character by baked specs or pose-to-pose IK. Lead turns with the
-   head (`looks` 4 to 6 frames ahead), stagger joint stops so all bones never freeze on one frame, add anticipation and
-   slapstick reaction beats on failures, and bake rigid-body physics (Rapier / Blender) so every frame is a pure
-   function of time `f(t)`. See `references/acting-and-motion.md`.
-6. **Camera, lighting and finish pass:** keep under 1 hard cut per 10 s on cutaway builds, space camera keys at least
-   5 to 8 frames apart, keep a soft fill light tracking the character's spine inside dark interiors, lock Depth of Field
-   on the active subject, and finish with 6-subframe 180-degree shutter motion blur, bloom, vignette and grain. See
-   `references/camera-and-lighting.md`.
-   Drawn 2D effects on a 3D shot (explosions, smoke, impacts, speed lines, smears): `references/hybrid-2d-3d-fx.md`.
-7. **Voice, captions and foley:** generate steady narration, trim tail silences over 0.12 s, align one-word centred
-   captions within ±0.05 s of spoken audio, and layer soft real SFX for every visible event at -14 LUFS.
-8. **Run the QA gate before any preview:** run all 10 gates in `references/qa-and-gates.md`.
-   `scripts/check_contact_and_slip.mjs` covers teleport, speed, flight, foot slip and contact gap only. Grip, clearance,
-   exits, chips and caption sync need the project's own checks. Inspect contact sheets (`scripts/contact-sheet.sh`), and fix every
-   flag before showing the user. See `references/qa-and-gates.md`.
+| Step | Writes | 3D rules for the step |
+|---|---|---|
+| 1. Brief | `brief.md` | `references/intent-brief.md`: five slots, at most 4 questions, then go |
+| 2. Reference | `refs/`, `refs/NOTES.md` | two views per hero subject, real footage for place, light and weather; real CC0 / CC BY assets before primitives: `references/assets-and-kitbash.md` |
+| 3. Script and beats | `script.md`, beat table, scratch voice, cue list | hook at 0 to 3 s with the picture already moving, 5 to 7 `But <failure> -> So <fix>` rounds, a flip, a stress test, a closer, sources on top: `references/shorts-storytelling.md` |
+| 4. Look gate | style frames A/B/C, grey blockout or animatic with real cameras, then `LOOK.md`, `cameras.json` | the user picks; `references/technique-atlas.md` picks the technique, `references/camera-and-lighting.md` the light, `references/clay-reveal.md` the clay pass |
+| 5. Assets and check | `assets/`, `CREDITS.md`, measured bounds | fit on real vertex bounds (`Box3.setFromObject(model, true)`), scale the world to the character, no clipping at shot distance: `references/assets-and-kitbash.md`, `references/characters-and-rigs.md` |
+| 6. Build and animate | shots | one continuous dressed set with ambient life, cutaway by section plane: `references/worlds-and-cutaways.md`; head leads turns 4 to 6 frames, staggered stops, anticipation, physics baked so every frame is `f(t)`: `references/acting-and-motion.md`; under 1 hard cut per 10 s, camera keys 5 to 8 frames apart, spine fill light, DoF on the subject, 6-subframe 180-degree blur, then bloom, vignette and grain: `references/camera-and-lighting.md`; drawn FX: `references/hybrid-2d-3d-fx.md` |
+| 7. Sound | final voice, SFX, music, mix | `design-sound`: tail silences over 0.12 s trimmed, one-word captions within ±0.05 s, a soft real SFX for every visible event, -14 LUFS |
+| 8. QA, preview, final | gate report, 540p preview with sound | every gate in `references/qa-and-gates.md` (contact and slip: `scripts/check_contact_and_slip.mjs`; look match: `scripts/compare_look.py`; sheets: `scripts/contact-sheet.sh`), then the user approves the preview before the full render |
 
 ## Hard anti-slop rules
 

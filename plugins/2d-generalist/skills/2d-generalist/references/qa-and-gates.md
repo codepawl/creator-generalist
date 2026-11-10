@@ -1,6 +1,7 @@
 # Render gate for 2D motion graphics (`qa-and-gates.md`)
 
-`scripts/validate_vox_recipe.py` checks a recipe before anything is built. This gate checks the rendered video before
+`scripts/validate_vox_recipe.py` checks the recipe at the look gate, before anything is built (step 4 of
+`~/.claude/skills/3d-generalist/references/pipeline-spine.md`). This gate checks the rendered video before
 anyone sees a preview. Numbers catch what an eye skims past; a contact sheet catches what numbers cannot see. Run both
 on the fast preview and again on the final.
 
@@ -31,12 +32,17 @@ More than about five pictures go through a subagent. Read one full-size frame fo
    decoration only. Nothing sits in the outer 5% (title safe) or under platform UI (bottom 15% and right edge on
    vertical video). On-screen text holds at least 0.5 s plus 0.3 s per word.
 2. **One focal point per frame:** the eye lands on one thing; a highlight, arrow or zoom points at it.
-3. **Paper and ink, not plastic:** grain and paper are visible, cutouts have their torn border, halftone is felt and not
-   seen.
+3. **Surface matches the picked look:** flat paper and thin print borders by default; grain, ink bleed, torn edges and
+   halftone only where `LOOK.md` picked a stylised option, and then on every card, not some.
 4. **Nothing pops:** every element eases in and out; nothing appears or vanishes between two frames.
 5. **No stiff repeats:** judged by eye on an 8 fps stretch of each group entrance. No two neighbouring elements share the exact size, angle and timing (the No Stiff Repeats law in SKILL.md).
 6. **Picture before word:** each highlight or zoom lands 4 to 8 frames before the word it shows.
 7. **Sound per event:** each stroke, pop, wipe and stamp has its own sound at its frame (`design-sound`).
+8. **Look match:** `uv run --no-project --with numpy python ~/.claude/skills/3d-generalist/scripts/compare_look.py
+   --style <picked style frame> <preview.mp4>` passes (mean luma within 20, saturation within 0.08, hue turned under
+   20 degrees on every sampled second). A stretch that is meant to differ, such as a dark map beat, gets its own
+   style frame.
+9. **Brief drift:** the preview matches `brief.md` slot by slot: purpose, format, length, beats, look, constraints.
 
 ## 3. Then the preview
 
