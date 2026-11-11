@@ -27,23 +27,26 @@ Use the first row that matches you.
 claude plugin marketplace add codepawl/creator-generalist
 claude plugin install 3d-generalist@creator-generalist
 claude plugin install 2d-generalist@creator-generalist
+claude plugin install game-generalist@creator-generalist
 claude plugin install watch-video@creator-generalist
 claude plugin install design-sound@creator-generalist
 ```
 
-If the `claude` command is not on the PATH, tell the user to type the same four lines as `/plugin ...` in Claude Code.
+If the `claude` command is not on the PATH, tell the user to type the same five lines as `/plugin ...` in Claude Code.
 
 **Any other agent.** If Node.js is installed, run `npx skills add codepawl/creator-generalist` and follow its prompts.
 Otherwise:
 
 1. Clone the repository to a temporary folder: `git clone --depth 1 https://github.com/codepawl/creator-generalist`.
-2. Copy these fourteen folders into the skills folder from step 1:
+2. Copy these sixteen folders into the skills folder from step 1:
    - `plugins/3d-generalist/skills/3d-generalist`
    - `plugins/3d-generalist/skills/3dg`
    - `plugins/3d-generalist/skills/model-characters`
    - `plugins/3d-generalist/skills/use-3d-software`
    - `plugins/2d-generalist/skills/2d-generalist`
    - `plugins/2d-generalist/skills/2dg`
+   - `plugins/game-generalist/skills/game-generalist`
+   - `plugins/game-generalist/skills/gameg`
    - `plugins/2d-generalist/skills/edit-video`
    - `plugins/3d-generalist/skills/animate-characters`
    - `plugins/3d-generalist/skills/rig-characters`
@@ -52,8 +55,8 @@ Otherwise:
    - `plugins/2d-generalist/skills/paint-stylized-backgrounds`
    - `plugins/watch-video/skills/watch-video`
    - `plugins/design-sound/skills/design-sound`
-3. Gemini CLI: copy `harness/gemini/3dg.toml` and `harness/gemini/2dg.toml` to the commands folder.
-   OpenCode: copy `harness/opencode/3dg.md` and `harness/opencode/2dg.md` to the commands folder.
+3. Gemini CLI: copy `harness/gemini/3dg.toml`, `harness/gemini/2dg.toml` and `harness/gemini/gameg.toml` to the commands folder.
+   OpenCode: copy `harness/opencode/3dg.md`, `harness/opencode/2dg.md` and `harness/opencode/gameg.md` to the commands folder.
 4. Delete the temporary clone.
 
 Check: each copied folder has a `SKILL.md` at its top.
@@ -83,7 +86,7 @@ yes. Optional tools are listed, not installed.
 
 ## 4. Smoke test
 
-1. Ask your agent to list its skills, or check the folders. `3d-generalist`, `2d-generalist`,
+1. Ask your agent to list its skills, or check the folders. `3d-generalist`, `2d-generalist`, `game-generalist`,
    `model-characters`, `use-3d-software`, `edit-video`, `animate-characters`,
    `rig-characters`, `sculpt-models`, `draw-and-paint-art`, `paint-stylized-backgrounds`, `watch-video` and `design-sound` must be there.
 2. Run `/2dg audit` (Claude Code: `/2d-generalist:2dg audit`) if your agent has commands.
@@ -95,3 +98,4 @@ Tell the user, in a few lines: where the skills went, which tools are ready, whi
 
 - `/3dg cutaway a 14th-century water mill, wheel turning the millstones`
 - `/2dg map the Silk Road from Chang'an to Constantinople`
+- `/gameg game a 3-minute browser arcade where you herd fireflies into jars`

@@ -1,0 +1,24 @@
+{
+  "name": "game-generalist",
+  "version": "0.1.0",
+  "description": "Playable-game studio for creators: a one-sentence promise becomes a playable greybox you try, a locked look, a built original game and a measured playtest report, on web (three.js, Phaser, canvas), Godot, Unity or Unreal, with scripted bots and gates for errors, win and lose paths, restart, determinism, frame time and softlocks.",
+  "author": {
+    "name": "CodePawl",
+    "url": "https://codepawl.com"
+  },
+  "homepage": "https://github.com/codepawl/creator-generalist",
+  "repository": "https://github.com/codepawl/creator-generalist",
+  "license": "MIT",
+  "keywords": [
+    "game",
+    "game-dev",
+    "game-jam",
+    "prototype",
+    "playtest",
+    "three.js",
+    "phaser",
+    "godot",
+    "unity",
+    "content-creator"
+  ]
+}

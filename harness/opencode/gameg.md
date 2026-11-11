@@ -1,0 +1,13 @@
+---
+description: Make playable prototypes, small original games and polish passes with the game-generalist skill
+---
+
+Load the game-generalist skill and follow it from the start for this request:
+
+$ARGUMENTS
+
+If the request is empty or is "help", list the three modes below and ask what game the user wants to make. Otherwise, if the first word is a mode, use that mode and drop the word from the idea.
+
+Modes: prototype (a playable greybox of the core loop and a go/kill note), game (a complete small original game inside the brief's time box; a jam entry is this mode), polish (feel, readability, audio and QA passes on an existing playable; no new features).
+
+Before building, run the intent brief in the skill (references/intent-brief.md): ask only about the engine, platform, session length, time box or constraints the request leaves open, at most 4 questions with options and a recommended default, then restate the one-sentence promise and show a playable greybox before the expensive step.

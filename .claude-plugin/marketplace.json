@@ -1,6 +1,6 @@
 {
   "name": "creator-generalist",
-  "description": "creator-generalist: AI agent skills to be professional at 2D and 3D",
+  "description": "creator-generalist: AI agent skills to be professional at 2D and 3D, and to make playable games",
   "owner": {
     "name": "CodePawl",
     "url": "https://codepawl.com"
@@ -15,6 +15,11 @@
       "name": "2d-generalist",
       "source": "./plugins/2d-generalist",
       "description": "2D and 2.5D editorial motion graphics in the Vox, Johnny Harris and WSJ explainer look: footage-led Vox look, flat paper cards, print-bordered real photos, highlighters, maps, charts and true-scale timelines, with torn paper, halftone and grain as opt-in stylised looks, across Blender, DaVinci Resolve Fusion, Remotion and FFmpeg."
+    },
+    {
+      "name": "game-generalist",
+      "source": "./plugins/game-generalist",
+      "description": "Playable-game studio for creators: a one-sentence promise becomes a playable greybox you try, a locked look, a built original game and a measured playtest report, on web (three.js, Phaser, canvas), Godot, Unity or Unreal, with scripted bots and gates for errors, win and lose paths, restart, determinism, frame time and softlocks."
     },
     {
       "name": "watch-video",

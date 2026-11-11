@@ -1,6 +1,6 @@
 # Production spine: eight steps for every piece (`pipeline-spine.md`)
 
-Both generalist skills run the same eight steps, in order, for every mode. Professional animation, motion-design and
+Every generalist skill (3D, 2D and game) runs the same eight steps, in order, for every mode. Professional animation, motion-design and
 game-art pipelines share this shape: decide on paper, prove the look and timing in the cheapest medium, then build.
 A change is cheapest before animation and most expensive after it, and an art pass before the blockout locks in early
 mistakes. Each step below writes a file. The next step starts from those files, not from memory of the chat.
@@ -109,8 +109,9 @@ to the platform loudness. The `design-sound` skill owns the method and its check
 
 ### 8. QA, preview, final
 
-Run the skill's `qa-and-gates.md`, including the look match, phone check and brief drift gates. Send the fast 540p
-preview with sound only when every gate passes. Render full quality only after the user approves the preview, every
+Run the skill's gates: `qa-and-gates.md` for films and motion graphics (look match, phone check and brief drift
+included), `playtest-gates.md` for games. Send the fast 540p preview with sound (for a game, the playable build plus a
+short capture) only when every gate passes. Render full quality only after the user approves the preview, every
 round, fixes included.
 
 ## Progress lines in `brief.md`
@@ -180,4 +181,7 @@ decide" choice. The user's answer picks the round:
 - 3D `asset`: steps 3 and 7 are skipped; the look gate is one hero still with a material close-up.
 - 2D `map`, `chart-timeline`, `thumbnail`, `texture-look`, `fx-type` alone: steps 3 and 7 shrink or skip; the
   reference step is the real data or source; the look gate is one frame.
-- Every mode keeps steps 1, 2, 5 and 8. Step 4 is kept for every new look.
+- Game `prototype`: steps 1 to 4; the choice at step 4 is the user playing the greybox, ending in a go/kill note.
+  Game `game`: all eight, with a playable greybox at step 4. Game `polish`: step 1, then 6 to 8.
+- Every mode keeps steps 1, 2, 5 and 8 (game `prototype` and `polish` excepted, as above). Step 4 is kept for every
+  new look.

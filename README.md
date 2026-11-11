@@ -9,9 +9,9 @@
   <img alt="Works with Codex, Cursor, Gemini CLI and OpenCode" src="https://img.shields.io/badge/also-Codex%20%C2%B7%20Cursor%20%C2%B7%20Gemini%20%C2%B7%20OpenCode-12302B?style=flat-square&labelColor=0A1D1A">
 </p>
 
-Install the pack one time. After that, your agent can work like a 2D and 3D generalist.
+Install the pack one time. After that, your agent can work like a 2D and 3D generalist and a small game studio.
 Use it to make content, videos and Shorts for YouTube, TikTok, Facebook, Instagram and X.
-You do not call a skill by name. Ask for the work and the matching skill loads, or start one with `/3dg` or `/2dg`.
+You do not call a skill by name. Ask for the work and the matching skill loads, or start one with `/3dg`, `/2dg` or `/gameg`.
 Before it builds, the agent asks a few short questions about whatever your request leaves open (purpose, platform, format, look), each with a suggested answer. It then shows a cheap preview, so the result matches what you meant.
 
 ## One prompt, one result
@@ -33,7 +33,7 @@ Each clip below came from the prompt above it, made with these skills for this R
 
 ## The skills
 
-Two main skills run the whole piece. They call the craft and tool skills for each step, and you can ask for any of
+Three main skills run the whole piece. They call the craft and tool skills for each step, and you can ask for any of
 those on its own too.
 
 **Main skills**
@@ -42,6 +42,7 @@ those on its own too.
 |---|---|---|
 | **[3d-generalist](plugins/3d-generalist/skills/3d-generalist/SKILL.md)** | a 3D Short, a cutaway build, a story scene, a world, a rigged character, a hero asset | A scripted and animated 3D piece in Blender, Three.js or [67js](https://github.com/codepawl/67.js), built from real CC0 and CC BY scans and checked by a QA gate before you see a preview |
 | **[2d-generalist](plugins/2d-generalist/skills/2d-generalist/SKILL.md)** | a Vox or Johnny Harris style explainer graphic | A footage-led Vox look with flat paper cards, print-bordered real photos, highlighters, maps, charts and true-scale timelines (torn paper, halftone and grain only as opt-in stylised looks), made with free tools |
+| **[game-generalist](plugins/game-generalist/skills/game-generalist/SKILL.md)** | a game prototype, a small original game, a game jam entry, a feel and QA pass on a playable | A playable greybox you try before any art, a locked look, an original game on web (three.js, Phaser, canvas), Godot, Unity or Unreal, and a playtest report from scripted bots (errors, win and lose paths, restart, determinism, frame time, softlocks) with a playable link and a 30 to 60 s capture |
 
 **Craft skills**
 
@@ -73,8 +74,8 @@ those on its own too.
 |---|---|---|
 | **[design-sound](plugins/design-sound/skills/design-sound/SKILL.md)** | SFX, foley, music or a mix for a video, game or reel | A sound library searched by meaning (CLAP) with sheets to look at before choosing, web and ElevenLabs fetching, foley generated from a silent film with a local video-to-audio model (HunyuanVideo-Foley), an effects stem placed from an event list, music fitted to the cut, and a mix to platform loudness checked for sync, masking and phone audibility |
 
-`model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters` and `rig-characters` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art` and `paint-stylized-backgrounds` come with the 2d-generalist plugin. `watch-video` and `design-sound` are their own plugins.
-Install all four plugins to get every skill. `2d-generalist` ships its own copy of the production spine and of
+`model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters` and `rig-characters` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art` and `paint-stylized-backgrounds` come with the 2d-generalist plugin. `watch-video`, `design-sound` and `game-generalist` are their own plugins.
+Install all five plugins to get every skill. `2d-generalist` ships its own copy of the production spine and of
 `compare_look.py`, so each of the two plugins also works installed alone.
 
 ## Install
@@ -93,6 +94,7 @@ https://raw.githubusercontent.com/codepawl/creator-generalist/main/INSTALL.md an
 /plugin marketplace add codepawl/creator-generalist
 /plugin install 3d-generalist@creator-generalist
 /plugin install 2d-generalist@creator-generalist
+/plugin install game-generalist@creator-generalist
 /plugin install watch-video@creator-generalist
 /plugin install design-sound@creator-generalist
 ```
@@ -103,6 +105,7 @@ https://raw.githubusercontent.com/codepawl/creator-generalist/main/INSTALL.md an
 claude plugin marketplace add codepawl/creator-generalist
 claude plugin install 3d-generalist@creator-generalist
 claude plugin install 2d-generalist@creator-generalist
+claude plugin install game-generalist@creator-generalist
 claude plugin install watch-video@creator-generalist
 claude plugin install design-sound@creator-generalist
 ```
@@ -123,6 +126,8 @@ npx skills add codepawl/creator-generalist
    - `plugins/3d-generalist/skills/use-3d-software`
    - `plugins/2d-generalist/skills/2d-generalist`
    - `plugins/2d-generalist/skills/2dg`
+   - `plugins/game-generalist/skills/game-generalist`
+   - `plugins/game-generalist/skills/gameg`
    - `plugins/2d-generalist/skills/edit-video`
    - `plugins/3d-generalist/skills/animate-characters`
    - `plugins/3d-generalist/skills/rig-characters`
@@ -133,9 +138,9 @@ npx skills add codepawl/creator-generalist
    - `plugins/design-sound/skills/design-sound`
 2. Use the folder of your agent: `~/.claude/skills/`, `~/.agents/skills/`, `~/.cursor/skills/`, `~/.gemini/skills/`
    or `~/.config/opencode/skills/`.
-3. For the `/3dg` and `/2dg` commands in Gemini CLI, copy `harness/gemini/3dg.toml` and `harness/gemini/2dg.toml` to
+3. For the `/3dg`, `/2dg` and `/gameg` commands in Gemini CLI, copy `harness/gemini/3dg.toml`, `harness/gemini/2dg.toml` and `harness/gemini/gameg.toml` to
    `~/.gemini/commands/`.
-4. For the same commands in OpenCode, copy `harness/opencode/3dg.md` and `harness/opencode/2dg.md` to
+4. For the same commands in OpenCode, copy `harness/opencode/3dg.md`, `harness/opencode/2dg.md` and `harness/opencode/gameg.md` to
    `~/.config/opencode/commands/`.
 
 </details>
@@ -190,6 +195,31 @@ Type `/2dg` alone to see the modes (`/2d-generalist:2dg` in Claude Code). Type a
 | `archival-collage` | Highlighters, newspaper zooms, 2.5D parallax; torn paper borders and halftone only as stylised options | `/2dg archival-collage the 1929 stock market crash` |
 | `design` | A style frame: hierarchy, asymmetric scale, paper and ink surface, palettes and type pairs | `/2dg design a style frame for a video on lithium mining` |
 | `audit` | Finds the free tools on your machine and gives install commands for the optional ones (QGIS, Inkscape, Krita) | `/2dg audit` |
+
+## game-generalist
+
+Give your agent a one-sentence game idea. It follows the same eight-step production spine as the other generalists:
+brief, reference, design, prep and play gate, assets, build, sound, then gates and preview. The choice at step 4 is a
+playable greybox plus style frames A/B/C: you play the bare core loop first and pick a look only if it is fun. You get
+a WIP playable build of the first finished feature while it keeps working, and the preview is a playable build plus a
+30 to 60 s capture of real play. After each preview you pick the next round: fix notes, continue in a direction you
+name, or let the agent decide. The engine is a brief slot: web (three.js, Phaser or plain canvas), Godot, Unity or
+Unreal. It never recreates an existing commercial game, and it never publishes or spends unless you ask.
+
+Type `/gameg` alone to see the modes (`/game-generalist:gameg` in Claude Code). Type a mode and an idea to start one.
+
+| Mode | What it makes | Example |
+|---|---|---|
+| `prototype` | A playable greybox of the core loop and a go/kill note. It ends when you have played the greybox. | `/gameg prototype a lighthouse keeper who redirects ships with a beam` |
+| `game` | A complete small original game inside your time box. A jam entry is this mode. | `/gameg game a 3-minute browser arcade where you herd fireflies into jars` |
+| `polish` | Feel, readability, audio and QA passes on an existing playable. No new features. | `/gameg polish my firefly arcade: jump feel, hit feedback and a softlock check` |
+
+**What keeps it from being a tech demo**
+
+- **Fun is your call.** Bots prove the game runs, ends and restarts. You play the greybox and the preview.
+- **Core loop before content.** No levels, art or menus until the greybox reaches win, lose and restart.
+- **Checks before preview.** `scripts/probe.mjs` drives a web build and checks errors, win and lose paths, restart,
+  determinism, frame time, softlocks and controls.
 
 ## Contributing
 
