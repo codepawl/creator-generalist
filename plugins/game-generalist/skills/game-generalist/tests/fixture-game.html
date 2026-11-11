@@ -12,8 +12,11 @@
 <canvas id="stage" width="320" height="120"></canvas>
 <p>Controls: arrows (right moves toward the goal). Reach the green goal before the timer ends.</p>
 <script>
-// Variant switch: ?broken=1 throws a console error and the goal never counts.
-const isBroken = new URLSearchParams(location.search).get('broken') === '1';
+// Variant switches: ?broken=1 throws a console error and the goal never counts;
+// ?nostep=1 leaves out window.__game.step().
+const queryParameters = new URLSearchParams(location.search);
+const isBroken = queryParameters.get('broken') === '1';
+const hasStepHook = queryParameters.get('nostep') !== '1';
 const canvas = document.getElementById('stage');
 const context = canvas.getContext('2d');
 
@@ -41,6 +44,7 @@ let restartCount = 0;
 let accumulatedSeconds = 0;
 let lastTimestamp = null;
 let hazardPhase = 0;
+let tickCount = 0;
 
 addEventListener('keydown', (event) => heldKeys.add(event.key));
 addEventListener('keyup', (event) => heldKeys.delete(event.key));
@@ -49,13 +53,16 @@ function resetRound() {
   status = 'playing';
   playerX = START_X;
   elapsedSeconds = 0;
+  tickCount = 0;
+  accumulatedSeconds = 0;
   hazardPhase = nextRandom() * Math.PI * 2;
 }
 
-function stepSimulation() {
+function stepSimulation(keysDown = heldKeys) {
   if (status !== 'playing') return;
-  if (heldKeys.has('ArrowRight')) playerX += SPEED_PIXELS_PER_SECOND * FIXED_STEP_SECONDS;
-  if (heldKeys.has('ArrowLeft')) playerX -= SPEED_PIXELS_PER_SECOND * FIXED_STEP_SECONDS;
+  tickCount += 1;
+  if (keysDown.has('ArrowRight')) playerX += SPEED_PIXELS_PER_SECOND * FIXED_STEP_SECONDS;
+  if (keysDown.has('ArrowLeft')) playerX -= SPEED_PIXELS_PER_SECOND * FIXED_STEP_SECONDS;
   playerX = Math.max(0, Math.min(canvas.width, playerX));
   elapsedSeconds += FIXED_STEP_SECONDS;
   hazardPhase += FIXED_STEP_SECONDS * 3;
@@ -102,7 +109,13 @@ if (isBroken) {
 window.__game = {
   state() {
     const progressPercent = Math.round(((playerX - START_X) / (GOAL_X - START_X)) * 100);
-    return { status, progress: Math.max(0, progressPercent), round: restartCount };
+    return {
+      status,
+      progress: Math.max(0, progressPercent),
+      round: restartCount,
+      tick: tickCount,
+      dt: FIXED_STEP_SECONDS,
+    };
   },
   restart() {
     restartCount += 1;
@@ -114,6 +127,14 @@ window.__game = {
     resetRound();
   },
 };
+
+if (hasStepHook) {
+  // Advances the fixed-step simulation synchronously with the given key names held.
+  window.__game.step = (ticks, keysDown = []) => {
+    const heldNames = new Set(keysDown);
+    for (let index = 0; index < ticks; index += 1) stepSimulation(heldNames);
+  };
+}
 
 resetRound();
 requestAnimationFrame(frame);

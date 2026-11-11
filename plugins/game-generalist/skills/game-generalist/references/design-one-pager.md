@@ -70,7 +70,7 @@ An array of 5 to 15 items. The core loop, win, lose and restart are always items
 |---|---|
 | `id` | short, lowercase, unique |
 | `description` | one sentence, player-visible behavior |
-| `verify` | a concrete machine check: a replay file plus the expected state values. Asserts game state, not pixels alone. "Looks right" is not a verify step |
+| `verify` | a concrete machine check that names its command: a replay file plus the expected state values, or a named unit check on the shared `sim.js` for a pure rule. Asserts game state, not pixels alone. End-to-end items (win, lose, restart) need a browser run. "Looks right" is not a verify step |
 | `passes` | `false` at start. Flip it to `true` only after the verify step ran and matched. Never edit the other fields to make a check pass |
 
 Replay files follow the input replay format: an array of `{t: ms, type: "key"|"pointer", key?, x?, y?, action: "down"|"up"|"move"}`.
@@ -87,10 +87,12 @@ check as its verify step.
 
 ## Go/kill note (prototype mode)
 
-A prototype ends at step 4 with `go-kill.md`, 6 lines. Kills are normal; write the reason so the next game reuses it.
+A prototype ends at step 4 with `go-kill.md`, 6 lines. Write it when the gate message goes out, with `Decision: not played yet` and the bot
+result lines; fill the human note, decision and reason after the user plays. Kills are normal; write the reason so the
+next game reuses it.
 
 ```
-Decision: go | reshape | kill
+Decision: go | reshape | kill | not played yet
 Promise tested: <the sentence>
 Bot result: win reached yes/no, lose reached yes/no, restart ok yes/no
 Human note: <what the user said after playing, in their words, or "not played yet">

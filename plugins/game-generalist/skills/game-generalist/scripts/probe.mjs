@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 /**
  * Playtest probe for web games that expose the page hook:
- *   window.__game = { state() -> { status: 'playing'|'won'|'lost', progress: number, ... },
- *                     restart(), seed(n) }
- * Runs a bot, collects hard-gate evidence and writes report.json and sheet.png.
- * Exit 0: all hard gates pass. 1: a gate failed. 2: the probe could not run.
+ *   window.__game = { state() -> { status: 'playing'|'won'|'lost', progress: number, tick?, dt?, ... },
+ *                     restart(), seed(n), step(ticks, keysDown)? }
+ * The probe never creates a canvas context: an init script records the context the page asks for,
+ * and the per-frame GPU sync reads one pixel back from the page's own context on the largest canvas.
+ * Gate statuses: pass | fail | not_tested. Every gate that is not pass carries "why" and "try".
+ * Exit 0: all pass. 1: a gate failed. 3: nothing failed but a gate was not tested. 2: the probe could not run.
  */
 
 import { parseArgs } from "node:util";
@@ -15,16 +17,33 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const USAGE = `Usage: node probe.mjs <url-or-file> --seconds 20 --seed 1 [options]
   --input FILE          replay JSON: [{t, type:'key'|'pointer', key?, x?, y?, action:'down'|'up'|'move'}]
-  --bot idle|random|script   default: script when --input is given, else random
+  --bot idle|random|script|FILE.mjs   default: script when --input is given, else random.
+                        A .mjs/.js file exports act(state, elapsedMs) -> ['ArrowLeft', ...] or {keys, pointer:{x,y,down}}
   --seeds N             run seeds seed..seed+N-1 and aggregate (default 1)
+  --expect won|lost|both  end states gate 2 requires (default both)
+  --gates 1,2,4         judge only these gates (others are not_tested)
   --stall-seconds N     softlock limit (default 30, a default)
   --viewport WxH        default 1280x720
   --frame-budget-ms N   p95 frame time limit (default 16.7 for 60 Hz, a default)
+  --tile-width N        contact sheet tile width (default 480)
+  --wallclock-determinism  for games without step(): compare two wall-clock runs
   --out DIR             default ./probe-out
   --software            use SwiftShader instead of the GPU (for tests)
-  --help`;
+  --help
+Gates: 1 console_errors, 2 won_and_lost, 3 determinism, 4 frame_time_p95, 5 softlock, 6 controls.`;
 
-const { positionals, values } = parseArgs({
+const { positionals, values } = parseCommandLine();
+
+function parseCommandLine() {
+  try {
+    return parseCommandLineStrict();
+  } catch (error) {
+    return fail(error.message.split("\n")[0]);
+  }
+}
+
+function parseCommandLineStrict() {
+  return parseArgs({
   allowPositionals: true,
   options: {
     seconds: { type: "string", default: "20" },
@@ -32,14 +51,19 @@ const { positionals, values } = parseArgs({
     input: { type: "string" },
     bot: { type: "string" },
     seeds: { type: "string", default: "1" },
+    expect: { type: "string", default: "both" },
+    gates: { type: "string" },
     "stall-seconds": { type: "string", default: "30" },
     viewport: { type: "string", default: "1280x720" },
     "frame-budget-ms": { type: "string", default: "16.7" },
+    "tile-width": { type: "string", default: "480" },
+    "wallclock-determinism": { type: "boolean", default: false },
     out: { type: "string", default: "probe-out" },
     software: { type: "boolean", default: false },
     help: { type: "boolean", short: "h" },
   },
-});
+  });
+}
 
 if (values.help) {
   console.log(USAGE);
@@ -51,24 +75,68 @@ if (positionals.length === 0) {
 }
 
 const targetArgument = positionals[0];
-const runSeconds = Number(values.seconds);
-const firstSeed = Number(values.seed);
-const seedCount = Math.max(1, Number(values.seeds));
-const stallLimitSeconds = Number(values["stall-seconds"]);
-const frameBudgetMs = Number(values["frame-budget-ms"]);
+const runSeconds = parsePositiveNumber(values.seconds, "--seconds");
+const firstSeed = parseIntegerAtLeast(values.seed, -Infinity, "--seed");
+const seedCount = parseIntegerAtLeast(values.seeds, 1, "--seeds");
+const stallLimitSeconds = parsePositiveNumber(values["stall-seconds"], "--stall-seconds");
+const frameBudgetMs = parsePositiveNumber(values["frame-budget-ms"], "--frame-budget-ms");
+const tileWidth = Math.max(100, Number(values["tile-width"]));
+if (!/^\d+x\d+$/.test(values.viewport)) fail(`--viewport must look like 1280x720, got "${values.viewport}"`);
 const [viewportWidth, viewportHeight] = values.viewport.split("x").map(Number);
-const botKind = values.bot ?? (values.input ? "script" : "random");
+if (viewportWidth < 1 || viewportHeight < 1) fail(`--viewport sizes must be at least 1, got "${values.viewport}"`);
+const botPathArgument = /\.(mjs|js)$/i.test(values.bot ?? "") ? values.bot : null;
+const botKind = botPathArgument ? "module" : (values.bot ?? (values.input ? "script" : "random"));
 const outputFolder = resolve(values.out);
-const POLL_INTERVAL_MS = 250;
 const TICK_INTERVAL_MS = 50;
+const RESTART_WAIT_MS = 2000;
+const DEFAULT_TICK_SECONDS = 1 / 60;
+const MAX_DETERMINISM_SECONDS = 10;
+const GATE_NAMES = {
+  1: "console_errors",
+  2: "won_and_lost",
+  3: "determinism",
+  4: "frame_time_p95",
+  5: "softlock",
+  6: "controls",
+};
 
 function fail(message, code = 2) {
   console.error(message);
   process.exit(code);
 }
 
-if (!["idle", "random", "script"].includes(botKind)) fail(`Unknown --bot ${botKind}`);
+// A failure that stops the run and exits 2 with a plain message instead of a stack trace.
+class ProbeError extends Error {}
+
+function parsePositiveNumber(text, optionName) {
+  const number = Number(text);
+  if (text === "" || !Number.isFinite(number) || number <= 0) fail(`${optionName} must be a number above 0, got "${text}"`);
+  return number;
+}
+
+function parseIntegerAtLeast(text, minimum, optionName) {
+  const number = Number(text);
+  if (!Number.isInteger(number) || number < minimum) fail(`${optionName} must be an integer of at least ${minimum}, got "${text}"`);
+  return number;
+}
+
+if (!["idle", "random", "script", "module"].includes(botKind)) fail(`Unknown --bot ${botKind}`);
 if (botKind === "script" && !values.input) fail("--bot script needs --input replay.json");
+if (!["won", "lost", "both"].includes(values.expect)) fail(`--expect must be won, lost or both`);
+
+function parseSelectedGates(gatesArgument) {
+  if (!gatesArgument) return new Set(Object.keys(GATE_NAMES).map(Number));
+  const gateNumbers = gatesArgument.split(",").map((text) => {
+    const trimmed = text.trim();
+    const gateNumber = Number(trimmed);
+    const valid = /^\d+$/.test(trimmed) && gateNumber >= 1 && gateNumber <= 6;
+    if (!valid) fail(`--gates must list integers from 1 to 6, got "${trimmed}"`);
+    return gateNumber;
+  });
+  return new Set(gateNumbers);
+}
+const selectedGates = parseSelectedGates(values.gates);
+const isActingBot = botKind !== "idle";
 
 // Playwright comes from the project, or from PLAYWRIGHT_FROM: a folder whose node_modules has it.
 async function loadChromium() {
@@ -93,9 +161,28 @@ if (!chromium) {
   );
 }
 
-const targetUrl = /^(https?|file):/i.test(targetArgument)
-  ? targetArgument
-  : pathToFileURL(resolve(targetArgument)).href;
+async function loadBotModule() {
+  if (!botPathArgument) return null;
+  try {
+    const loaded = await import(pathToFileURL(resolve(botPathArgument)).href);
+    const act = loaded.act ?? loaded.default?.act ?? loaded.default;
+    if (typeof act !== "function") fail(`${botPathArgument} must export act(state, elapsedMs)`);
+    return act;
+  } catch (error) {
+    return fail(`Could not load bot module ${botPathArgument}: ${error.message}`);
+  }
+}
+const moduleBotAct = await loadBotModule();
+
+// A local path may carry ?query and #hash; pathToFileURL would percent-encode them into the file name.
+function buildTargetUrl(argument) {
+  if (/^(https?|file):/i.test(argument)) return argument;
+  const suffixStart = argument.search(/[?#]/);
+  const pathPart = suffixStart === -1 ? argument : argument.slice(0, suffixStart);
+  const suffix = suffixStart === -1 ? "" : argument.slice(suffixStart);
+  return pathToFileURL(resolve(pathPart)).href + suffix;
+}
+const targetUrl = buildTargetUrl(targetArgument);
 
 const replayEvents = values.input ? JSON.parse(readFileSync(values.input, "utf8")) : [];
 
@@ -109,41 +196,79 @@ function createMulberry32(seedNumber) {
   };
 }
 
-// Runs before page scripts: seeded Math.random and a frame-time loop with a GPU sync per frame.
+// Runs before page scripts. It never creates a context: it wraps getContext to remember what the
+// page created (a second getContext of another type would return null and break the page), seeds
+// Math.random, and times frames with a one-pixel readback from the largest visible canvas.
 function buildInitScript(seedNumber) {
   return `
 (() => {
   let randomState = ${seedNumber} >>> 0;
+  function reseed(seedNumber) { randomState = seedNumber >>> 0; }
+  window.__probeReseed = reseed;
   Math.random = () => {
     randomState = (randomState + 0x6d2b79f5) >>> 0;
     let mixed = Math.imul(randomState ^ (randomState >>> 15), 1 | randomState);
     mixed = (mixed + Math.imul(mixed ^ (mixed >>> 7), 61 | mixed)) ^ mixed;
     return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
   };
-  window.__probeFrames = [];
-  const syncCache = new WeakMap();
-  function forceSync() {
-    const canvas = document.querySelector('canvas');
-    if (!canvas || canvas.width === 0 || canvas.height === 0) return;
-    let sync = syncCache.get(canvas);
-    if (!sync) {
-      const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-      if (gl) {
-        const pixel = new Uint8Array(4);
-        sync = () => gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
-      } else {
-        const context2d = canvas.getContext('2d');
-        sync = context2d ? () => context2d.getImageData(0, 0, 1, 1) : () => {};
-      }
-      syncCache.set(canvas, sync);
+
+  const createdContexts = new Map();
+  const originalGetContext = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function (contextType, ...rest) {
+    const context = originalGetContext.call(this, contextType, ...rest);
+    if (context && !createdContexts.has(this)) {
+      const normalizedType = contextType === 'experimental-webgl' ? 'webgl' : contextType;
+      createdContexts.set(this, { type: normalizedType, context });
     }
-    try { sync(); } catch (error) {}
+    return context;
+  };
+
+  function buildSync(entry) {
+    if (entry.type === 'webgl' || entry.type === 'webgl2') {
+      const pixel = new Uint8Array(4);
+      return () => entry.context.readPixels(0, 0, 1, 1, entry.context.RGBA, entry.context.UNSIGNED_BYTE, pixel);
+    }
+    if (entry.type === '2d') return () => entry.context.getImageData(0, 0, 1, 1);
+    return null;
   }
+
+  function findLargestVisibleCanvas() {
+    let best = null;
+    let bestArea = 0;
+    for (const [canvas, entry] of createdContexts) {
+      if (!canvas.isConnected || canvas.width === 0 || canvas.height === 0) continue;
+      const rect = canvas.getBoundingClientRect();
+      const area = rect.width * rect.height;
+      if (area > bestArea) {
+        bestArea = area;
+        best = { canvas, entry };
+      }
+    }
+    return best;
+  }
+
+  const syncByCanvas = new WeakMap();
+  const stats = { deltas: [], syncedFrames: 0, contextType: null };
+  window.__probeFrameStats = stats;
+
+  function forceSync() {
+    const largest = findLargestVisibleCanvas();
+    if (!largest) return;
+    if (!syncByCanvas.has(largest.canvas)) syncByCanvas.set(largest.canvas, buildSync(largest.entry));
+    const sync = syncByCanvas.get(largest.canvas);
+    if (!sync) return;
+    try {
+      sync();
+      stats.syncedFrames += 1;
+      stats.contextType = largest.entry.type;
+    } catch (error) {}
+  }
+
   let previousTime = null;
   function onFrame() {
     forceSync();
     const afterSync = performance.now();
-    if (previousTime !== null) window.__probeFrames.push(afterSync - previousTime);
+    if (previousTime !== null) stats.deltas.push(afterSync - previousTime);
     previousTime = afterSync;
     requestAnimationFrame(onFrame);
   }
@@ -151,20 +276,21 @@ function buildInitScript(seedNumber) {
 })();`;
 }
 
-function buildRandomBotEvents(seedNumber) {
+const RANDOM_KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "];
+
+function buildRandomBotEvents(seedNumber, durationSeconds, { includePointer }) {
   const nextRandom = createMulberry32(seedNumber + 1000);
-  const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "];
   const events = [];
   let timeMs = 100;
-  while (timeMs < runSeconds * 1000) {
-    if (nextRandom() < 0.25) {
+  while (timeMs < durationSeconds * 1000) {
+    if (includePointer && nextRandom() < 0.25) {
       const x = Math.round(nextRandom() * viewportWidth);
       const y = Math.round(nextRandom() * viewportHeight);
       events.push({ t: timeMs, type: "pointer", x, y, action: "move" });
       events.push({ t: timeMs + 20, type: "pointer", x, y, action: "down" });
       events.push({ t: timeMs + 80, type: "pointer", x, y, action: "up" });
     } else {
-      const key = keys[Math.floor(nextRandom() * keys.length)];
+      const key = RANDOM_KEYS[Math.floor(nextRandom() * RANDOM_KEYS.length)];
       const holdMs = 80 + Math.floor(nextRandom() * 400);
       events.push({ t: timeMs, type: "key", key, action: "down" });
       events.push({ t: timeMs + holdMs, type: "key", key, action: "up" });
@@ -174,10 +300,10 @@ function buildRandomBotEvents(seedNumber) {
   return events.sort((first, second) => first.t - second.t);
 }
 
-function eventsForBot(seedNumber) {
-  if (botKind === "idle") return [];
+function eventsForActingRun(seedNumber) {
   if (botKind === "script") return [...replayEvents].sort((first, second) => first.t - second.t);
-  return buildRandomBotEvents(seedNumber);
+  if (botKind === "random") return buildRandomBotEvents(seedNumber, runSeconds, { includePointer: true });
+  return [];
 }
 
 async function dispatchEvent(page, inputEvent) {
@@ -191,17 +317,51 @@ async function dispatchEvent(page, inputEvent) {
   else await page.mouse.up();
 }
 
+// Presses and releases keys so the held set matches what a module bot asked for.
+async function applyModuleBotOutput(page, held, botOutput) {
+  const wantedKeys = new Set(Array.isArray(botOutput) ? botOutput : (botOutput?.keys ?? []));
+  for (const key of [...held.keys]) {
+    if (wantedKeys.has(key)) continue;
+    await page.keyboard.up(key).catch(() => {});
+    held.keys.delete(key);
+  }
+  for (const key of wantedKeys) {
+    if (held.keys.has(key)) continue;
+    await page.keyboard.down(key).catch(() => {});
+    held.keys.add(key);
+  }
+  const pointer = Array.isArray(botOutput) ? null : botOutput?.pointer;
+  if (!pointer) return wantedKeys.size > 0;
+  if (pointer.x !== held.pointerX || pointer.y !== held.pointerY) {
+    await page.mouse.move(pointer.x, pointer.y).catch(() => {});
+    held.pointerX = pointer.x;
+    held.pointerY = pointer.y;
+  }
+  const wantDown = Boolean(pointer.down);
+  if (wantDown !== held.pointerDown) {
+    await (wantDown ? page.mouse.down() : page.mouse.up()).catch(() => {});
+    held.pointerDown = wantDown;
+  }
+  return wantedKeys.size > 0 || wantDown;
+}
+
+function botAsksForInput(botOutput) {
+  const keys = Array.isArray(botOutput) ? botOutput : (botOutput?.keys ?? []);
+  return keys.length > 0 || Boolean(botOutput?.pointer?.down);
+}
+
 const sleep = (milliseconds) => new Promise((done) => setTimeout(done, milliseconds));
 const percentile = (sortedValues, fraction) =>
   sortedValues.length === 0
     ? null
     : sortedValues[Math.min(sortedValues.length - 1, Math.floor(fraction * sortedValues.length))];
+const hashOf = (text) => createHash("sha256").update(String(text)).digest("hex");
 
 async function readState(page) {
   return page.evaluate(() => (window.__game?.state ? window.__game.state() : null)).catch(() => null);
 }
 
-async function runOnce(browser, seedNumber, { takeShots }) {
+async function openGamePage(browser, seedNumber) {
   const context = await browser.newContext({ viewport: { width: viewportWidth, height: viewportHeight } });
   await context.addInitScript({ content: buildInitScript(seedNumber) });
   const page = await context.newPage();
@@ -212,77 +372,116 @@ async function runOnce(browser, seedNumber, { takeShots }) {
     consoleErrors.push(message.text());
   });
   page.on("pageerror", (error) => consoleErrors.push(`pageerror: ${error.message}`));
-
   const loadStart = Date.now();
-  await page.goto(targetUrl, { waitUntil: "load" });
+  try {
+    await page.goto(targetUrl, { waitUntil: "load" });
+  } catch (error) {
+    await context.close().catch(() => {});
+    throw new ProbeError(`Could not open ${targetUrl}: ${error.message.split("\n")[0]}`);
+  }
   const loadMs = Date.now() - loadStart;
   const hookPresent = await page.evaluate(() => Boolean(window.__game?.state));
+  return { context, page, consoleErrors, loadMs, hookPresent };
+}
+
+// Updates the end-state flags and the stall clock for one state read; restarts after an end state.
+async function observeState(page, state, run) {
+  run.statusesSeen.add(state.status);
+  run.lastStateJson = JSON.stringify(state);
+  const progress = Number(state.progress);
+  if (Number.isFinite(progress)) run.maxProgress = Math.max(run.maxProgress, progress);
+
+  if (state.status === "playing") {
+    if (Number.isFinite(progress) && progress > run.roundBestProgress) {
+      run.roundBestProgress = progress;
+      run.stallStartMs = null;
+    } else if (run.stallStartMs === null) {
+      run.stallStartMs = Date.now();
+    }
+    if (run.stallStartMs !== null) {
+      run.longestStallSeconds = Math.max(run.longestStallSeconds, (Date.now() - run.stallStartMs) / 1000);
+    }
+    return;
+  }
+  if (state.status !== "won" && state.status !== "lost") return;
+
+  // The stall clock pauses on an end state, and the end state stays recorded across restarts.
+  if (state.status === "won") run.reachedWon = true;
+  if (state.status === "lost") run.reachedLost = true;
+  run.stallStartMs = null;
+  run.restartAttempts += 1;
+  await page.evaluate(() => window.__game.restart?.()).catch(() => {});
+  let backToPlaying = false;
+  const restartDeadline = Date.now() + RESTART_WAIT_MS;
+  while (Date.now() < restartDeadline && !backToPlaying) {
+    await sleep(100);
+    backToPlaying = (await readState(page))?.status === "playing";
+  }
+  if (!backToPlaying) run.restartFailures += 1;
+  run.roundBestProgress = -Infinity;
+}
+
+async function runActingSeed(browser, seedNumber, { takeShots }) {
+  const { context, page, consoleErrors, loadMs, hookPresent } = await openGamePage(browser, seedNumber);
   if (hookPresent) await page.evaluate((value) => window.__game.seed?.(value), seedNumber);
 
-  const events = eventsForBot(seedNumber);
-  const statusesSeen = new Set();
+  const run = {
+    seedNumber,
+    hookPresent,
+    consoleErrors,
+    loadMs,
+    statusesSeen: new Set(),
+    reachedWon: false,
+    reachedLost: false,
+    lastStateJson: "null",
+    maxProgress: -Infinity,
+    roundBestProgress: -Infinity,
+    stallStartMs: null,
+    longestStallSeconds: 0,
+    restartAttempts: 0,
+    restartFailures: 0,
+    inputResponseMs: null,
+  };
+  const events = eventsForActingRun(seedNumber);
+  const heldByModuleBot = { keys: new Set(), pointerX: null, pointerY: null, pointerDown: false };
   const shots = [];
-  let maxProgress = -Infinity;
-  let roundBestProgress = -Infinity;
-  let stallStartMs = null;
-  let longestStallSeconds = 0;
-  let restartAttempts = 0;
-  let restartFailures = 0;
   let firstInputAtMs = null;
-  let inputResponseMs = null;
   let baselineStateJson = null;
   let nextEventIndex = 0;
-  let nextPollAtMs = 0;
   let nextShotAtMs = 0;
   const shotEveryMs = Math.max(1000, (runSeconds * 1000) / 6);
   const startedAt = Date.now();
 
+  async function markFirstInput() {
+    if (firstInputAtMs !== null) return;
+    firstInputAtMs = Date.now();
+    baselineStateJson = JSON.stringify(await readState(page));
+  }
+
   while (Date.now() - startedAt < runSeconds * 1000) {
     const elapsedMs = Date.now() - startedAt;
     while (nextEventIndex < events.length && events[nextEventIndex].t <= elapsedMs) {
-      if (firstInputAtMs === null) {
-        firstInputAtMs = Date.now();
-        baselineStateJson = JSON.stringify(await readState(page));
-      }
+      await markFirstInput();
       await dispatchEvent(page, events[nextEventIndex]).catch(() => {});
       nextEventIndex += 1;
     }
-    if (hookPresent) {
-      const state = await readState(page);
-      if (state) {
-        if (firstInputAtMs !== null && inputResponseMs === null && JSON.stringify(state) !== baselineStateJson) {
-          inputResponseMs = Date.now() - firstInputAtMs;
+    const state = hookPresent ? await readState(page) : null;
+    if (state) {
+      if (moduleBotAct) {
+        let botOutput;
+        try {
+          botOutput = await moduleBotAct(state, elapsedMs);
+        } catch (error) {
+          await context.close().catch(() => {});
+          throw new ProbeError(`bot threw: ${error.message}`);
         }
-        if (elapsedMs >= nextPollAtMs) {
-          nextPollAtMs = elapsedMs + POLL_INTERVAL_MS;
-          statusesSeen.add(state.status);
-          const progress = Number(state.progress);
-          if (Number.isFinite(progress)) maxProgress = Math.max(maxProgress, progress);
-          if (state.status === "playing") {
-            if (Number.isFinite(progress) && progress > roundBestProgress) {
-              roundBestProgress = progress;
-              stallStartMs = null;
-            } else if (stallStartMs === null) {
-              stallStartMs = Date.now();
-            }
-            if (stallStartMs !== null) {
-              longestStallSeconds = Math.max(longestStallSeconds, (Date.now() - stallStartMs) / 1000);
-            }
-          } else if (state.status === "won" || state.status === "lost") {
-            restartAttempts += 1;
-            await page.evaluate(() => window.__game.restart?.()).catch(() => {});
-            let backToPlaying = false;
-            const restartDeadline = Date.now() + 2000;
-            while (Date.now() < restartDeadline && !backToPlaying) {
-              await sleep(100);
-              backToPlaying = (await readState(page))?.status === "playing";
-            }
-            if (!backToPlaying) restartFailures += 1;
-            roundBestProgress = -Infinity;
-            stallStartMs = null;
-          }
-        }
+        if (botAsksForInput(botOutput)) await markFirstInput();
+        await applyModuleBotOutput(page, heldByModuleBot, botOutput);
       }
+      if (firstInputAtMs !== null && run.inputResponseMs === null && JSON.stringify(state) !== baselineStateJson) {
+        run.inputResponseMs = Date.now() - firstInputAtMs;
+      }
+      await observeState(page, state, run);
     }
     if (takeShots && elapsedMs >= nextShotAtMs) {
       nextShotAtMs = elapsedMs + shotEveryMs;
@@ -292,24 +491,94 @@ async function runOnce(browser, seedNumber, { takeShots }) {
   }
 
   const finalState = hookPresent ? await readState(page) : null;
-  const frameDeltas = await page.evaluate(() => window.__probeFrames.slice(5)).catch(() => []);
+  const frameStats = await page.evaluate(() => window.__probeFrameStats).catch(() => null);
   const pageText = await page.evaluate(() => document.body?.innerText ?? "").catch(() => "");
   await context.close();
   return {
-    seedNumber,
-    hookPresent,
-    consoleErrors,
-    statusesSeen: [...statusesSeen],
-    maxProgress: Number.isFinite(maxProgress) ? maxProgress : null,
-    longestStallSeconds,
-    restartAttempts,
-    restartFailures,
+    ...run,
+    statusesSeen: [...run.statusesSeen],
     finalStateJson: JSON.stringify(finalState),
-    frameDeltas,
+    frameDeltas: (frameStats?.deltas ?? []).slice(5),
+    syncedFrames: frameStats?.syncedFrames ?? 0,
+    contextType: frameStats?.contextType ?? null,
     pageText,
-    loadMs,
-    inputResponseMs,
     shots: shots.filter(Boolean),
+  };
+}
+
+// Turns timed key events into [{ticks, keys}] segments; pointer events cannot be replayed by tick.
+function buildTickPlan(inputEvents, tickSeconds) {
+  const keyEvents = inputEvents.filter((inputEvent) => inputEvent.type === "key");
+  const skippedPointerEvents = inputEvents.length - keyEvents.length;
+  const heldKeys = new Set();
+  const segments = [];
+  let cursorTick = 0;
+  for (const keyEvent of keyEvents) {
+    const targetTick = Math.round(keyEvent.t / 1000 / tickSeconds);
+    if (targetTick > cursorTick) {
+      segments.push({ ticks: targetTick - cursorTick, keys: [...heldKeys] });
+      cursorTick = targetTick;
+    }
+    if (keyEvent.action === "down") heldKeys.add(keyEvent.key);
+    else heldKeys.delete(keyEvent.key);
+  }
+  segments.push({ ticks: Math.round(1 / tickSeconds), keys: [...heldKeys] });
+  return { segments, skippedPointerEvents };
+}
+
+function eventsForDeterminism(seedNumber) {
+  if (botKind === "script") return [...replayEvents].sort((first, second) => first.t - second.t);
+  const durationSeconds = Math.min(runSeconds, MAX_DETERMINISM_SECONDS);
+  return buildRandomBotEvents(seedNumber, durationSeconds, { includePointer: false });
+}
+
+// The whole replay runs inside one evaluate, so no animation frame can advance the game between ticks.
+async function replayByTicks(page, seedNumber, segments) {
+  return page.evaluate(
+    ({ seedNumber: seedValue, segments: plan }) => {
+      window.__probeReseed?.(seedValue);
+      window.__game.seed?.(seedValue);
+      window.__game.restart?.();
+      const initialStateJson = JSON.stringify(window.__game.state());
+      for (const segment of plan) window.__game.step(segment.ticks, segment.keys);
+      return { initialStateJson, finalStateJson: JSON.stringify(window.__game.state()) };
+    },
+    { seedNumber, segments },
+  );
+}
+
+async function runStepDeterminism(browser, seedNumber) {
+  const { context, page, consoleErrors } = await openGamePage(browser, seedNumber);
+  const hasStep = await page.evaluate(() => typeof window.__game?.step === "function").catch(() => false);
+  if (!hasStep) {
+    await context.close();
+    return { hasStep: false, consoleErrors };
+  }
+  const reportedTickSeconds = await page.evaluate(() => window.__game.state()?.dt).catch(() => null);
+  const tickSeconds = reportedTickSeconds > 0 ? reportedTickSeconds : DEFAULT_TICK_SECONDS;
+  const { segments, skippedPointerEvents } = buildTickPlan(eventsForDeterminism(seedNumber), tickSeconds);
+  const totalTicks = segments.reduce((sum, segment) => sum + segment.ticks, 0);
+  let first;
+  let second;
+  try {
+    first = await replayByTicks(page, seedNumber, segments);
+    second = await replayByTicks(page, seedNumber, segments);
+  } catch (error) {
+    await context.close().catch(() => {});
+    return { hasStep: true, consoleErrors, seedNumber, stepError: error.message.split("\n")[0].replace(/^page\.evaluate: /, "") };
+  }
+  await context.close();
+  return {
+    hasStep: true,
+    consoleErrors,
+    seedNumber,
+    totalTicks,
+    skippedPointerEvents,
+    firstHash: hashOf(first.finalStateJson),
+    secondHash: hashOf(second.finalStateJson),
+    stateChanged: first.finalStateJson !== first.initialStateJson,
+    firstStateJson: first.finalStateJson,
+    secondStateJson: second.finalStateJson,
   };
 }
 
@@ -322,16 +591,213 @@ function findControlsInReadme() {
   return Boolean(readmePath && /controls/i.test(readFileSync(readmePath, "utf8")));
 }
 
+// Fills the grid row by row: columns = min(tiles, 3), so no row is ever empty.
 async function writeContactSheet(browser, shots) {
   if (shots.length === 0) return;
+  const columns = Math.min(shots.length, 3);
+  const gap = 4;
   const images = shots.map((shot) => `<img src="data:image/png;base64,${shot.toString("base64")}">`).join("");
-  const page = await browser.newPage({ viewport: { width: 1200, height: 800 } });
+  const page = await browser.newPage({ viewport: { width: columns * tileWidth + (columns - 1) * gap, height: 200 } });
   await page.setContent(
-    `<body style="margin:0;background:#000;display:grid;grid-template-columns:repeat(3,1fr);gap:4px">` +
-      `${images}<style>img{width:100%}</style></body>`,
+    `<body style="margin:0;background:#000;display:grid;grid-template-columns:repeat(${columns},${tileWidth}px);gap:${gap}px">` +
+      `${images}<style>img{width:${tileWidth}px;display:block}</style></body>`,
   );
   await page.screenshot({ path: join(outputFolder, "sheet.png"), fullPage: true });
   await page.close();
+}
+
+function makeGate(status, detail, why = null, nextAction = null) {
+  const gate = { status, detail };
+  if (status !== "pass") {
+    gate.why = why ?? detail;
+    gate.try = nextAction ?? "inspect the detail above";
+  }
+  return gate;
+}
+
+const notSelectedGate = (gateNumber) =>
+  makeGate("not_tested", "not selected", "not selected", `add ${gateNumber} to --gates`);
+
+const noHookGate = () =>
+  makeGate(
+    "not_tested",
+    "window.__game hook missing",
+    "window.__game.state() is missing, so the probe cannot read the game",
+    "expose window.__game = { state, restart, seed } (see the hook contract)",
+  );
+
+function judgeConsoleErrors(allErrors) {
+  if (allErrors.length === 0) return makeGate("pass", "none");
+  const summary = `${allErrors.length}: ${allErrors.slice(0, 3).join(" | ")}`;
+  return makeGate("fail", summary, `${allErrors.length} console error(s), first: ${allErrors[0]}`, "fix the first error, then rerun");
+}
+
+function judgeEndStates(runs) {
+  const statuses = new Set(runs.flatMap((run) => run.statusesSeen));
+  const reachedWon = runs.some((run) => run.reachedWon);
+  const reachedLost = runs.some((run) => run.reachedLost);
+  const restartAttempts = runs.reduce((sum, run) => sum + run.restartAttempts, 0);
+  const restartFailures = runs.reduce((sum, run) => sum + run.restartFailures, 0);
+  const restartStatus = restartAttempts === 0 ? "not_tested" : restartFailures === 0 ? "pass" : "fail";
+  const subChecks = { reached_won: reachedWon, reached_lost: reachedLost, restart_ok: restartStatus };
+  const needWon = values.expect !== "lost";
+  const needLost = values.expect !== "won";
+  const detail =
+    `expect ${values.expect}; won ${reachedWon}, lost ${reachedLost}, restart ${restartAttempts} tries, ` +
+    `${restartFailures} failed to return to playing within ${RESTART_WAIT_MS / 1000} s`;
+  const missing = [];
+  if (needWon && !reachedWon) missing.push("won");
+  if (needLost && !reachedLost) missing.push("lost");
+  let gate;
+  if (missing.length > 0) {
+    const lastState = runs[runs.length - 1].lastStateJson;
+    gate = makeGate(
+      "fail",
+      detail,
+      `never reached ${missing.join(" and ")}; statuses seen: ${[...statuses].join(", ")}; last state: ${lastState}`,
+      "use a bot that can reach it (--bot FILE.mjs), run longer (--seconds), or set --expect to the end state that is reachable",
+    );
+  } else if (restartFailures > 0) {
+    gate = makeGate(
+      "fail",
+      detail,
+      `${restartFailures} of ${restartAttempts} restarts did not return status to playing within ${RESTART_WAIT_MS / 1000} s`,
+      "make restart() reset status to playing synchronously",
+    );
+  } else {
+    gate = makeGate("pass", detail);
+  }
+  return { ...gate, sub_checks: subChecks };
+}
+
+function judgeDeterminism(determinismRuns, wallclock, hookPresent) {
+  if (!hookPresent) return noHookGate();
+  if (wallclock) {
+    const same = wallclock.firstHash === wallclock.secondHash;
+    const detail = `wall clock: ${wallclock.firstHash.slice(0, 12)} vs ${wallclock.secondHash.slice(0, 12)}`;
+    return same
+      ? makeGate("pass", detail)
+      : makeGate("fail", detail, "two wall-clock runs of the same seed ended in different states (expected for any game driven by frame or wall time)", "add window.__game.step() and rerun, or remove unseeded randomness and time reads");
+  }
+  if (determinismRuns.length === 0 || !determinismRuns[0].hasStep) {
+    return makeGate(
+      "not_tested",
+      "window.__game.step missing",
+      "window.__game.step(ticks, keysDown) is missing, and a wall-clock repeat run is not repeatable enough to judge",
+      "add step(ticks, keysDown) that advances the fixed-step simulation synchronously, or pass --wallclock-determinism",
+    );
+  }
+  const throwing = determinismRuns.find((run) => run.stepError);
+  if (throwing) {
+    return makeGate(
+      "fail",
+      `step() threw on seed ${throwing.seedNumber}`,
+      `step() threw: ${throwing.stepError}`,
+      "fix the exception in step()",
+    );
+  }
+  const mismatches = determinismRuns.filter((run) => run.firstHash !== run.secondHash);
+  const first = determinismRuns[0];
+  const notes = [];
+  if (first.skippedPointerEvents > 0) notes.push(`${first.skippedPointerEvents} pointer events skipped`);
+  if (determinismRuns.every((run) => !run.stateChanged)) notes.push("state never changed, so input may not reach step()");
+  const detail =
+    `${determinismRuns.length} seed(s), ${first.totalTicks} ticks each: ${first.firstHash.slice(0, 12)} vs ${first.secondHash.slice(0, 12)}` +
+    (notes.length > 0 ? ` (${notes.join("; ")})` : "");
+  if (mismatches.length === 0) return makeGate("pass", detail);
+  const bad = mismatches[0];
+  return makeGate(
+    "fail",
+    detail,
+    `seed ${bad.seedNumber} replayed twice by ticks gave ${bad.firstHash.slice(0, 12)} vs ${bad.secondHash.slice(0, 12)}; run 1 ${bad.firstStateJson.slice(0, 120)}, run 2 ${bad.secondStateJson.slice(0, 120)}`,
+    "make step() depend only on the seed and the keys given; remove Date.now, performance.now and unseeded Math.random from the simulation",
+  );
+}
+
+function summarizeFrames(runs) {
+  const frames = runs.flatMap((run) => run.frameDeltas).sort((first, second) => first - second);
+  const syncedFrames = runs.reduce((sum, run) => sum + run.syncedFrames, 0);
+  const contextType = runs.map((run) => run.contextType).find(Boolean) ?? null;
+  const usesReadback = syncedFrames > 0 && syncedFrames >= frames.length / 2;
+  return {
+    frames,
+    method: usesReadback ? "context-readback" : "raf-delta",
+    context_type: contextType,
+    samples: frames.length,
+    p50: percentile(frames, 0.5),
+    p95: percentile(frames, 0.95),
+    p99: percentile(frames, 0.99),
+  };
+}
+
+function judgeFrameTime(summary) {
+  if (summary.p95 === null) {
+    return makeGate("fail", "no frames recorded", "the page requested no animation frames during the run", "check the game starts rendering on load and the run lasts long enough");
+  }
+  const methodNote = summary.method === "raf-delta"
+    ? "no page-created canvas context found, so rAF deltas only (no GPU sync)"
+    : `readback from the page's ${summary.context_type} context`;
+  const budgetNote = values["frame-budget-ms"] === "16.7" ? " (default)" : "";
+  const detail =
+    `p50 ${summary.p50.toFixed(1)} ms, p95 ${summary.p95.toFixed(1)} ms, p99 ${summary.p99.toFixed(1)} ms, ` +
+    `budget ${frameBudgetMs} ms${budgetNote}; ${methodNote}`;
+  if (summary.p95 <= frameBudgetMs) return makeGate("pass", detail);
+  return makeGate(
+    "fail",
+    detail,
+    `p95 ${summary.p95.toFixed(1)} ms is over the ${frameBudgetMs} ms budget`,
+    "profile the slowest frame; on --software runs raise --frame-budget-ms, the CPU renderer is slow",
+  );
+}
+
+function judgeSoftlock(runs) {
+  if (!runs.every((run) => run.hookPresent)) return noHookGate();
+  if (!isActingBot) {
+    return makeGate(
+      "not_tested",
+      "idle bot never acts",
+      "the idle bot presses nothing, so a lack of progress proves nothing",
+      "rerun with --bot random, --bot FILE.mjs or --input replay.json",
+    );
+  }
+  const longestStall = Math.max(...runs.map((run) => run.longestStallSeconds));
+  const detail = `longest stall ${longestStall.toFixed(1)} s, limit ${stallLimitSeconds} s${values["stall-seconds"] === "30" ? " (default)" : ""}`;
+  if (longestStall <= stallLimitSeconds) return makeGate("pass", detail);
+  return makeGate(
+    "fail",
+    detail,
+    `progress did not rise for ${longestStall.toFixed(1)} s while status was playing`,
+    "find where the bot got stuck (sheet.png) and add a way out or a timer",
+  );
+}
+
+function judgeControls(runs) {
+  const found = runs.some((run) => /controls/i.test(run.pageText)) || findControlsInReadme();
+  if (found) return makeGate("pass", "controls listed");
+  return makeGate(
+    "fail",
+    "no 'controls' text on the page or in a README beside the file",
+    "players cannot see which keys or buttons to use",
+    "show a Controls line on the title screen or in a README beside the file",
+  );
+}
+
+function printPlan() {
+  const secondsPerSeed = runSeconds + 3;
+  const wallclockExtra = values["wallclock-determinism"] && selectedGates.has(3) ? secondsPerSeed : 0;
+  const stepExtra = selectedGates.has(3) ? seedCount * 2 : 0;
+  const actingTotal = [...selectedGates].some((gate) => gate !== 3) ? seedCount * secondsPerSeed : 0;
+  const expected = Math.round(actingTotal + wallclockExtra + stepExtra + 5);
+  console.log(`Expected wall time about ${expected} s. Plan, bot ${botKind}, gates ${[...selectedGates].join(",")}:`);
+  for (let offset = 0; offset < seedCount; offset += 1) {
+    const seedNumber = firstSeed + offset;
+    const acting = actingTotal > 0 ? `play ${runSeconds} s` : "no play";
+    const determinism = selectedGates.has(3)
+      ? "; determinism by step() ticks if present (about 1 s), else not_tested"
+      : "";
+    console.log(`  seed ${seedNumber}: ${acting}${determinism}`);
+  }
+  if (wallclockExtra > 0) console.log(`  wall-clock determinism pair on seed ${firstSeed} if step() is missing`);
 }
 
 const launchArguments = values.software
@@ -340,6 +806,91 @@ const launchArguments = values.software
     ? ["--use-angle=d3d11", "--enable-gpu", "--ignore-gpu-blocklist", "--mute-audio"]
     : ["--mute-audio"];
 
+async function collectReport(browser) {
+  const seedNumbers = Array.from({ length: seedCount }, (_, offset) => firstSeed + offset);
+  const needsPlay = [...selectedGates].some((gate) => gate !== 3);
+  const runs = [];
+  if (needsPlay) {
+    for (const seedNumber of seedNumbers) {
+      runs.push(await runActingSeed(browser, seedNumber, { takeShots: seedNumber === firstSeed }));
+    }
+    await writeContactSheet(browser, runs[0].shots);
+  }
+
+  let hookPresent = runs.length > 0 && runs.every((run) => run.hookPresent);
+  const determinismRuns = [];
+  let wallclock = null;
+  if (selectedGates.has(3)) {
+    if (!needsPlay) {
+      const probePage = await openGamePage(browser, firstSeed);
+      hookPresent = probePage.hookPresent;
+      await probePage.context.close();
+    }
+    if (hookPresent) {
+      for (const seedNumber of seedNumbers) {
+        const result = await runStepDeterminism(browser, seedNumber);
+        determinismRuns.push(result);
+        if (!result.hasStep) break;
+      }
+      const stepMissing = determinismRuns.length > 0 && !determinismRuns[0].hasStep;
+      if (stepMissing && values["wallclock-determinism"]) {
+        const repeatRun = await runActingSeed(browser, firstSeed, { takeShots: false });
+        const baseline = runs[0] ?? (await runActingSeed(browser, firstSeed, { takeShots: false }));
+        wallclock = { firstHash: hashOf(baseline.finalStateJson), secondHash: hashOf(repeatRun.finalStateJson) };
+        runs.push({ ...repeatRun, repeatOnly: true });
+      }
+    }
+  }
+
+  const playRuns = runs.filter((run) => !run.repeatOnly);
+  const allErrors = [...runs.flatMap((run) => run.consoleErrors), ...determinismRuns.flatMap((run) => run.consoleErrors)];
+  const frameSummary = playRuns.length > 0 ? summarizeFrames(playRuns) : null;
+  const judges = {
+    1: () => judgeConsoleErrors(allErrors),
+    2: () => (hookPresent ? judgeEndStates(playRuns) : noHookGate()),
+    3: () => judgeDeterminism(determinismRuns, wallclock, hookPresent),
+    4: () => judgeFrameTime(frameSummary),
+    5: () => judgeSoftlock(playRuns),
+    6: () => judgeControls(playRuns),
+  };
+  const gates = {};
+  for (const [gateNumber, gateName] of Object.entries(GATE_NAMES)) {
+    gates[gateName] = selectedGates.has(Number(gateNumber)) ? judges[gateNumber]() : notSelectedGate(gateNumber);
+  }
+
+  return {
+    target: targetUrl,
+    bot: botPathArgument ?? botKind,
+    expect: values.expect,
+    seeds: seedNumbers,
+    gates,
+    frame_time: frameSummary && {
+      method: frameSummary.method,
+      context_type: frameSummary.context_type,
+      samples: frameSummary.samples,
+      p50_ms: frameSummary.p50,
+      p95_ms: frameSummary.p95,
+      p99_ms: frameSummary.p99,
+    },
+    advisory: {
+      load_ms: playRuns[0] ? Math.round(playRuns[0].loadMs) : null,
+      input_response_ms: playRuns[0]?.inputResponseMs ?? null,
+      input_response_note: "polled every 50 ms, so coarse",
+      max_progress: playRuns.length > 0 ? Math.max(...playRuns.map((run) => run.maxProgress)) : null,
+    },
+  };
+}
+
+function exitCodeFor(report) {
+  // A gate left out with --gates was not asked for, so it must not turn a clean subset run into exit 3.
+  const judgedGates = Object.values(report.gates).filter((gate) => gate.detail !== "not selected");
+  const statuses = judgedGates.map((gate) => gate.status);
+  if (statuses.includes("fail")) return 1;
+  if (statuses.includes("not_tested")) return 3;
+  return 0;
+}
+
+printPlan();
 let browser;
 try {
   browser = await chromium.launch({ headless: true, args: launchArguments });
@@ -350,83 +901,19 @@ try {
 mkdirSync(outputFolder, { recursive: true });
 let report;
 try {
-  const runs = [];
-  for (let offset = 0; offset < seedCount; offset += 1) {
-    runs.push(await runOnce(browser, firstSeed + offset, { takeShots: offset === 0 }));
-  }
-  const repeatRun = await runOnce(browser, firstSeed, { takeShots: false });
-  await writeContactSheet(browser, runs[0].shots);
-
-  const hookPresent = runs.every((run) => run.hookPresent);
-  const allErrors = runs.flatMap((run) => run.consoleErrors).concat(repeatRun.consoleErrors);
-  const statuses = new Set(runs.flatMap((run) => run.statusesSeen));
-  const restartAttempts = runs.reduce((sum, run) => sum + run.restartAttempts, 0);
-  const restartFailures = runs.reduce((sum, run) => sum + run.restartFailures, 0);
-  const hashOf = (text) => createHash("sha256").update(text).digest("hex");
-  const firstHash = hashOf(runs[0].finalStateJson);
-  const secondHash = hashOf(repeatRun.finalStateJson);
-  const frames = runs.flatMap((run) => run.frameDeltas).sort((first, second) => first - second);
-  const frameP95 = percentile(frames, 0.95);
-  const longestStall = Math.max(...runs.map((run) => run.longestStallSeconds));
-  const controlsFound = runs.some((run) => /controls/i.test(run.pageText)) || findControlsInReadme();
-  const noHook = "window.__game hook missing";
-
-  report = {
-    target: targetUrl,
-    bot: botKind,
-    seeds: runs.map((run) => run.seedNumber),
-    gates: {
-      console_errors: {
-        pass: allErrors.length === 0,
-        detail: allErrors.length === 0 ? "none" : `${allErrors.length}: ${allErrors.slice(0, 3).join(" | ")}`,
-      },
-      won_and_lost: {
-        pass: hookPresent && statuses.has("won") && statuses.has("lost"),
-        detail: hookPresent ? `statuses seen: ${[...statuses].join(", ")}` : noHook,
-      },
-      restart: {
-        pass: hookPresent && restartAttempts > 0 && restartFailures === 0,
-        detail: hookPresent
-          ? `${restartAttempts} restarts, ${restartFailures} failed to return to playing within 2 s`
-          : noHook,
-      },
-      determinism: {
-        pass: hookPresent && firstHash === secondHash,
-        detail: hookPresent ? `${firstHash.slice(0, 12)} vs ${secondHash.slice(0, 12)}` : noHook,
-      },
-      frame_time_p95: {
-        pass: frameP95 !== null && frameP95 <= frameBudgetMs,
-        detail:
-          frameP95 === null
-            ? "no frames recorded"
-            : `p50 ${percentile(frames, 0.5).toFixed(1)} ms, p95 ${frameP95.toFixed(1)} ms, p99 ${percentile(frames, 0.99).toFixed(1)} ms, budget ${frameBudgetMs} ms${values["frame-budget-ms"] === "16.7" ? " (default)" : ""}`,
-      },
-      softlock: {
-        pass: hookPresent && longestStall <= stallLimitSeconds,
-        detail: hookPresent
-          ? `longest stall ${longestStall.toFixed(1)} s, limit ${stallLimitSeconds} s${values["stall-seconds"] === "30" ? " (default)" : ""}`
-          : noHook,
-      },
-      controls: {
-        pass: controlsFound,
-        detail: controlsFound ? "controls listed" : "no 'controls' text on the page or in a README beside the file",
-      },
-    },
-    advisory: {
-      load_ms: Math.round(runs[0].loadMs),
-      input_response_ms: runs[0].inputResponseMs,
-      input_response_note: "polled every 50 ms, so coarse",
-      max_progress: Math.max(...runs.map((run) => run.maxProgress ?? -Infinity)),
-    },
-  };
-} finally {
-  await browser.close();
+  report = await collectReport(browser);
+} catch (error) {
+  await browser.close().catch(() => {});
+  fail(error instanceof ProbeError ? error.message : `probe failed: ${error.stack ?? error.message}`);
 }
+await browser.close();
 
 writeFileSync(join(outputFolder, "report.json"), JSON.stringify(report, null, 2));
-let allPass = true;
 for (const [gateName, gate] of Object.entries(report.gates)) {
-  allPass = allPass && gate.pass;
-  console.log(`${gate.pass ? "PASS" : "FAIL"}  ${gateName}: ${gate.detail}`);
+  console.log(`${gate.status.toUpperCase()}  ${gateName}: ${gate.detail}`);
+  if (gate.status !== "pass") {
+    console.log(`  why: ${gate.why}`);
+    console.log(`  try: ${gate.try}`);
+  }
 }
-process.exit(allPass ? 0 : 1);
+process.exit(exitCodeFor(report));

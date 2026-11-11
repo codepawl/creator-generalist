@@ -32,6 +32,8 @@ Paths use `{{WORK_DIR}}` for the project folder and `{{SKILL_DIR}}` for this ski
 The engine is a brief slot, not a mode: web (three.js, Phaser or plain canvas) when people open it in a browser;
 Godot or Unity for a light native game (ask once, record the pick); Unreal for photoreal or when a jam requires it.
 Details and the jam checklist: `references/engine-and-ship.md`.
+Idea check, lore as mechanic, readability and trailer order: `references/idea-lore-trailer.md` (read at steps 1, 2 and
+8). A C++ Unreal game built headless, its scripted capture and the web target: `references/unreal-jam-build.md`.
 
 ## Order of work: the production spine
 
@@ -43,9 +45,9 @@ next round: fix, continue in a direction, or "you decide" free creative mode (th
 | Step | Writes | Game rules for the step |
 |---|---|---|
 | 1. Brief | `brief.md` | `references/intent-brief.md`: one-sentence promise (verb, goal, win, lose), platform and input, session length, time box, scope cut list, not-a-copy line |
-| 2. Reference | `refs/`, `refs/NOTES.md` | games of the genre and gameplay footage, one "take / leave" line each; asset sources found for every subject |
+| 2. Reference | `refs/`, `refs/NOTES.md` | games of the genre and gameplay footage, one "take / leave" line each; a CC0 asset search for every subject with what was searched, `prototype` included (footage optional there) |
 | 3. Design | `design.md`, `features.json` | one page: core loop (input, rule, feedback, win, lose, restart), controls, progression, fail state; every feature has a machine check and starts `passes: false`: `references/design-one-pager.md`, `scripts/check_features.py --start` |
-| 4. Prep and play gate | `plan.md`, playable greybox, style frames A/B/C, then `LOOK.md` | primitives allowed here only; the greybox reaches win, lose and restart under the bot; the user plays it and picks a look; a loop that is not fun is reshaped or killed with a one-line reason |
+| 4. Prep and play gate | `plan.md`, playable greybox, style frames A/B/C, `go-kill.md` (prototype), then `LOOK.md` | the greybox may be primitives; style frames never recolour it: same subject and layout on the step-2 assets, differing in palette and light plus texture, rendering or shape language; gates 1, 2 and 6 pass on the greybox, 3 to 5 are measured and reported; the user plays it and picks a look; `go-kill.md` reads "not played yet" until the user's line comes back; a loop that is not fun is reshaped or killed with a one-line reason |
 | 5. Assets and check | `assets/`, `CREDITS.md` | real resources first, scale and budgets measured on the target device |
 | 6. Build | the game, one feature at a time | a feature's `passes` flips only after its check ran; feel first, then feedback layers one at a time behind toggles: `references/game-feel.md`; WIP playable link after the first finished slice |
 | 7. Sound | SFX, music, mix | `design-sound`: a cue for every player action and outcome; still playable muted |

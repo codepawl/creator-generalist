@@ -25,14 +25,21 @@ A web build exposes this before the first frame is drawn:
 window.__game = {
   state() { /* JSON: at least { status: 'playing'|'won'|'lost', progress: number } */ },
   restart() { /* back to the exact initial state */ },
-  seed(seedNumber) { /* reseed every random source the game uses */ }
+  seed(seedNumber) { /* reseed every random source the game uses */ },
+  step(ticks, keysDown) { /* optional: advance the fixed-step sim synchronously with these keys held */ }
 }
 ```
 
 - `progress` rises as the player advances (score, distance, rooms cleared). The softlock gate reads it.
-- `state()` also carries every value a replay should assert (position, health, score). The state hash is taken over this JSON.
+- `state()` also carries every value a replay or a bot needs (position, health, score, target positions), plus
+  `tick` and `dt` (seconds per tick, default 1/60) when the game has `step()`. The state hash is taken over this JSON.
 - All game randomness comes from the seeded source. Never call `Math.random()` in game code.
-- Game logic runs on a fixed timestep, not on wall time.
+- Game logic runs on a fixed timestep, not on wall time. Keep the rules in a pure module (`sim.js`) that the page and
+  a Node check both import: unit checks and `step()` then run the same code as the browser.
+- `step()` is what makes gate 3 testable: without it a wall-clock replay drifts by a frame and the hash differs on a
+  deterministic game, so the probe reports gate 3 `not_tested`.
+- A `?speed=N` debug query param (sim ticks per frame) lets a 3-minute lose clock fit in a short probe run. Write the
+  factor used in `brief.md`.
 
 Input replay JSON, an array of events:
 
@@ -51,34 +58,53 @@ Input replay JSON, an array of events:
 | # | Gate | Passes when |
 |---|---|---|
 | 1 | No errors | zero console errors and zero uncaught script errors over a full run |
-| 2 | Win, lose, restart | the bot reaches `won` and `lost`, and `restart()` returns to the initial state |
-| 3 | Determinism | same seed and same input replay give the same final state hash twice |
+| 2 | Win, lose, restart | runs reach `won` and `lost` (one run each with `--expect`, or both in one), and `restart()` returns to the initial state |
+| 3 | Determinism | same seed and same inputs, run by ticks through `step()`, give the same state hash twice |
 | 4 | Frame time | p95 frame time at or under the budget in `brief.md` (default 16.7 ms for 60 Hz), measured with a sync per frame |
-| 5 | No softlock | `progress` never stalls longer than N seconds under the bot (default 30) |
+| 5 | No softlock | `progress` never stalls longer than N seconds under an acting bot (default 30); end screens pause the clock |
 | 6 | Controls shown | the controls are listed on screen or in the README, checked by a string test |
 
-A failing gate blocks the preview. Fix and rerun. A gate that fails twice means cut a feature, not tune the gate (`references/pipeline-spine.md`, critique loops).
+Each gate reports `pass`, `fail` or `not_tested`, and every gate that is not `pass` carries a `why` (the cause, with
+numbers) and a `try` (the next action). A failing or untested hard gate blocks the preview; `not_tested` needs the
+missing hook or run, not a fix to the game. Fix and rerun. A gate that fails twice means cut a feature, not tune the gate (`references/pipeline-spine.md`, critique loops).
 
 ## Run the gates on a web build
 
-Serve the build locally (or pass a file path). `scripts/probe.mjs` needs Node 18 or newer and Playwright with Chromium. When either is missing it exits 2 with a clear message.
+Serve the build locally or pass a file path (a prototype's `index.html` works; `build/` is for `game` mode). The probe
+needs Node 18 or newer and Playwright with Chromium; when either is missing it exits 2 with a clear message. Run it
+through the machine's GPU queue if it has one, in the background when it runs longer than about 2 minutes (machine
+paths: `local.md`).
 
 ```
-node scripts/probe.mjs <url-or-file> --seconds 20 --seed 1 [--input replay.json] [--bot idle|random|script] [--seeds 8] [--stall-seconds 30] [--viewport 1280x720] [--out DIR]
+node {{SKILL_DIR}}/scripts/probe.mjs <url-or-file> --seconds 20 --seed 1 [--input replay.json]
+  [--bot idle|random|script|<bot.mjs>] [--expect won|lost|both] [--gates 1,2,4] [--seeds 8]
+  [--stall-seconds 30] [--viewport 1280x720] [--wallclock-determinism] [--out DIR]
 ```
 
-It writes `DIR/report.json` and `DIR/sheet.png`. Exit code: 0 all hard gates pass, 1 a gate failed, 2 cannot run.
+It prints the expected wall time first, then writes `DIR/report.json` and `DIR/sheet.png`. Exit code: 0 all judged
+gates pass, 1 a gate failed, 3 nothing failed but a gate is `not_tested`, 2 cannot run. The probe never creates a
+canvas context: it syncs on the one the page made (WebGL or 2D).
 
-| Gate | Command |
+| Gate | Command (`P` = `node {{SKILL_DIR}}/scripts/probe.mjs`) |
 |---|---|
-| 1 and 5 | `node scripts/probe.mjs {{WORK_DIR}}/build/index.html --seconds 120 --seed 1 --bot random --stall-seconds 30 --out {{WORK_DIR}}/qa/run1` |
-| 2 | `node scripts/probe.mjs <url> --seconds 60 --seed 1 --bot script --input {{WORK_DIR}}/qa/win.json --out {{WORK_DIR}}/qa/win`, then the same with `lose.json`. Reaching `won`, `lost` and then calling `restart()` is recorded in `report.json` |
-| 3 | `node scripts/probe.mjs <url> --seconds 20 --seed 1 --input replay.json --out {{WORK_DIR}}/qa/a`, rerun into `qa/b`. The probe also runs the pair itself and reports `deterministic: true or false` |
-| 4 | any run above. The probe reads a pixel (a sync) after every frame, then takes p50, p95, p99 and the worst frame. Headless `requestAnimationFrame` alone over-reports fps, so never use it for this gate |
+| 1, 4 and 5 | `P <build> --seconds 120 --bot random --seeds 3 --gates 1,4,5 --out {{WORK_DIR}}/qa/random` |
+| 2, won | `P <build>?speed=4 --bot {{WORK_DIR}}/tools/bot.mjs --expect won --gates 2 --out {{WORK_DIR}}/qa/win` |
+| 2, lost | `P <build>?speed=4 --bot idle --expect lost --gates 2 --out {{WORK_DIR}}/qa/lose` |
+| 3 | `P <build> --input {{WORK_DIR}}/replays/run.json --gates 3 --out {{WORK_DIR}}/qa/determinism`: run by ticks through `step()`, twice per seed |
+| 4 | any run above. The probe reads a pixel back after every frame, then takes p50, p95, p99 and the worst frame. Headless `requestAnimationFrame` alone over-reports fps, so never use it for this gate. Note how busy the GPU was |
 | 6 | `grep -iE "controls|wasd|arrow|click|tap" README.md` or a string test on the page text |
-| all seeds | add `--seeds 8` to a random-bot run: eight seeds, crashes and stalls logged per seed |
 
-Features: `uv run --no-project python scripts/check_features.py {{WORK_DIR}}/features.json` (exit 0 ok, 1 a feature lacks a verify step or a pass flag changed wrongly, 2 file unreadable). Run it before flipping any `passes` value.
+- Bots: `idle` presses nothing, `random` mashes the game's keys, `script` plays `--input`. A goal-seeking game (reach,
+  collect, aim, steer) needs a closed-loop module bot: a `.mjs` file exporting `act(state, elapsedMs)` that returns
+  the held key names (or `{keys, pointer: {x, y, down}}`), called every poll. Open-loop replays drift and miss. The
+  bot reacts once per poll of wall time, so keep `?speed` at 3 or lower for it; idle lose runs can go faster.
+- Gates left out of `--gates` do not count toward the exit code.
+- Wall time is about `--seconds` times the number of seeds; `--wallclock-determinism` (engines without `step()`)
+  doubles it.
+
+Features: `uv run --no-project python {{SKILL_DIR}}/scripts/check_features.py {{WORK_DIR}}/features.json` (exit 0 ok,
+1 a feature lacks a verify step, or with `--start` any `passes` is true, 2 file unreadable). Run it before flipping
+any `passes` value.
 
 Run real measurements on a GPU browser. Software rendering (SwiftShader) is for the script's own unit tests only, because it changes frame time.
 
@@ -96,6 +122,8 @@ Report these in `report.json` and the preview note. They never block, because th
 | First input | seconds from load to the first thing the player can do | 10 s |
 | Readability | contact sheet at 360x640 and 1920x1080; player, threat and goal against the background | contrast 3:1 |
 | Audio | every input verb and outcome has a cue; peak under 1.0; limiter before the output; the game stays playable muted | n/a |
+| Input hygiene | a script: hold a key and blur the window (keys must release), click or mash during the end screen (no instant skip), resize mid-run, hide the tab (the sim pauses) | all four behave |
+| Session length | a competent closed-loop bot's win time against the session length in `brief.md` | within the brief's range |
 
 - Readability: judge the sheet with a subagent that returns text. Run the critique two or three times and act on items flagged twice. A model judge is good at filtering and weak at absolute scores.
 - Audio tests run muted on a speaker-less path: tap an analyser node, never play to the real output in a test.

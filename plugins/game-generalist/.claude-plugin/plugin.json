@@ -1,6 +1,6 @@
 {
   "name": "game-generalist",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Playable-game studio for creators: a one-sentence promise becomes a playable greybox you try, a locked look, a built original game and a measured playtest report, on web (three.js, Phaser, canvas), Godot, Unity or Unreal, with scripted bots and gates for errors, win and lose paths, restart, determinism, frame time and softlocks.",
   "author": {
     "name": "CodePawl",

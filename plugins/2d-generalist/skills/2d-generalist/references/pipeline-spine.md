@@ -37,7 +37,7 @@ next round (see the last sections).
 
 ### 1. Brief
 
-Run the intent brief (`intent-brief.md` in this folder; the 2D skill has its own copy). Inside it, check the installed
+Run the intent brief of the calling skill (`references/intent-brief.md` in the 3D, 2D or game skill's own folder). Inside it, check the installed
 tools and report only what is missing. Ask the cast and copyright question here when the piece shows real people,
 brands or characters someone owns: name the risk in one line, ask once, and follow the answer.
 
@@ -49,6 +49,11 @@ Look at the real thing before inventing it.
   measured size when one exists.
 - A real place, period, weather or light gets real footage, aerials or photos of that place and that day. A storm
   report says overcast: the film is overcast.
+- Matching a reference video or picture: copy its camera first. Estimate its lens, height and distance, render
+  one grey camera test beside the reference frame, and list what fills each part of that frame (numbered build
+  list on the frame) before dressing anything. A wrong lens or an empty corner found after the build costs a
+  round each.
+- A prop that reads wrong (a knife that is not a knife) is replaced by a real model, not reshaped.
 - Search for ready resources here, in this order: an add-on or library that supplies the asset, an open online
   model, scan or photo, and only then a build from the references. Write down what was searched when nothing fits.
 - `refs/NOTES.md` gives one line per file: what it is for (shape, light, motion, colour, scale), plus the measured
@@ -74,7 +79,8 @@ that can actually be made, and the build starts with everything at hand.
   style family); otherwise they differ only in look.
 - Render two or three style frames, labelled A, B and C, at final grade on the real hero assets or the closest
   sourced stand-ins, never primitive boxes. Each option differs in look (palette, light, lens, texture), not in
-  subject.
+  subject. A game's greybox may be primitives, but its style frames are never a recolour of it (the game skill's step 4
+  row).
 - Add the cheapest timing proof: a grey blockout with the real cameras, or an animatic of boards or stills timed
   to the scratch voice. Shots, order and ending are fixed here.
 - Send the plan summary, the options and the timing proof in one message. The user picks and gives the reason in
