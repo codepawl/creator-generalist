@@ -15,6 +15,7 @@ Read `local.md` next to this file when it exists (machine paths).
 - A character, creature, head or bust that must read as organic, not blobby or symmetric.
 - Rocks, cliffs, terrain, bark, ruins, worn and damaged props.
 - Refining an AI base mesh (Tripo Studio) or a scanned mesh: re-cutting planes, eyelids, mouth corners, folds.
+- A realistic close-up asset from AI: generate in parts, retopo, bake to a low poly (`references/ai-mesh-to-game-ready.md`).
 - Turning one picture (AI image, render, figurine photo, drawing) into a sculpt measured against it.
 - Baking sculpt detail onto a low-poly mesh for a game engine, three.js or 67js.
 
@@ -72,6 +73,7 @@ Worked procedural example: `blender -b --python scripts/procedural_rock.py -- --
 | Blender 5.x brushes, remesh, Dyntopo, Multires, masks, face sets, bake, retopo, sculpting through bpy | `references/blender-sculpt-tools.md` |
 | Form hierarchy, heads, bodies, creatures, asymmetry, stylisation, procedural and AI-mesh routes | `references/form-and-anatomy.md` |
 | One image to a sculpt: views, registration, screening, staged fitting, IoU and normal-error targets | `references/image-to-sculpt.md` |
+| AI high-poly in parts to a baked low poly: Tripo Studio steps, `scripts/bake_ai_mesh.py`, detail normal, roughness | `references/ai-mesh-to-game-ready.md` |
 | Skin and surface layers, cloth folds, rocks, cliffs, terrain, bark, hard surface, stamps | `references/surfaces-environment-and-hard-surface.md` |
 | Stylised cartoon character sculpt, step by step | `~/.claude/skills/model-characters/references/sculpt-stylized.md` |
 | Which detail method is cheapest (texture, displacement, scatter, cards, model) | `~/.claude/skills/3d-generalist/references/assets-and-kitbash.md` |

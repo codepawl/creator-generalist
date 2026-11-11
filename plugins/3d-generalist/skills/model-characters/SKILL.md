@@ -31,7 +31,7 @@ When a generalist skill called this one with a brief, use that brief and do not 
 | Low poly: PS1, N64, chibi, anime, mascot, painterly, under about 2k triangles | Low-poly | `references/style-presets.md`, then `references/low-poly-route.md` |
 | Stylized and smooth: cartoon, Pixar-like, figurine, toy, collectible | Sculpt | `references/sculpt-stylized.md`, then retopo by the base-mesh route; anatomy, creatures, surface detail, bake and the silhouette check: the `sculpt-models` skill |
 | Clean quads for subdivision, a game LOD or a sculpt base | Base mesh | `references/base-mesh-and-box-modeling.md` |
-| Realistic human or creature | Generate or source, then adapt | `3d-generalist` `references/characters-and-rigs.md` (generators, scans, Mixamo, retargeting) |
+| Realistic human or creature | Generate or source, then adapt | `3d-generalist` `references/characters-and-rigs.md` (generators, scans, Mixamo, retargeting); for close-ups generate in parts and bake: `sculpt-models` `references/ai-mesh-to-game-ready.md` |
 | Anime-semireal, painted or manga character, finished by painting and rendered in EEVEE | Painted | `references/stylized-character-process.md` (build order, head, body, hair), then `references/npr-shading-and-painted-look.md` |
 | Toon shader, key and rim light, Solidify outline, painted mask layers or hatching on any model | Shading | `references/npr-shading-and-painted-look.md` (shared with the background and animation skills) |
 | An existing model to restyle | Adapt | Keep the rig if it has one. Repaint by `uv-and-texturing.md`, reshape by the sculpt route |
