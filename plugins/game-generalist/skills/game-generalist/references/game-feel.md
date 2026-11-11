@@ -51,7 +51,7 @@ Order and caps (defaults):
 1. Sound on the action. One cue per verb (see design-sound). Peak under 1.0, limiter before the output.
 2. Hit-stop. Freeze the sim 2 to 6 frames on a strong hit; keep input and sound running. Never on every hit.
 3. Screen shake. Decay over 150 to 300 ms; cap offset at about 2% of screen width; scale with impact; respect a "reduce
-   motion" toggle that turns it off.
+   motion" toggle that turns it off. Shake and flash wrap the scene only; draw the HUD and overlays after, unshaken.
 4. Particles. Few, short, on the event only. Cap the count; check frame time after adding them. No ambient glow around
    a human-scale hand or body.
 5. Squash and stretch. 10 to 20% scale change over 3 to 6 frames, volume kept.
@@ -99,7 +99,9 @@ and the player cannot tell what happened.
 1. Feel: timestep, response, forgiveness, then feedback layers one at a time.
 2. Readability: silhouettes, contrast, camera, HUD at phone size.
 3. Audio: a cue for every player action and outcome; loudness measured; a muted run still plays.
-4. UI: title, controls line, end screen, restart in one input.
+4. UI: title, controls line, end screen, restart in one input. Pause on blur and on a hidden tab, release held keys on
+   blur, resume on a press. Text over the scene gets a dim backing and a minimum on-screen size; a controls line
+   stays on one line and fades after the first seconds of play.
 
 After each stage run the hard gates again. Polish mode adds no features; a new idea goes to the cut list.
 

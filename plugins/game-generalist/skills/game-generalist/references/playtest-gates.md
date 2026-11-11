@@ -23,14 +23,18 @@ A web build exposes this before the first frame is drawn:
 
 ```js
 window.__game = {
-  state() { /* JSON: at least { status: 'playing'|'won'|'lost', progress: number } */ },
+  state() { /* JSON: at least { status: 'title'|'playing'|'paused'|'won'|'lost', progress: number } */ },
   restart() { /* back to the exact initial state */ },
   seed(seedNumber) { /* reseed every random source the game uses */ },
-  step(ticks, keysDown) { /* optional: advance the fixed-step sim synchronously with these keys held */ }
+  step(ticks, keysDown) { /* optional: advance the fixed-step sim synchronously with these keys held */ },
+  screen() { /* optional: 'title'|'play'|'pause'|'end', for UI feature checks */ },
+  effects() { /* optional: counters such as { particles, shakes, flashes } since restart */ }
 }
 ```
 
-- `progress` rises as the player advances (score, distance, rooms cleared). The softlock gate reads it.
+- `progress` rises as the player advances (score, distance, rooms cleared). The softlock gate reads it, so it counts
+  every kind of advance toward the win, including a meter that fills while the player holds a position; counting only
+  the main action made a maintenance phase read as a 36 s softlock.
 - `state()` also carries every value a replay or a bot needs (position, health, score, target positions), plus
   `tick` and `dt` (seconds per tick, default 1/60) when the game has `step()`. The state hash is taken over this JSON.
 - All game randomness comes from the seeded source. Never call `Math.random()` in game code.
@@ -40,6 +44,10 @@ window.__game = {
   deterministic game, so the probe reports gate 3 `not_tested`.
 - A `?speed=N` debug query param (sim ticks per frame) lets a 3-minute lose clock fit in a short probe run. Write the
   factor used in `brief.md`.
+- A game with a title screen reports `status: 'title'` there and supports `?autostart=1` to skip it; the probe's
+  `--autostart` adds it. The softlock clock does not run on `title`, `paused`, `won` or `lost`.
+- UI features (title, pause, HUD, feedback toggles) are verified by a small Playwright check the build writes: it
+  drives the input, reads `screen()` and `effects()`, and saves a screenshot as evidence. The probe does not judge them.
 
 Input replay JSON, an array of events:
 
@@ -60,17 +68,21 @@ Input replay JSON, an array of events:
 | 1 | No errors | zero console errors and zero uncaught script errors over a full run |
 | 2 | Win, lose, restart | runs reach `won` and `lost` (one run each with `--expect`, or both in one), and `restart()` returns to the initial state |
 | 3 | Determinism | same seed and same inputs, run by ticks through `step()`, give the same state hash twice |
-| 4 | Frame time | p95 frame time at or under the budget in `brief.md` (default 16.7 ms for 60 Hz), measured with a sync per frame |
-| 5 | No softlock | `progress` never stalls longer than N seconds under an acting bot (default 30); end screens pause the clock |
+| 4 | Frame time | p95 frame time at or under the budget in `brief.md` (default 1.25 refresh intervals, 20.8 ms at 60 Hz) and under 1% dropped frames (over 1.5 intervals), measured with a sync per frame on an idle GPU. Deltas jitter 1 to 2 ms around vsync with no visible stutter; a dropped frame is the stutter people see |
+| 5 | No softlock | `progress` never stalls longer than N seconds under the closed-loop bot (default 30); title, pause and end screens stop the clock. A stall under the random bot is not a softlock when every run ends on its own |
 | 6 | Controls shown | the controls are listed on screen or in the README, checked by a string test |
 
 Each gate reports `pass`, `fail` or `not_tested`, and every gate that is not `pass` carries a `why` (the cause, with
 numbers) and a `try` (the next action). A failing or untested hard gate blocks the preview; `not_tested` needs the
-missing hook or run, not a fix to the game. Fix and rerun. A gate that fails twice means cut a feature, not tune the gate (`references/pipeline-spine.md`, critique loops).
+missing hook or run, not a fix to the game. Step 8 stays open, and no preview goes out, until every hard gate reads
+`pass`. Fix and rerun. A gate that fails twice means cut a feature, not tune the gate (`references/pipeline-spine.md`, critique loops).
 
 ## Run the gates on a web build
 
-Serve the build locally or pass a file path (a prototype's `index.html` works; `build/` is for `game` mode). The probe
+Freeze the build before the first gate run and log any edit made after it; a gate run against a file that changed
+mid-run proves nothing. Serve the build over http for gate 4 (a `file://` page with image files taints the canvas, so
+the probe cannot sync on it); a file path is fine for the other gates (a prototype's `index.html` works; `build/` is
+for `game` mode). The probe
 needs Node 18 or newer and Playwright with Chromium; when either is missing it exits 2 with a clear message. Run it
 through the machine's GPU queue if it has one, in the background when it runs longer than about 2 minutes (machine
 paths: `local.md`).
@@ -78,26 +90,31 @@ paths: `local.md`).
 ```
 node {{SKILL_DIR}}/scripts/probe.mjs <url-or-file> --seconds 20 --seed 1 [--input replay.json]
   [--bot idle|random|script|<bot.mjs>] [--expect won|lost|both] [--gates 1,2,4] [--seeds 8]
-  [--stall-seconds 30] [--viewport 1280x720] [--wallclock-determinism] [--out DIR]
+  [--stall-seconds 30] [--viewport 1280x720] [--refresh-hz 60] [--frame-budget-ms N] [--max-dropped-percent 1]
+  [--autostart] [--wallclock-determinism] [--out DIR]
 ```
 
 It prints the expected wall time first, then writes `DIR/report.json` and `DIR/sheet.png`. Exit code: 0 all judged
 gates pass, 1 a gate failed, 3 nothing failed but a gate is `not_tested`, 2 cannot run. The probe never creates a
-canvas context: it syncs on the one the page made (WebGL or 2D).
+canvas context: it syncs on the one the page made. WebGL is read back directly; a 2D canvas is copied into a WebGL
+texture and read there, because `getImageData` every frame makes Chrome move the canvas off the GPU (measured: a
+sprite scene at 16.8 ms p95 went to 133 ms).
 
 | Gate | Command (`P` = `node {{SKILL_DIR}}/scripts/probe.mjs`) |
 |---|---|
-| 1, 4 and 5 | `P <build> --seconds 120 --bot random --seeds 3 --gates 1,4,5 --out {{WORK_DIR}}/qa/random` |
-| 2, won | `P <build>?speed=4 --bot {{WORK_DIR}}/tools/bot.mjs --expect won --gates 2 --out {{WORK_DIR}}/qa/win` |
-| 2, lost | `P <build>?speed=4 --bot idle --expect lost --gates 2 --out {{WORK_DIR}}/qa/lose` |
+| 1 and 4 | `P <http-build> --seconds 120 --bot random --seeds 3 --autostart --gates 1,4 --out {{WORK_DIR}}/qa/random` |
+| 5 | `P <build> --seconds 120 --bot {{WORK_DIR}}/tools/bot.mjs --autostart --gates 5 --out {{WORK_DIR}}/qa/softlock` (a game with no goal to seek can use `random`) |
+| 2, won | `P <build>?speed=3 --bot {{WORK_DIR}}/tools/bot.mjs --expect won --gates 2 --out {{WORK_DIR}}/qa/win` |
+| 2, lost | `P <build>?speed=4 --bot idle --autostart --expect lost --gates 2 --out {{WORK_DIR}}/qa/lose` |
 | 3 | `P <build> --input {{WORK_DIR}}/replays/run.json --gates 3 --out {{WORK_DIR}}/qa/determinism`: run by ticks through `step()`, twice per seed |
-| 4 | any run above. The probe reads a pixel back after every frame, then takes p50, p95, p99 and the worst frame. Headless `requestAnimationFrame` alone over-reports fps, so never use it for this gate. Note how busy the GPU was |
-| 6 | `grep -iE "controls|wasd|arrow|click|tap" README.md` or a string test on the page text |
+| 4 | the http run above. The probe syncs after every frame, then takes p50, p95, p99 and the worst frame. Headless `requestAnimationFrame` alone over-reports fps, so never use it for this gate. Read the GPU load before the run: on a card busy with other jobs the result is `not_tested`, not `fail`; rerun on an idle card before the preview |
+| 6 | the probe looks for the word "controls" in the page text or in a README beside the page (`grep -i controls README.md`) |
 
 - Bots: `idle` presses nothing, `random` mashes the game's keys, `script` plays `--input`. A goal-seeking game (reach,
   collect, aim, steer) needs a closed-loop module bot: a `.mjs` file exporting `act(state, elapsedMs)` that returns
   the held key names (or `{keys, pointer: {x, y, down}}`), called every poll. Open-loop replays drift and miss. The
-  bot reacts once per poll of wall time, so keep `?speed` at 3 or lower for it; idle lose runs can go faster.
+  bot reacts once per poll of wall time, so keep `?speed` at 3 or lower for it; idle lose runs can go faster. The
+  build writes `tools/bot.mjs` from the game's state contract; `tests/fixture-bot.mjs` is the template.
 - Gates left out of `--gates` do not count toward the exit code.
 - Wall time is about `--seconds` times the number of seeds; `--wallclock-determinism` (engines without `step()`)
   doubles it.
@@ -108,7 +125,7 @@ any `passes` value.
 
 Run real measurements on a GPU browser. Software rendering (SwiftShader) is for the script's own unit tests only, because it changes frame time.
 
-Native dialogs and UI drawn off the canvas are invisible to browser automation. Add one scripted manual check for each (title screen, pause, any `alert`).
+Title and pause screens drawn by the game are covered by the UI check above. Native dialogs (`alert`, file pickers) are invisible to browser automation: add one scripted manual check for each.
 
 ## Advisory checks
 

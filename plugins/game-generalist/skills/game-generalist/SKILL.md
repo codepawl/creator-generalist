@@ -29,6 +29,10 @@ Paths use `{{WORK_DIR}}` for the project folder and `{{SKILL_DIR}}` for this ski
 | `game` | A complete small original game inside the brief's time box (a jam entry is this mode) | all eight |
 | `polish` | Feel, readability, audio and QA passes on an existing playable; no new features | 1, then 6 to 8 |
 
+Prototype to game after a go: set the mode, done condition and cut list in `brief.md` (rewrite superseded lines in
+place), add a dated `## Freeze` and a change-log line to `plan.md`, turn each `skip: prototype` progress line into
+`open`, keep `LOOK.md` locked, and start at step 5.
+
 The engine is a brief slot, not a mode: web (three.js, Phaser or plain canvas) when people open it in a browser;
 Godot or Unity for a light native game (ask once, record the pick); Unreal for photoreal or when a jam requires it.
 Details and the jam checklist: `references/engine-and-ship.md`.
@@ -50,7 +54,7 @@ next round: fix, continue in a direction, or "you decide" free creative mode (th
 | 4. Prep and play gate | `plan.md`, playable greybox, style frames A/B/C, `go-kill.md` (prototype), then `LOOK.md` | the greybox may be primitives; style frames never recolour it: same subject and layout on the step-2 assets, differing in palette and light plus texture, rendering or shape language; gates 1, 2 and 6 pass on the greybox, 3 to 5 are measured and reported; the user plays it and picks a look; `go-kill.md` reads "not played yet" until the user's line comes back; a loop that is not fun is reshaped or killed with a one-line reason |
 | 5. Assets and check | `assets/`, `CREDITS.md` | real resources first, scale and budgets measured on the target device |
 | 6. Build | the game, one feature at a time | a feature's `passes` flips only after its check ran; feel first, then feedback layers one at a time behind toggles: `references/game-feel.md`; WIP playable link after the first finished slice |
-| 7. Sound | SFX, music, mix | `design-sound`: a cue for every player action and outcome; still playable muted |
+| 7. Sound | SFX, music, mix | `design-sound` picks the sounds, `references/web-game-audio.md` wires them in a web page: a cue for every player action and outcome; still playable muted |
 | 8. Gates, preview, final | `report.json`, `capture.mp4`, playable build | the six hard gates in `references/playtest-gates.md` (`scripts/probe.mjs` for web builds), then a 30-60 s capture of real play; the user plays the preview before any final build |
 
 ## Hard rules

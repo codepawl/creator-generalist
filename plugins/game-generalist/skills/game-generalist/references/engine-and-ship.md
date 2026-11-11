@@ -44,7 +44,10 @@ The engine is a slot in `brief.md`. This file holds only what a game needs on to
 ## Capture real play
 
 - Record 30 to 60 s of real play of the build, with sound, as `capture.mp4`. Record real gameplay before writing any caption, post or devlog about the game.
-- Web: record the page with the browser's own capture, or drive it with a replay and record the screen. Keep the window at the target size.
+- Web: `node {{SKILL_DIR}}/scripts/record.mjs <url> --seconds 45 --bot <bot.mjs> --size 960x540 --autostart --out capture.mp4`
+  records the page with the game's own sound (tapped from its audio graph, never the speakers), aligns them on a
+  flash-and-beep marker and prints the offset. A WIP clip uses the same script at 640x360. Check the track with
+  `ffmpeg -af volumedetect` before sending.
 - Godot: `--write-movie` with `--fixed-fps 60` gives a steady file; mux the audio afterward. Unity: the Recorder package or a screen capture. Unreal: a screen capture of the packaged build, or a Movie Render Queue pass for a cleaner clip.
 - Show the loop, one win or loss and the restart. Do not cut together moments the game cannot produce.
 - Send a small, low-quality capture first. Make the full-quality one only after the user signs off.

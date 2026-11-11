@@ -63,8 +63,47 @@ check(Boolean(broken.report?.gates.console_errors.why), "failed gate needs why")
 const late = runProbe(lateFixturePath, "late");
 checkAllGatesPass(late, "2d-late fixture");
 check(late.report?.frame_time?.context_type === "2d", "2d-late fixture should get a non-null 2d context");
-check(late.report?.frame_time?.method === "context-readback", "2d-late fixture should sync by readback");
+check(late.report?.frame_time?.method === "2d-webgl-copy", "2d-late fixture should sync by the WebGL copy, never getImageData");
 check(late.report?.gates.determinism.status === "pass", "2d-late determinism should pass via step()");
+
+const filtersFixturePath = join(testsFolder, "fixture-2d-filters.html");
+const filters = runProbe(filtersFixturePath, "filters", ["--seconds", "4", "--bot", "idle", "--gates", "4"]);
+check(filters.report?.frame_time?.method === "2d-webgl-copy", `filters fixture: method should be 2d-webgl-copy, got ${filters.report?.frame_time?.method}\n${filters.output}`);
+check(["pass", "fail"].includes(filters.report?.gates.frame_time_p95.status), `filters fixture: gate 4 should be judged, got ${filters.report?.gates.frame_time_p95.status}`);
+
+const titleFixturePath = join(testsFolder, "fixture-title.html");
+const titleIdle = runProbe(titleFixturePath, "title-idle", ["--seconds", "8", "--bot", "idle", "--gates", "2", "--expect", "lost"]);
+check(titleIdle.report?.gates.won_and_lost.status === "fail", "title fixture without --autostart: idle never leaves the title, gate 2 should fail");
+const titleAutostart = runProbe(titleFixturePath, "title-autostart", ["--seconds", "9", "--bot", "idle", "--gates", "2", "--expect", "lost", "--autostart"]);
+check(titleAutostart.report?.gates.won_and_lost.status === "pass", `title fixture with --autostart: gate 2 should reach lost\n${titleAutostart.output}`);
+check(/autostart=1/.test(titleAutostart.report?.target ?? ""), "--autostart should put autostart=1 into the target url");
+const autostartKeepsQuery = runProbe(`${pathToFileURL(titleFixturePath).href}?a=1#top`, "title-query", ["--seconds", "2", "--gates", "1", "--bot", "idle", "--autostart"]);
+check(/\?a=1&autostart=1#top$/.test(autostartKeepsQuery.report?.target ?? ""), `--autostart should keep the query and hash, got ${autostartKeepsQuery.report?.target}`);
+
+const holdKeyBotPath = join(workFolder, "holdkeybot.mjs");
+writeFileSync(holdKeyBotPath, 'export function act() { return ["a"]; }\n');
+const titleSoftlock = runProbe(titleFixturePath, "title-softlock", ["--seconds", "9", "--bot", holdKeyBotPath, "--gates", "5", "--stall-seconds", "3", "--autostart"]);
+check(titleSoftlock.report?.gates.softlock.status === "pass", `softlock must not count the paused 3 s: ${titleSoftlock.report?.gates.softlock.detail}`);
+
+const taintedFolder = mkdtempSync(join(tmpdir(), "probe-tainted-"));
+const spritePngBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+writeFileSync(join(taintedFolder, "sprite.png"), Buffer.from(spritePngBase64, "base64"));
+const taintedPagePath = join(taintedFolder, "tainted.html");
+writeFileSync(
+  taintedPagePath,
+  `<canvas width="64" height="64"></canvas><script>
+  const context = document.querySelector("canvas").getContext("2d");
+  const sprite = new Image();
+  sprite.src = "sprite.png";
+  window.__game = { seed() {}, restart() {}, state() { return { status: "playing", progress: 0 }; } };
+  (function draw() { if (sprite.complete) context.drawImage(sprite, 0, 0, 8, 8); requestAnimationFrame(draw); })();
+  </script>`,
+);
+const tainted = runProbe(taintedPagePath, "tainted", ["--seconds", "3", "--bot", "idle", "--gates", "4"]);
+check(tainted.report?.gates.frame_time_p95.status === "not_tested", `tainted canvas: gate 4 should be not_tested, got ${tainted.report?.gates.frame_time_p95.status}\n${tainted.output}`);
+check(/canvas tainted \(file:\/\/ sprites\): serve over http/.test(tainted.report?.gates.frame_time_p95.why ?? ""), "tainted canvas: why should name the tainted canvas");
+check(/serve the folder over http and rerun/.test(tainted.report?.gates.frame_time_p95.try ?? ""), "tainted canvas: try should say to serve over http");
+check(tainted.report?.frame_time?.method === "raf-only", "tainted canvas: method should fall back to raf-only");
 
 const moduleBot = runProbe(fixturePath, "module", ["--seconds", "8", "--bot", botPath, "--expect", "won", "--gates", "1,2"]);
 check(moduleBot.report?.gates.won_and_lost.status === "pass", `module bot should reach won\n${moduleBot.output}`);

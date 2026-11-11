@@ -75,14 +75,16 @@ An array of 5 to 15 items. The core loop, win, lose and restart are always items
 
 Replay files follow the input replay format: an array of `{t: ms, type: "key"|"pointer", key?, x?, y?, action: "down"|"up"|"move"}`.
 
-A feature that needs a native dialog or an off-canvas UI cannot be seen by browser automation: add a scripted manual
-check as its verify step.
+UI features (title, pause, HUD, feedback toggles) verify through a Playwright check that reads the optional `screen()`
+and `effects()` hooks and saves a screenshot (`playtest-gates.md`). A native dialog cannot be seen by browser
+automation: add a scripted manual check as its verify step.
 
 ## Freeze and change log
 
-- At the end of step 4, the list is frozen. Add a `## Freeze` line to `plan.md` with the date and item count.
-- After the freeze, adding or removing a feature needs one line in `plan.md`: id, reason, what was cut to pay for it.
-- Feature freeze when all items pass (alpha); content freeze after the preview round (beta). After a freeze, fix only.
+- List freeze, end of step 4: add a `## Freeze` line to `plan.md` with the date and item count. After it, adding or
+  removing a feature needs one line in `plan.md`: id, reason, what was cut to pay for it.
+- Feature freeze (alpha), when all items pass, and content freeze (beta), after the preview round: fix only, every
+  edit logged in `plan.md`.
 - Check before delivery: every item has a verify step, and none passes without a run behind it.
 
 ## Go/kill note (prototype mode)

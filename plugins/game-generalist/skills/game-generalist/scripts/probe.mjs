@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 /**
  * Playtest probe for web games that expose the page hook:
- *   window.__game = { state() -> { status: 'playing'|'won'|'lost', progress: number, tick?, dt?, ... },
+ *   window.__game = { state() -> { status: 'playing'|'won'|'lost'|'title'|'paused', progress: number, tick?, dt?, ... },
  *                     restart(), seed(n), step(ticks, keysDown)? }
  * The probe never creates a canvas context: an init script records the context the page asks for,
  * and the per-frame GPU sync reads one pixel back from the page's own context on the largest canvas.
+ * Frame time sync (report.json frame_time.method): webgl-readback for webgl/webgl2 pages,
+ * 2d-webgl-copy for 2D pages (never getImageData), raf-only when there is no usable canvas.
  * Gate statuses: pass | fail | not_tested. Every gate that is not pass carries "why" and "try".
  * Exit 0: all pass. 1: a gate failed. 3: nothing failed but a gate was not tested. 2: the probe could not run.
  */
@@ -19,15 +21,19 @@ const USAGE = `Usage: node probe.mjs <url-or-file> --seconds 20 --seed 1 [option
   --input FILE          replay JSON: [{t, type:'key'|'pointer', key?, x?, y?, action:'down'|'up'|'move'}]
   --bot idle|random|script|FILE.mjs   default: script when --input is given, else random.
                         A .mjs/.js file exports act(state, elapsedMs) -> ['ArrowLeft', ...] or {keys, pointer:{x,y,down}}
+  --seed N              first seed (default 1)
   --seeds N             run seeds seed..seed+N-1 and aggregate (default 1)
   --expect won|lost|both  end states gate 2 requires (default both)
   --gates 1,2,4         judge only these gates (others are not_tested)
   --stall-seconds N     softlock limit (default 30, a default)
   --viewport WxH        default 1280x720
-  --frame-budget-ms N   p95 frame time limit (default 16.7 for 60 Hz, a default)
+  --refresh-hz N        display refresh rate (default 60)
+  --frame-budget-ms N   p95 frame time limit (default 1.25 refresh intervals: 20.8 ms at 60 Hz)
+  --max-dropped-percent N  frames over 1.5 refresh intervals allowed (default 1)
   --tile-width N        contact sheet tile width (default 480)
   --wallclock-determinism  for games without step(): compare two wall-clock runs
   --out DIR             default ./probe-out
+  --autostart           append autostart=1 to the URL query (keeps an existing query), for games that wait on a title screen
   --software            use SwiftShader instead of the GPU (for tests)
   --help
 Gates: 1 console_errors, 2 won_and_lost, 3 determinism, 4 frame_time_p95, 5 softlock, 6 controls.`;
@@ -55,11 +61,14 @@ function parseCommandLineStrict() {
     gates: { type: "string" },
     "stall-seconds": { type: "string", default: "30" },
     viewport: { type: "string", default: "1280x720" },
-    "frame-budget-ms": { type: "string", default: "16.7" },
+    "refresh-hz": { type: "string", default: "60" },
+    "frame-budget-ms": { type: "string" },
+    "max-dropped-percent": { type: "string", default: "1" },
     "tile-width": { type: "string", default: "480" },
     "wallclock-determinism": { type: "boolean", default: false },
     out: { type: "string", default: "probe-out" },
     software: { type: "boolean", default: false },
+    autostart: { type: "boolean", default: false },
     help: { type: "boolean", short: "h" },
   },
   });
@@ -79,7 +88,16 @@ const runSeconds = parsePositiveNumber(values.seconds, "--seconds");
 const firstSeed = parseIntegerAtLeast(values.seed, -Infinity, "--seed");
 const seedCount = parseIntegerAtLeast(values.seeds, 1, "--seeds");
 const stallLimitSeconds = parsePositiveNumber(values["stall-seconds"], "--stall-seconds");
-const frameBudgetMs = parsePositiveNumber(values["frame-budget-ms"], "--frame-budget-ms");
+// Frame deltas jitter a millisecond or two around vsync without any visible stutter, so the default budget sits a
+// quarter interval above the refresh, and a dropped frame (over 1.5 intervals) is counted separately.
+const refreshIntervalMs = 1000 / parsePositiveNumber(values["refresh-hz"], "--refresh-hz");
+const frameBudgetIsDefault = values["frame-budget-ms"] === undefined;
+const frameBudgetMs = frameBudgetIsDefault
+  ? Math.round(refreshIntervalMs * 1.25 * 10) / 10
+  : parsePositiveNumber(values["frame-budget-ms"], "--frame-budget-ms");
+// A dropped frame is one over 1.5 expected intervals; an explicit budget (a slow software run) widens the interval too.
+const droppedFrameThresholdMs = 1.5 * Math.max(refreshIntervalMs, frameBudgetMs / 1.25);
+const maxDroppedPercent = parsePositiveNumber(values["max-dropped-percent"], "--max-dropped-percent");
 const tileWidth = Math.max(100, Number(values["tile-width"]));
 if (!/^\d+x\d+$/.test(values.viewport)) fail(`--viewport must look like 1280x720, got "${values.viewport}"`);
 const [viewportWidth, viewportHeight] = values.viewport.split("x").map(Number);
@@ -182,7 +200,17 @@ function buildTargetUrl(argument) {
   const suffix = suffixStart === -1 ? "" : argument.slice(suffixStart);
   return pathToFileURL(resolve(pathPart)).href + suffix;
 }
-const targetUrl = buildTargetUrl(targetArgument);
+
+// Puts autostart=1 into the query, before any #hash, and keeps the query the caller already had.
+function addAutostartParameter(url) {
+  const hashStart = url.indexOf("#");
+  const beforeHash = hashStart === -1 ? url : url.slice(0, hashStart);
+  const hash = hashStart === -1 ? "" : url.slice(hashStart);
+  const separator = beforeHash.includes("?") ? "&" : "?";
+  return `${beforeHash}${separator}autostart=1${hash}`;
+}
+const builtTargetUrl = buildTargetUrl(targetArgument);
+const targetUrl = values.autostart ? addAutostartParameter(builtTargetUrl) : builtTargetUrl;
 
 const replayEvents = values.input ? JSON.parse(readFileSync(values.input, "utf8")) : [];
 
@@ -223,12 +251,37 @@ function buildInitScript(seedNumber) {
     return context;
   };
 
-  function buildSync(entry) {
+  // getImageData every frame makes Chrome move a 2D canvas off GPU acceleration, so the probe would
+  // time a slower canvas than the player sees. Copying the canvas into a helper WebGL texture and
+  // reading one pixel back forces the GPU to finish the frame without touching the 2D canvas.
+  function buildCanvasCopySync(sourceCanvas) {
+    const helperCanvas = document.createElement('canvas');
+    helperCanvas.width = 1;
+    helperCanvas.height = 1;
+    const gl = originalGetContext.call(helperCanvas, 'webgl2', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' });
+    if (!gl) return null;
+    // One fixed 1x1 texture and framebuffer, built once. Each frame only the top-left pixel of the canvas is
+    // copied in place (texSubImage2D), so no storage is reallocated and no full-size copy is made; the copy
+    // still waits for the canvas to finish drawing, which is the sync wanted.
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA8, 1, 1);
+    const framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    const pixel = new Uint8Array(4);
+    return () => {
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, sourceCanvas);
+      gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    };
+  }
+
+  function buildSync(canvas, entry) {
     if (entry.type === 'webgl' || entry.type === 'webgl2') {
       const pixel = new Uint8Array(4);
       return () => entry.context.readPixels(0, 0, 1, 1, entry.context.RGBA, entry.context.UNSIGNED_BYTE, pixel);
     }
-    if (entry.type === '2d') return () => entry.context.getImageData(0, 0, 1, 1);
+    if (entry.type === '2d') return buildCanvasCopySync(canvas);
     return null;
   }
 
@@ -248,28 +301,51 @@ function buildInitScript(seedNumber) {
   }
 
   const syncByCanvas = new WeakMap();
-  const stats = { deltas: [], syncedFrames: 0, contextType: null };
+  const stats = { deltas: [], unsyncedDeltas: [], syncedFrames: 0, contextType: null, syncMethod: null, tainted: false };
   window.__probeFrameStats = stats;
 
+  // The last frames of every cycle skip the sync, so the same run yields a plain rAF figure to put
+  // beside the synced one. Without it a slow readback and a slow game look the same.
+  const FRAMES_PER_CYCLE = 120;
+  const UNSYNCED_FRAMES_PER_CYCLE = 30;
+  let frameIndex = 0;
+
+  // Returns 'synced', 'skipped' (sync was left out on purpose) or 'none' (no canvas to sync).
   function forceSync() {
     const largest = findLargestVisibleCanvas();
-    if (!largest) return;
-    if (!syncByCanvas.has(largest.canvas)) syncByCanvas.set(largest.canvas, buildSync(largest.entry));
+    if (!largest) return 'none';
+    if (!syncByCanvas.has(largest.canvas)) syncByCanvas.set(largest.canvas, buildSync(largest.canvas, largest.entry));
     const sync = syncByCanvas.get(largest.canvas);
-    if (!sync) return;
+    if (!sync) return 'none';
+    if (frameIndex % FRAMES_PER_CYCLE >= FRAMES_PER_CYCLE - UNSYNCED_FRAMES_PER_CYCLE) return 'skipped';
     try {
       sync();
       stats.syncedFrames += 1;
       stats.contextType = largest.entry.type;
-    } catch (error) {}
+      stats.syncMethod = largest.entry.type === '2d' ? '2d-webgl-copy' : 'webgl-readback';
+    } catch (error) {
+      // A canvas tainted by cross-origin sprites (file:// pages) cannot be copied: stop syncing it.
+      if (error && error.name === 'SecurityError') {
+        stats.tainted = true;
+        syncByCanvas.set(largest.canvas, null);
+        return 'none';
+      }
+    }
+    return 'synced';
   }
 
   let previousTime = null;
+  let previousMode = null;
   function onFrame() {
-    forceSync();
+    frameIndex += 1;
+    const mode = forceSync();
     const afterSync = performance.now();
-    if (previousTime !== null) stats.deltas.push(afterSync - previousTime);
+    if (previousTime !== null) {
+      if (mode === 'skipped' && previousMode === 'skipped') stats.unsyncedDeltas.push(afterSync - previousTime);
+      else if (mode !== 'skipped' && previousMode !== 'skipped') stats.deltas.push(afterSync - previousTime);
+    }
     previousTime = afterSync;
+    previousMode = mode;
     requestAnimationFrame(onFrame);
   }
   requestAnimationFrame(onFrame);
@@ -351,6 +427,7 @@ function botAsksForInput(botOutput) {
 }
 
 const sleep = (milliseconds) => new Promise((done) => setTimeout(done, milliseconds));
+const MIN_UNSYNCED_SAMPLES = 20;
 const percentile = (sortedValues, fraction) =>
   sortedValues.length === 0
     ? null
@@ -401,6 +478,11 @@ async function observeState(page, state, run) {
     if (run.stallStartMs !== null) {
       run.longestStallSeconds = Math.max(run.longestStallSeconds, (Date.now() - run.stallStartMs) / 1000);
     }
+    return;
+  }
+  // Waiting on a title screen or a pause is not a softlock: the stall clock stops there too.
+  if (state.status === "title" || state.status === "paused") {
+    run.stallStartMs = null;
     return;
   }
   if (state.status !== "won" && state.status !== "lost") return;
@@ -499,8 +581,11 @@ async function runActingSeed(browser, seedNumber, { takeShots }) {
     statusesSeen: [...run.statusesSeen],
     finalStateJson: JSON.stringify(finalState),
     frameDeltas: (frameStats?.deltas ?? []).slice(5),
+    unsyncedFrameDeltas: frameStats?.unsyncedDeltas ?? [],
     syncedFrames: frameStats?.syncedFrames ?? 0,
     contextType: frameStats?.contextType ?? null,
+    syncMethod: frameStats?.syncMethod ?? null,
+    canvasTainted: frameStats?.tainted ?? false,
     pageText,
     shots: shots.filter(Boolean),
   };
@@ -582,13 +667,31 @@ async function runStepDeterminism(browser, seedNumber) {
   };
 }
 
-function findControlsInReadme() {
-  if (!targetUrl.startsWith("file:")) return false;
-  const targetPath = fileURLToPath(targetUrl);
-  const readmePath = ["README.md", "readme.md", "README.txt"]
-    .map((name) => join(dirname(targetPath), name))
-    .find((candidate) => existsSync(candidate));
+const README_NAMES = ["README.md", "readme.md", "README.txt"];
+
+function findControlsInLocalReadme() {
+  const targetPath = fileURLToPath(targetUrl.split("?")[0]);
+  const readmePath = README_NAMES.map((name) => join(dirname(targetPath), name)).find((candidate) => existsSync(candidate));
   return Boolean(readmePath && /controls/i.test(readFileSync(readmePath, "utf8")));
+}
+
+// Over http the README beside the page is fetched from the same folder the page was served from.
+async function findControlsInServedReadme() {
+  for (const name of README_NAMES) {
+    try {
+      const response = await fetch(new URL(name, targetUrl));
+      if (response.ok && /controls/i.test(await response.text())) return true;
+    } catch {
+      // An unreachable README is the same as no README.
+    }
+  }
+  return false;
+}
+
+async function findControlsInReadme() {
+  if (targetUrl.startsWith("file:")) return findControlsInLocalReadme();
+  if (/^https?:/.test(targetUrl)) return findControlsInServedReadme();
+  return false;
 }
 
 // Fills the grid row by row: columns = min(tiles, 3), so no row is ever empty.
@@ -716,36 +819,66 @@ function judgeDeterminism(determinismRuns, wallclock, hookPresent) {
 
 function summarizeFrames(runs) {
   const frames = runs.flatMap((run) => run.frameDeltas).sort((first, second) => first - second);
+  const unsyncedFrames = runs.flatMap((run) => run.unsyncedFrameDeltas).sort((first, second) => first - second);
   const syncedFrames = runs.reduce((sum, run) => sum + run.syncedFrames, 0);
   const contextType = runs.map((run) => run.contextType).find(Boolean) ?? null;
-  const usesReadback = syncedFrames > 0 && syncedFrames >= frames.length / 2;
+  const syncMethod = runs.map((run) => run.syncMethod).find(Boolean) ?? null;
+  const usesSync = syncedFrames > 0 && syncedFrames >= frames.length / 2;
+  const canvasTainted = runs.some((run) => run.canvasTainted);
   return {
     frames,
-    method: usesReadback ? "context-readback" : "raf-delta",
+    method: usesSync && !canvasTainted ? syncMethod : "raf-only",
+    canvas_tainted: canvasTainted,
     context_type: contextType,
     samples: frames.length,
     p50: percentile(frames, 0.5),
     p95: percentile(frames, 0.95),
     p99: percentile(frames, 0.99),
+    dropped_percent: frames.length > 0
+      ? (100 * frames.filter((delta) => delta > droppedFrameThresholdMs).length) / frames.length
+      : null,
+    unsynced_samples: unsyncedFrames.length,
+    unsynced_p50: percentile(unsyncedFrames, 0.5),
+    unsynced_p95: percentile(unsyncedFrames, 0.95),
   };
 }
 
 function judgeFrameTime(summary) {
+  if (summary.canvas_tainted) {
+    return makeGate(
+      "not_tested",
+      "canvas tainted (file:// sprites): serve over http",
+      "canvas tainted (file:// sprites): serve over http",
+      "serve the folder over http and rerun",
+    );
+  }
   if (summary.p95 === null) {
     return makeGate("fail", "no frames recorded", "the page requested no animation frames during the run", "check the game starts rendering on load and the run lasts long enough");
   }
-  const methodNote = summary.method === "raf-delta"
+  const methodNote = summary.method === "raf-only"
     ? "no page-created canvas context found, so rAF deltas only (no GPU sync)"
-    : `readback from the page's ${summary.context_type} context`;
-  const budgetNote = values["frame-budget-ms"] === "16.7" ? " (default)" : "";
+    : summary.method === "2d-webgl-copy"
+      ? "GPU sync by copying the 2d canvas into a helper WebGL texture"
+      : `readback from the page's ${summary.context_type} context`;
+  const budgetNote = frameBudgetIsDefault ? " (default)" : "";
+  const hasUnsyncedFigure = summary.unsynced_samples >= MIN_UNSYNCED_SAMPLES;
+  const unsyncedNote = hasUnsyncedFigure
+    ? `; unsynced rAF p50 ${summary.unsynced_p50.toFixed(1)} ms, p95 ${summary.unsynced_p95.toFixed(1)} ms`
+    : "";
   const detail =
     `p50 ${summary.p50.toFixed(1)} ms, p95 ${summary.p95.toFixed(1)} ms, p99 ${summary.p99.toFixed(1)} ms, ` +
-    `budget ${frameBudgetMs} ms${budgetNote}; ${methodNote}`;
-  if (summary.p95 <= frameBudgetMs) return makeGate("pass", detail);
+    `budget ${frameBudgetMs} ms${budgetNote}; dropped ${summary.dropped_percent.toFixed(1)}% ` +
+    `(over ${droppedFrameThresholdMs.toFixed(1)} ms, limit ${maxDroppedPercent}%); ${methodNote}${unsyncedNote}`;
+  // The synced figure is the gate on every page; the unsynced rAF figure (a short sample) is advisory only.
+  const droppedTooMany = summary.dropped_percent > maxDroppedPercent;
+  if (summary.p95 <= frameBudgetMs && !droppedTooMany) return makeGate("pass", detail);
+  const cause = droppedTooMany
+    ? `${summary.dropped_percent.toFixed(1)}% of frames dropped (over ${droppedFrameThresholdMs.toFixed(1)} ms)`
+    : `p95 ${summary.p95.toFixed(1)} ms is over the ${frameBudgetMs} ms budget`;
   return makeGate(
     "fail",
     detail,
-    `p95 ${summary.p95.toFixed(1)} ms is over the ${frameBudgetMs} ms budget`,
+    cause,
     "profile the slowest frame; on --software runs raise --frame-budget-ms, the CPU renderer is slow",
   );
 }
@@ -771,8 +904,8 @@ function judgeSoftlock(runs) {
   );
 }
 
-function judgeControls(runs) {
-  const found = runs.some((run) => /controls/i.test(run.pageText)) || findControlsInReadme();
+function judgeControls(runs, readmeHasControls) {
+  const found = runs.some((run) => /controls/i.test(run.pageText)) || readmeHasControls;
   if (found) return makeGate("pass", "controls listed");
   return makeGate(
     "fail",
@@ -845,13 +978,14 @@ async function collectReport(browser) {
   const playRuns = runs.filter((run) => !run.repeatOnly);
   const allErrors = [...runs.flatMap((run) => run.consoleErrors), ...determinismRuns.flatMap((run) => run.consoleErrors)];
   const frameSummary = playRuns.length > 0 ? summarizeFrames(playRuns) : null;
+  const readmeHasControls = selectedGates.has(6) ? await findControlsInReadme() : false;
   const judges = {
     1: () => judgeConsoleErrors(allErrors),
     2: () => (hookPresent ? judgeEndStates(playRuns) : noHookGate()),
     3: () => judgeDeterminism(determinismRuns, wallclock, hookPresent),
     4: () => judgeFrameTime(frameSummary),
     5: () => judgeSoftlock(playRuns),
-    6: () => judgeControls(playRuns),
+    6: () => judgeControls(playRuns, readmeHasControls),
   };
   const gates = {};
   for (const [gateNumber, gateName] of Object.entries(GATE_NAMES)) {
@@ -866,11 +1000,17 @@ async function collectReport(browser) {
     gates,
     frame_time: frameSummary && {
       method: frameSummary.method,
+      canvas_tainted: frameSummary.canvas_tainted,
       context_type: frameSummary.context_type,
       samples: frameSummary.samples,
       p50_ms: frameSummary.p50,
       p95_ms: frameSummary.p95,
       p99_ms: frameSummary.p99,
+      dropped_percent: frameSummary.dropped_percent,
+      budget_ms: frameBudgetMs,
+      unsynced_raf_samples: frameSummary.unsynced_samples,
+      unsynced_raf_p50_ms: frameSummary.unsynced_p50,
+      unsynced_raf_p95_ms: frameSummary.unsynced_p95,
     },
     advisory: {
       load_ms: playRuns[0] ? Math.round(playRuns[0].loadMs) : null,
