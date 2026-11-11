@@ -4,16 +4,24 @@ Reading map: 1 Generate in parts · 2 Assemble · 3 Retopo and UV · 4 Bake (scr
 Marks: [M] measured here on 2026-11-11, [R] reported by the source video and not tested here, [O] checked against
 the vendor's own page. Tripo steps use the Tripo Studio web app.
 
-## 1. Generate in parts [R]
+## 1. Generate in parts [M]
 
-For a creature, vehicle or character that must hold up in close-up, do not generate the whole thing at once:
+For a creature, vehicle or character that must hold up in close-up, do not generate the whole thing at once.
+Measured 2026-11-11 on one shore crab photo, H3.1, same 2K export and credits per job: the claw inside a whole-crab
+generation got about 43k faces and 0.39M texture pixels and read as smooth clay; the claw generated alone got 288k faces
+and 2.8M texture pixels (about 7 times both) with the shell granules and joints carved in the geometry. The part image
+drifted from the photo (chunkier claw, the pincer teeth lost), so step 2's check is required, not optional.
 
 1. List the parts that differ in shape: for a crab, the top shell, the underside, one claw, one leg (segments), one eye.
    Only one of each mirrored or repeated part.
 2. One reference image per part, on a plain background, matching colour and lighting across the set. Give the image
-   model both a prompt and an input image (the whole-subject reference). Check every image against the reference.
+   model both a prompt and an input image (the whole-subject reference); Tripo Studio's own image tool works (GPT
+   Image 2.5 cost 0 credits on the Max plan). Check every image against the reference for shape, proportion and
+   small features (teeth, spines, joints) and regenerate before spending 3D credits.
 3. Generate each part from its image in Tripo Studio with the high-fidelity model (the "H3.1 - Best Quality" option at
-   the time of the video [O]). A small part needs no more than about 1M faces.
+   the time of the video [O]; 65 credits a job with 8K texture on, about 3 minutes, measured). A small part needs no
+   more than about 1M faces. Studio also has a members-only "Generate in Parts" switch that splits one generation
+   into segments; it is a different thing and was not tested here.
 
 Why: each part gets the generator's full resolution, and image-following beats a whole-body generation on fine organic
 detail. Other high-fidelity generators gave sharper meshes but followed the image worse on organic shapes [R].
@@ -27,7 +35,7 @@ one leg, scaled per position. Keep the mirrors live until after the bake (sectio
 
 - Upload the assembled high parts back to Tripo Studio and run Smart Mesh on each. Set a low face count: about 3k for a
   crab body held its shape and key details; 10k was too dense to count as retopology. Smart Mesh P1.0 was shown;
-  P2.0 with native quads was announced on 2026-09-21 [O], so use the newest one Studio lists.
+  Studio listed "Smart Mesh P2.0: Quads & Edit" on 2026-11-11 [O], so use the newest one it lists.
 - Studio bakes a normal map but not colour, and **resets each part's position and scale**. Put every low part back on
   its high part before baking; `bake_ai_mesh.py` warns when the mean gap is over 1% of the object size.
 - Spend five minutes on the wireframe at joints and tight areas; mush there spoils the bake.
