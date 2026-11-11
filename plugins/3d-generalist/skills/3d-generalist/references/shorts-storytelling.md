@@ -1,7 +1,5 @@
 # High-Retention 3D Shorts Storytelling (`shorts-storytelling.md`)
 
-`@BarelyInvented`).
-
 <!-- skill-navigation:start -->
 ## Reading Map
 

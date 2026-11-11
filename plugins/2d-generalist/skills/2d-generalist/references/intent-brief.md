@@ -26,7 +26,7 @@ first step of any build. It costs one short round of questions and saves a full 
 | Purpose and audience | What the piece is for and who watches or uses it | TikTok or Shorts hook, YouTube explainer, X post, game asset, client pitch, portfolio piece |
 | Format | Aspect ratio, length, resolution, file type | 9:16 vertical 30 to 60 s, 16:9 2 to 5 min, 1:1 still, GLB model, PNG set |
 | Subject | Exactly what is shown and the facts or story beats that must be in it | the named object, place, period, character, the one moment that must land |
-| Look | Style, references, palette, mood | Vox editorial paper and ink, clean flat infographic, archival collage, blueprint; a link or image the user likes |
+| Look | Style, references, palette, mood | footage-led Vox (vox-now), Vox editorial paper and ink, clean flat infographic, archival collage, blueprint; a link or image the user likes |
 | Constraints | Must-haves, must-nots, tools, voice and music, language, deadline; whether real people, brands or owned characters appear (name the risk once, follow the answer) | "no voiceover", "use my logo", "Blender only", "Vietnamese captions", "by Friday" |
 
 ## How to ask
@@ -50,14 +50,14 @@ Write `brief.md` in the project folder, 5 to 8 lines:
 - Goal in the user's own words, then one line on what done looks like (for example "a 45 s 9:16 MP4 with captions").
 - The five slots, each marked given, answered or default.
 - Out of scope: what you will not make.
-- A `## Progress` section, one line per step of the production spine (`~/.claude/skills/3d-generalist/references/pipeline-spine.md`),
+- A `## Progress` section, one line per step of the production spine (`references/pipeline-spine.md`),
   filled as each step finishes.
 
 Show the brief to the user in one short message and start work. Stop only if the user changes something.
 
 ## Checkpoints while building
 
-- The checkpoints are the production spine's two user gates (`~/.claude/skills/3d-generalist/references/pipeline-spine.md`): the look gate before
+- The checkpoints are the production spine's two user gates (`references/pipeline-spine.md`): the look gate before
   the first expensive step (style frames A/B/C plus a blockout or animatic, the user picks, `LOOK.md` is written) and
   the fast preview before the full render. Every other step checks itself.
 - When the user gives notes, update `brief.md` (or `LOOK.md`) first, then change the work. Notes that change the

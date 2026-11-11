@@ -4,11 +4,15 @@
 Enforces the 6 core Vox production rules distilled from the 66-video
 Flat Pack FX Vox playlist and Vox explainer references:
 1. 3-Color Rule (neutral background, muted structural ink, 1 primary accent)
-2. Mixed Frame-Rate Contract (24/30fps camera + 8-12fps stepped boil/cutout)
+2. Mixed Frame-Rate Contract (24/30fps camera; 8-12fps posterize only for the stylised look)
 3. Non-Linear Speed/Value Graph Easing (no raw linear keyframes on hero motion)
 4. Null-Rigged 2D/3D Camera Hierarchy (Position Null + Orbit/Rotation Null)
-5. Tactile Texture Layering (paper grain, dot/cross grid, or halftone)
+5. Tactile Texture Layering (stylised look only; the flat look has none)
 6. Tactile SFX Sync (mechanical clicks, paper rustles, marker swipes, bass thuds)
+
+The recipe carries a "look" choice: "flat" (default: flat paper, print borders, no
+posterize, no tactile treatment) or "stylised" (posterize 6-15 fps and at least one
+tactile treatment such as grain, grid, halftone or roughened edges).
 """
 
 from __future__ import annotations
@@ -20,13 +24,17 @@ from pathlib import Path
 from typing import Any
 
 
+VALID_LOOKS = ("flat", "stylised")
+DEFAULT_LOOK = "flat"
+
 DEFAULT_RECIPE_TEMPLATE: dict[str, Any] = {
+    "look": "flat",
     "scene_name": "vox_explainer_scene_01",
     "dimension_mode": "2.5d_hybrid",
     "target_stack": "remotion_three_or_blender_or_fusion",
     "timeline": {
         "camera_fps": 24,
-        "cutout_posterize_fps": 12,
+        "cutout_posterize_fps": 0,
         "duration_seconds": 12.0,
     },
     "palette": {
@@ -41,9 +49,9 @@ DEFAULT_RECIPE_TEMPLATE: dict[str, Any] = {
         "depth_of_field_enabled": True,
     },
     "tactile_treatment": {
-        "background_grid": "dot_grid",
-        "paper_grain_overlay": True,
-        "halftone_or_roughen_edges": True,
+        "background_grid": "none",
+        "paper_grain_overlay": False,
+        "halftone_or_roughen_edges": False,
     },
     "audio_cues": [
         {"time_sec": 0.2, "type": "paper_unfold", "target": "background_map_reveal"},
@@ -58,6 +66,11 @@ def validate_recipe(recipe: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
     checks: dict[str, bool] = {}
+
+    look = recipe.get("look", DEFAULT_LOOK)
+    is_stylised = look == "stylised"
+    if look not in VALID_LOOKS:
+        errors.append(f"look must be one of {list(VALID_LOOKS)}, got '{look}'.")
 
     # 1. Dimension mode check
     dim_mode = recipe.get("dimension_mode", "")
@@ -97,12 +110,16 @@ def validate_recipe(recipe: dict[str, Any]) -> dict[str, Any]:
     if cam_fps not in (24, 25, 30, 60):
         errors.append(f"timeline.camera_fps should be 24, 25, 30, or 60 (got {cam_fps}).")
         checks["mixed_framerate_contract"] = False
-    elif not (6 <= cutout_fps <= 15):
+    elif is_stylised and not (6 <= cutout_fps <= 15):
         errors.append(
-            f"timeline.cutout_posterize_fps must be between 6 and 15 fps (typically 8-12 fps) for tactile stop-motion feel (got {cutout_fps})."
+            f"timeline.cutout_posterize_fps must be between 6 and 15 fps (typically 8-12 fps) for the stylised look (got {cutout_fps})."
         )
         checks["mixed_framerate_contract"] = False
     else:
+        if not is_stylised and cutout_fps:
+            warnings.append(
+                "look is 'flat': cutout_posterize_fps is ignored; set it to 0 or choose look 'stylised'."
+            )
         checks["mixed_framerate_contract"] = True
 
     # 4. Null-Rigged Camera & Non-Linear Easing
@@ -132,9 +149,9 @@ def validate_recipe(recipe: dict[str, Any]) -> dict[str, Any]:
     has_grid = tactile.get("background_grid") in {"dot_grid", "cross_grid", "line_grid"}
     has_grain = bool(tactile.get("paper_grain_overlay"))
     has_edges = bool(tactile.get("halftone_or_roughen_edges"))
-    if not (has_grid or has_grain or has_edges):
+    if is_stylised and not (has_grid or has_grain or has_edges):
         errors.append(
-            "tactile_treatment must enable at least one of 'background_grid', 'paper_grain_overlay', or 'halftone_or_roughen_edges'."
+            "look 'stylised' needs tactile_treatment to enable at least one of 'background_grid', 'paper_grain_overlay', or 'halftone_or_roughen_edges'."
         )
         checks["tactile_layering"] = False
     else:

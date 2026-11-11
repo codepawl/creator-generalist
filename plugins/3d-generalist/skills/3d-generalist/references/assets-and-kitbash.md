@@ -71,7 +71,7 @@ In Blender, Godot, Unity or Unreal, import the `engine/` tier: it keeps PNG and 
 
 ## Detail ladder: the cheapest method that looks best
 
-An, 2026-11-09: some pieces modelled a pile of grass or gravel when another method was cheaper and looked better.
+Some pieces modelled a pile of grass or gravel when another method was cheaper and looked better.
 Pick the first rung that holds up at the closest distance the camera reaches, and climb only where it fails:
 
 1. **Texture only:** a scanned PBR set (Poly Haven, ambientCG, Quixel) with base colour, roughness and normal at
@@ -93,7 +93,7 @@ rung in the build notes, and check the result in a close still and a wide still.
 
 ## Variation and imperfection: nothing boxy, nothing repeated
 
-An, 2026-11-09: many shapes, effects and animations looked stiff, boxy and repeated. Real things are worn, uneven and
+Many shapes, effects and animations looked stiff, boxy and repeated. Real things are worn, uneven and
 out of step. Check a still and a moving clip for each rule below before a preview.
 
 **Shapes**

@@ -37,7 +37,7 @@ If the `claude` command is not on the PATH, tell the user to type the same four 
 Otherwise:
 
 1. Clone the repository to a temporary folder: `git clone --depth 1 https://github.com/codepawl/creator-generalist`.
-2. Copy these twelve folders into the skills folder from step 1:
+2. Copy these fourteen folders into the skills folder from step 1:
    - `plugins/3d-generalist/skills/3d-generalist`
    - `plugins/3d-generalist/skills/3dg`
    - `plugins/3d-generalist/skills/model-characters`
@@ -47,6 +47,7 @@ Otherwise:
    - `plugins/2d-generalist/skills/edit-video`
    - `plugins/3d-generalist/skills/animate-characters`
    - `plugins/3d-generalist/skills/rig-characters`
+   - `plugins/3d-generalist/skills/sculpt-models`
    - `plugins/2d-generalist/skills/draw-and-paint-art`
    - `plugins/2d-generalist/skills/paint-stylized-backgrounds`
    - `plugins/watch-video/skills/watch-video`
@@ -84,7 +85,7 @@ yes. Optional tools are listed, not installed.
 
 1. Ask your agent to list its skills, or check the folders. `3d-generalist`, `2d-generalist`,
    `model-characters`, `use-3d-software`, `edit-video`, `animate-characters`,
-   `rig-characters`, `draw-and-paint-art`, `paint-stylized-backgrounds`, `watch-video` and `design-sound` must be there.
+   `rig-characters`, `sculpt-models`, `draw-and-paint-art`, `paint-stylized-backgrounds`, `watch-video` and `design-sound` must be there.
 2. Run `/2dg audit` (Claude Code: `/2d-generalist:2dg audit`) if your agent has commands.
 3. If Blender is installed, run `blender --version`.
 

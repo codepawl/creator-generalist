@@ -9,8 +9,10 @@ editorial motion graphics). To use a skill, read its `SKILL.md` under `plugins/<
 - Every `SKILL.md` stays at or under 100 lines. Its frontmatter has only `name`, `description` and `license`, with
   `description` in double quotes so it parses as YAML. Put detailed rules in `references/`.
 - Skills load on their own: never add `disable-model-invocation` to a skill other than the commands `3dg` and `2dg`.
-- `skills/3dg/SKILL.md` and `skills/2dg/SKILL.md` keep `disable-model-invocation: true`, and their
-  `agents/openai.yaml` files keep `allow_implicit_invocation: false`.
+- `skills/3dg/SKILL.md` and `skills/2dg/SKILL.md` are commands: their frontmatter also carries `argument-hint` and
+  `disable-model-invocation: true`, and their `agents/openai.yaml` files keep `allow_implicit_invocation: false`
+  under a top-level `policy:` block (not under `interface:`).
+- There is no `local.md` in this pack, by design: machine paths and personal rules never ship.
 - Only `3d-generalist` and `2d-generalist` are main skills. Every other skill is a craft or tool skill they call.
 - `model-characters` is a craft skill for 3D characters in every style. It lives only inside the `3d-generalist` plugin. Do not add a separate
   plugin for it.
@@ -32,5 +34,5 @@ editorial motion graphics). To use a skill, read its `SKILL.md` under `plugins/<
 - No private data: no personal names, home folders, internal keys or tokens. Use `{{WORK_DIR}}` and `{{SKILL_DIR}}`.
   Default install paths are allowed only inside tool-detection scripts.
 - Every frame of a rendered scene or check script must be a pure function of time `f(t)`.
-- 2D mode names (`map`, `chart-timeline`, `archival-collage`, `design`, `audit`) must match across the 2d-generalist
+- 2D mode names (`vox-now`, `script`, `photos`, `map`, `chart-timeline`, `archival-collage`, `design`, `audit`) must match across the 2d-generalist
   `SKILL.md`, `skills/2dg/SKILL.md`, `harness/gemini/2dg.toml`, `harness/opencode/2dg.md` and `README.md`.

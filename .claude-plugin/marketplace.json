@@ -14,7 +14,7 @@
     {
       "name": "2d-generalist",
       "source": "./plugins/2d-generalist",
-      "description": "2D and 2.5D editorial motion graphics in the Vox, Johnny Harris and WSJ explainer look: maps, charts, true-scale timelines, archival collage, torn paper, halftone and paper texture, across Blender, DaVinci Resolve Fusion, Remotion and FFmpeg."
+      "description": "2D and 2.5D editorial motion graphics in the Vox, Johnny Harris and WSJ explainer look: footage-led Vox look, flat paper cards, print-bordered real photos, highlighters, maps, charts and true-scale timelines, with torn paper, halftone and grain as opt-in stylised looks, across Blender, DaVinci Resolve Fusion, Remotion and FFmpeg."
     },
     {
       "name": "watch-video",

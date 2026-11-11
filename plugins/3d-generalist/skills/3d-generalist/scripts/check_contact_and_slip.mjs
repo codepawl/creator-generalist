@@ -18,11 +18,21 @@
 
 import { parseArgs } from "node:util";
 
-const { positionals } = parseArgs({ allowPositionals: true });
+const USAGE = "Usage: node check_contact_and_slip.mjs <url> <durationSec> [fps=30]";
+const { positionals, values } = parseArgs({
+  allowPositionals: true,
+  options: { help: { type: "boolean", short: "h" } },
+});
+
+if (values.help) {
+  console.log(USAGE);
+  process.exit(0);
+}
+
 const [url, durStr = "60", fpsStr = "30"] = positionals;
 
 if (!url) {
-  console.error("Usage: node check_contact_and_slip.mjs <url> <durationSec> [fps=30]");
+  console.error(USAGE);
   process.exit(2);
 }
 

@@ -49,8 +49,7 @@ Flags: `--from <s> --to <s>` narrows the window; `--fps <n>` sets the frame rate
 
 ## 3. Read all of it
 
-1. Read `MANIFEST.txt`, then every sheet and cut sheet in order, through a subagent when there are more than a few.
-   Note what changes between neighbouring tiles.
+1. Read `MANIFEST.txt`, then every sheet and cut sheet in order, through a subagent when there are more than a few. Note what changes between neighbouring tiles.
 2. Look at each spectrogram next to `audio_timeline.txt`:
    - a thin vertical line across all pitches is a click, tap or hit; many at even spacing are a rhythm or typing;
    - brightness at the bottom only is bass: a thump, a boom, a sub drop;

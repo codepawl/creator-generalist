@@ -41,7 +41,7 @@ those on its own too.
 | Skill | Ask for | You get |
 |---|---|---|
 | **[3d-generalist](plugins/3d-generalist/skills/3d-generalist/SKILL.md)** | a 3D Short, a cutaway build, a story scene, a world, a rigged character, a hero asset | A scripted and animated 3D piece in Blender, Three.js or [67js](https://github.com/codepawl/67.js), built from real CC0 and CC BY scans and checked by a QA gate before you see a preview |
-| **[2d-generalist](plugins/2d-generalist/skills/2d-generalist/SKILL.md)** | a Vox or Johnny Harris style explainer graphic | Maps, true-scale timelines, charts and archival collage with paper, ink, halftone and moire texture, made with free tools |
+| **[2d-generalist](plugins/2d-generalist/skills/2d-generalist/SKILL.md)** | a Vox or Johnny Harris style explainer graphic | A footage-led Vox look with flat paper cards, print-bordered real photos, highlighters, maps, charts and true-scale timelines (torn paper, halftone and grain only as opt-in stylised looks), made with free tools |
 
 **Craft skills**
 
@@ -74,7 +74,8 @@ those on its own too.
 | **[design-sound](plugins/design-sound/skills/design-sound/SKILL.md)** | SFX, foley, music or a mix for a video, game or reel | A sound library searched by meaning (CLAP) with sheets to look at before choosing, web and ElevenLabs fetching, foley generated from a silent film with a local video-to-audio model (HunyuanVideo-Foley), an effects stem placed from an event list, music fitted to the cut, and a mix to platform loudness checked for sync, masking and phone audibility |
 
 `model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters` and `rig-characters` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art` and `paint-stylized-backgrounds` come with the 2d-generalist plugin. `watch-video` and `design-sound` are their own plugins.
-Install all four plugins to get every skill.
+Install all four plugins to get every skill. `2d-generalist` ships its own copy of the production spine and of
+`compare_look.py`, so each of the two plugins also works installed alone.
 
 ## Install
 
@@ -141,8 +142,10 @@ npx skills add codepawl/creator-generalist
 
 ## 3d-generalist
 
-Give your agent a premise, a story, an object or a world. The skill writes the script first. Then it sources real
-scans, builds the set, animates the characters, lights and shoots the scene, syncs voice and foley, and runs its checks.
+Give your agent a premise, a story, an object or a world. Both generalists follow the same eight-step production
+spine: brief, reference, script and beats, look gate, assets, build and animate, sound, then QA with a preview and the
+final. You make two decisions: the look at step 4 (style frames A/B/C) and the 540p preview before the final render.
+Nothing renders at full quality until you approve the preview.
 
 Type `/3dg` alone to see the modes (`/3d-generalist:3dg` in Claude Code). Type a mode and a subject to start one.
 
@@ -163,20 +166,26 @@ Type `/3dg` alone to see the modes (`/3d-generalist:3dg` in Claude Code). Type a
 - **Light and lens.** A soft fill light follows the character inside pits, tunnels and cabins. Depth of field stays on
   the subject. The finish pass adds 180-degree shutter motion blur.
 - **Checks before preview.** `check_contact_and_slip.mjs` tests every frame at 30 fps for teleports, speed, flight, foot
-  slip and contact gaps. Grips, clearance, exits and caption sync go through your project checks and contact sheets.
+  slip and contact gaps. `compare_look.py` compares the render with the approved look. Grips, clearance, exits and
+  caption sync go through your project checks and contact sheets.
 
 ## 2d-generalist
 
-Editorial explainer graphics that look printed and researched. The skill runs on free tools: Blender, DaVinci Resolve
-Fusion, Remotion with SVG and Three.js, and FFmpeg.
+Editorial explainer graphics in the footage-led Vox look: flat paper cards, print-bordered real photos, highlighters,
+maps, charts and true-scale timelines. Torn paper, halftone and grain are opt-in stylised looks. The skill runs on
+free tools: Blender, DaVinci Resolve Fusion, Remotion with SVG and Three.js, and FFmpeg. It follows the same eight-step
+production spine as `3d-generalist` (look gate and 540p preview included).
 
 Type `/2dg` alone to see the modes (`/2d-generalist:2dg` in Claude Code). Type a mode and a subject to start one.
 
 | Mode | What it builds | Example |
 |---|---|---|
+| `vox-now` | The current Vox look, measured: footage-led, mostly empty frames, still holds, hard cuts, three inks, lemon highlight. Read first for a Vox look | `/2dg vox-now why container ships got so big` |
+| `script` | Title, hook, explainer structure, voice pace, beat table and captions | `/2dg script a 6 minute explainer on the Suez blockage` |
+| `photos` | Real photos, scans and documents found online, picked from a numbered sheet, reworked, credited | `/2dg photos 1920s newspaper front pages about radio` |
 | `map` | 2D vector and satellite maps, 2.5D extruded layers, 3D terrain and routes that draw on | `/2dg map the Silk Road from Chang'an to Constantinople` |
 | `chart-timeline` | Ruler timelines at true scale, bar and line charts, dot grids and waveforms | `/2dg chart-timeline 4,000 years of writing on one ruler` |
-| `archival-collage` | Highlighters, newspaper zooms, torn paper borders, 2.5D parallax, halftone and moire texture | `/2dg archival-collage the 1929 stock market crash` |
+| `archival-collage` | Highlighters, newspaper zooms, 2.5D parallax; torn paper borders and halftone only as stylised options | `/2dg archival-collage the 1929 stock market crash` |
 | `design` | A style frame: hierarchy, asymmetric scale, paper and ink surface, palettes and type pairs | `/2dg design a style frame for a video on lithium mining` |
 | `audit` | Finds the free tools on your machine and gives install commands for the optional ones (QGIS, Inkscape, Krita) | `/2dg audit` |
 

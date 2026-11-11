@@ -2,7 +2,7 @@
 # Behaviour test for scripts/check_sculpt.py: a clean fixture passes (exit 0), a broken one fails (exit 1)
 # with the scale and loose-vertex checks named, and both write the report and the two sheets.
 set -u
-BLENDER="${BLENDER:-C:/Program Files/Blender Foundation/Blender 5.2/blender.exe}"
+BLENDER="${BLENDER:-C:/Program Files/Blender Foundation/Blender 5.3/blender.exe}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 WORK="$(mktemp -d)"
 status=0

@@ -29,7 +29,8 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SCRIPTS = Path(__file__).resolve().parent
-TRANSCRIBE = Path.home() / ".agents" / "tools" / "transcribe.py"
+BUNDLED_TRANSCRIBE = Path(__file__).resolve().parent / "transcribe.py"  # the public pack ships a copy here
+TRANSCRIBE = BUNDLED_TRANSCRIBE if BUNDLED_TRANSCRIBE.exists() else Path.home() / ".agents" / "tools" / "transcribe.py"
 LONG_VIDEO_SECONDS = 300
 OLD_UPLOAD_DAYS = 180
 TUTORIAL_TITLE = re.compile(r"tutorial|how to|guide|course|walkthrough|step by step|beginner|blender|unity|unreal|godot|"

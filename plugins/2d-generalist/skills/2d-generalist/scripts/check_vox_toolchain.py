@@ -27,6 +27,7 @@ TOOL_SPECS: list[dict[str, Any]] = [
         "required": True,
         "commands": ["blender"],
         "candidate_paths": [
+            r"C:\Program Files\Blender Foundation\Blender 5.3\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 5.1\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 5.0\blender.exe",

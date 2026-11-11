@@ -29,7 +29,8 @@ import time
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SCRIPT_FOLDER = pathlib.Path(__file__).resolve().parent
-TRANSCRIBE = pathlib.Path.home() / ".agents" / "tools" / "transcribe.py"
+BUNDLED_TRANSCRIBE = pathlib.Path(__file__).resolve().parent / "transcribe.py"  # the public pack ships a copy here
+TRANSCRIBE = BUNDLED_TRANSCRIBE if BUNDLED_TRANSCRIBE.exists() else pathlib.Path.home() / ".agents" / "tools" / "transcribe.py"
 RATE_LIMITED = re.compile(r"HTTP Error 429|Too Many Requests|page needs to be reloaded", re.I)
 INDEX_FIELDS = ["id", "title", "seconds", "views", "date"]
 

@@ -4,8 +4,20 @@ set -euo pipefail
 # Build a labelled 1-fps contact sheet from a rendered 3D video for anti-slop QA review.
 # Usage: bash contact-sheet.sh <input.mp4> <output.png> [fps=1] [cols=6]
 
-VIDEO="${1:?Usage: contact-sheet.sh <input.mp4> <output.png> [fps=1] [cols=6]}"
-OUT="${2:?Usage: contact-sheet.sh <input.mp4> <output.png> [fps=1] [cols=6]}"
+USAGE="Usage: contact-sheet.sh <input.mp4> <output.png> [fps=1] [cols=6]"
+
+if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+  echo "$USAGE"
+  exit 0
+fi
+
+if [ "$#" -lt 2 ]; then
+  echo "$USAGE" >&2
+  exit 2
+fi
+
+VIDEO="$1"
+OUT="$2"
 FPS="${3:-1}"
 COLS="${4:-6}"
 

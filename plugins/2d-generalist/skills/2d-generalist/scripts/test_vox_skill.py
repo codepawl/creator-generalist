@@ -80,6 +80,35 @@ class TestValidateVoxRecipe(unittest.TestCase):
         self.assertTrue(result["valid"], f"Expected valid template, got errors: {result['errors']}")
         self.assertTrue(all(result["checks"].values()))
 
+    def test_default_template_is_flat(self) -> None:
+        template = validate_vox_recipe.DEFAULT_RECIPE_TEMPLATE
+        self.assertEqual(template["look"], "flat")
+        self.assertEqual(template["timeline"]["cutout_posterize_fps"], 0)
+
+    def test_flat_look_accepts_no_posterize_and_no_tactile_treatment(self) -> None:
+        recipe = copy.deepcopy(validate_vox_recipe.DEFAULT_RECIPE_TEMPLATE)
+        recipe.pop("look")
+        recipe.pop("tactile_treatment")
+        result = validate_vox_recipe.validate_recipe(recipe)
+        self.assertTrue(result["valid"], result["errors"])
+
+    def test_stylised_look_keeps_posterize_and_tactile_rules(self) -> None:
+        recipe = copy.deepcopy(validate_vox_recipe.DEFAULT_RECIPE_TEMPLATE)
+        recipe["look"] = "stylised"
+        result = validate_vox_recipe.validate_recipe(recipe)
+        self.assertFalse(result["valid"])
+        self.assertFalse(result["checks"]["mixed_framerate_contract"])
+        self.assertFalse(result["checks"]["tactile_layering"])
+        recipe["timeline"]["cutout_posterize_fps"] = 12
+        recipe["tactile_treatment"]["paper_grain_overlay"] = True
+        result = validate_vox_recipe.validate_recipe(recipe)
+        self.assertTrue(result["valid"], result["errors"])
+
+    def test_rejects_unknown_look(self) -> None:
+        recipe = copy.deepcopy(validate_vox_recipe.DEFAULT_RECIPE_TEMPLATE)
+        recipe["look"] = "grungy"
+        self.assertFalse(validate_vox_recipe.validate_recipe(recipe)["valid"])
+
     def test_rejects_linear_easing_and_excess_accents(self) -> None:
         bad = copy.deepcopy(validate_vox_recipe.DEFAULT_RECIPE_TEMPLATE)
         bad["palette"]["accent_colors_hex"] = ["#FFF200", "#E63946", "#00D4B2"]
