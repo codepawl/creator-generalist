@@ -23,21 +23,37 @@ drifted from the photo (chunkier claw, the pincer teeth lost), so step 2's check
    more than about 1M faces. Studio also has a members-only "Generate in Parts" switch that splits one generation
    into segments; it is a different thing and was not tested here.
 
+Pick the route by shot: parts for a hero asset seen up close, where the detail pays for an assembly pass (section 2's
+crab cost 250 credits for 2 more parts and 3 retopos); one whole generation for anything seen from a distance, since
+its pose and proportions come out coherent with no assembly.
+
 Why: each part gets the generator's full resolution, and image-following beats a whole-body generation on fine organic
 detail. Other high-fidelity generators gave sharper meshes but followed the image worse on organic shapes [R].
 
-## 2. Assemble [R]
+## 2. Assemble [M]
 
-Import the parts into Blender, place them against the reference, model one side only and add Mirror modifiers; reuse
-one leg, scaled per position. Keep the mirrors live until after the bake (section 4).
+Place the parts by script against the reference photo: one anchor per part (the joint end of a leg or claw, the
+centre of the body), a turn that lays it in the body's frame, then location, angle and scale per instance; the left
+side is the right side times a -1 X scale. Reuse one leg, scaled per position. Render a top view beside the photo and
+adjust until the outline matches; the whole-subject generation is a good guide for pose and proportion. Assemble the
+low parts with their baked maps (section 4), since each part's high and low share one space.
 
-## 3. Retopology and UV [R]
+Measured 2026-11-11, crab from 3 parts (shell, one claw, one leg; 8 instances): 31k triangles against 298k for the
+whole-crab generation, with the claw teeth, shell granules, eyes and leg spines that the whole generation smoothed
+away. But the result read as kit-bashed: the shell image had empty leg sockets that stayed as visible rings, legs sat
+beside them instead of in them, and the pose was stiffer than the whole generation's. Ask for the body image with
+short leg stubs or closed sockets, and seat each leg in its socket in the side view too, not only from the top.
 
-- Upload the assembled high parts back to Tripo Studio and run Smart Mesh on each. Set a low face count: about 3k for a
-  crab body held its shape and key details; 10k was too dense to count as retopology. Smart Mesh P1.0 was shown;
-  Studio listed "Smart Mesh P2.0: Quads & Edit" on 2026-11-11 [O], so use the newest one it lists.
-- Studio bakes a normal map but not colour, and **resets each part's position and scale**. Put every low part back on
-  its high part before baking; `bake_ai_mesh.py` warns when the mean gap is over 1% of the object size.
+## 3. Retopology and UV [M]
+
+- Run Studio's Retopo tool (left bar) on each high part: Quad, Smart Mesh on (P1.0 on 2026-11-11), polygon count from
+  500 to 10000, 40 credits a part, about a minute. Targets of 1500 and 3000 gave 1.7k and 2.8k quads; 3k held a crab
+  shell's shape and teeth, 1.5k a claw and a leg. The "Smart Mesh" tab of the Model panel is a different thing: it
+  generates a new model from an image.
+- The video reported that retopo resets each part's position and scale; on parts generated in Studio and retopologized
+  in place it did not (mean gap 0.2% to 0.3% of the size on all three). `bake_ai_mesh.py` still warns when the mean
+  gap is over 1% of the object size; then put the low back on the high before baking.
+- The retopo comes back with a projected texture, but bake your own colour anyway (section 4).
 - Spend five minutes on the wireframe at joints and tight areas; mush there spoils the bake.
 - UV: Tripo Studio Smart UV costs 10 credits for 4 results. Generate all 4, keep the best, and add a seam in Blender
   where a close-up shot would show stretching.
