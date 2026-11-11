@@ -57,9 +57,12 @@ Show the brief to the user in one short message and start work. Stop only if the
 
 ## Checkpoints while building
 
-- The checkpoints are the production spine's two user gates (`references/pipeline-spine.md`): the look gate before
-  the first expensive step (style frames A/B/C plus a blockout or animatic, the user picks, `LOOK.md` is written) and
-  the fast preview before the full render. Every other step checks itself.
+- The checkpoints are the production spine's (`references/pipeline-spine.md`): the prep sheet and options before the
+  first expensive step (sketch, tools and resources ready, style frames A/B/C plus a blockout or animatic; the user
+  picks, `LOOK.md` is written), a WIP demo of the first finished part (sent without waiting), and the fast preview
+  before the full render. Every other step checks itself.
+- After the preview, offer two or three next directions and a "you decide" choice; the answer picks a fix round,
+  a round in the user's direction, or free creative mode (the spine's last section).
 - When the user gives notes, update `brief.md` (or `LOOK.md`) first, then change the work. Notes that change the
   purpose or format restart the brief.
 - Keep previews fast and small. The user judges direction from them, not polish.

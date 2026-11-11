@@ -14,7 +14,7 @@ mistakes. Each step below writes a file. The next step starts from those files, 
 - [Lock and reopen](#lock-and-reopen)
 - [Parallel workers only after the lock](#parallel-workers-only-after-the-lock)
 - [Critique loops](#critique-loops)
-- [Fix rounds](#fix-rounds)
+- [After the preview: the next round](#after-the-preview-the-next-round)
 - [Steps per mode](#steps-per-mode)
 <!-- skill-navigation:end -->
 
@@ -25,14 +25,15 @@ mistakes. Each step below writes a file. The next step starts from those files, 
 | 1. Brief | `brief.md` | self: five slots filled or defaulted | five lines, no questions when inferable |
 | 2. Reference | `refs/`, `refs/NOTES.md` | self: every hero subject has references, nothing guessed | one image and one line per subject |
 | 3. Script and beats | `script.md`, beat table, scratch voice, cue list | self: read-aloud length fits the brief | a five-line beat list; skip for a still or an asset |
-| 4. Look gate | style frames A/B/C, grey blockout or animatic, then `LOOK.md` and `cameras.json` | **the user picks** | two stills on a grey block |
+| 4. Prep and look gate | `plan.md` (sketch, tools, resources), style frames A/B/C, blockout or animatic, then `LOOK.md` and `cameras.json` | **the user picks** | a sketch and two stills on a grey block |
 | 5. Assets and check | `assets/`, `CREDITS.md`, measured bounds | self: scale, silhouette and clipping measured | one line per asset inside `brief.md` |
-| 6. Build and animate | per-shot renders or scene states | self: each shot against its style frame and board | one shot |
+| 6. Build and animate | per-shot renders or scene states, a WIP demo after the first finished shot | self: each shot against its style frame and board; the WIP goes to the user without waiting | one shot |
 | 7. Sound | final voice, SFX, music, mix | self: cue timing and loudness measured | skip for a silent still or model |
 | 8. QA, preview, final | gate report, 540p preview with sound, final | all gates pass, then **the user approves** the preview | one still instead of a preview |
 
-The user is asked twice per piece: at the look gate and at the preview. Every other gate is a measured self-check.
-No other step waits for an answer.
+The user sees the work three times per piece: the choice at step 4 and the preview at step 8 wait for an answer, the
+WIP demo at step 6 does not. Every other gate is a measured self-check. After the preview, the user's answer picks the
+next round (see the last sections).
 
 ### 1. Brief
 
@@ -59,17 +60,26 @@ Write the script with its sources on top, split it into a beat table (spoken lin
 a scratch voice and a cue list now. Sound is planned with the picture, not added after it: walk keys and cuts that
 hang on words need the voice timing early.
 
-### 4. Look gate
+### 4. Prep and look gate
 
-The one decision the user makes before anything expensive is built.
+The one decision the user makes before anything expensive is built. Prepare first, so the user chooses between options
+that can actually be made, and the build starts with everything at hand.
 
+- Prepare: rough the piece out (thumbnails, a board or a block-in), confirm every tool the build needs runs on this
+  machine, and download the resources found at step 2 into the project. Write `plan.md`: the sketch, the tool list
+  with what was checked, and one line per subject naming its resource and licence, or "built from refs" with what was
+  searched. Anything that needs the user (a sign-in, a paid asset, a licence trade-off) goes at the top of `plan.md`
+  in one line each.
+- Options may differ in approach as well as look when the brief leaves the approach open (story angle, camera idea,
+  style family); otherwise they differ only in look.
 - Render two or three style frames, labelled A, B and C, at final grade on the real hero assets or the closest
   sourced stand-ins, never primitive boxes. Each option differs in look (palette, light, lens, texture), not in
   subject.
 - Add the cheapest timing proof: a grey blockout with the real cameras, or an animatic of boards or stills timed
   to the scratch voice. Shots, order and ending are fixed here.
-- Send everything in one message. The user picks and gives the reason in one line. Never claim an option matches
-  the user's taste.
+- Send the plan summary, the options and the timing proof in one message. The user picks and gives the reason in
+  one line. Never claim an option matches the user's taste. If the user says "you choose", pick, state why in one
+  line, and go on.
 - Write `LOOK.md` from the pick: palette hex, lens, light direction and key-to-fill ratio, grade values, character
   or subject scale, texture rules, and the measured luma and saturation of the picked frame. Write `cameras.json`
   (or the shot list with framing for 2D).
@@ -87,6 +97,10 @@ shot's camera distance for clipping, lumps and wrong scale before anything moves
 Execution only: no new design decisions. A decision that changes the look or the shots goes back to step 4.
 Each finished shot gets three stills (first, middle, last) compared with its style frame and board before the next
 shot starts.
+
+The first finished shot (or the first finished part of a still, model or app) goes to the user as a WIP demo: a short
+low-resolution clip or still with one line on what comes next. Keep building while waiting; nothing is thrown away
+before an answer. Notes on the WIP start a fix round at once. When the user asked to approve the WIP first, wait.
 
 ### 7. Sound
 
@@ -108,9 +122,9 @@ End `brief.md` with a `## Progress` section, one line per step, filled as each s
 1 brief: done
 2 reference: done, refs/NOTES.md
 3 script: done, script.md, 42 s scratch voice
-4 look: B picked ("warmer, less clutter"), LOOK.md, cameras.json
+4 look: plan.md ready, B picked ("warmer, less clutter"), LOOK.md, cameras.json
 5 assets: done, CREDITS.md
-6 build: shots 1-4 done, 5-6 open
+6 build: WIP of shot 1 sent, shots 1-4 done, 5-6 open
 7 sound: open
 8 preview: open
 ```
@@ -139,11 +153,23 @@ Workers that started before the lock drift apart in scale and grade, and no late
   keep the best version so far instead of the latest.
 - Read many frames through a subagent that returns text; open only the frame a decision hangs on.
 
-## Fix rounds
+## After the preview: the next round
 
-After the user's notes, update `brief.md` or `LOOK.md` first, then redo only the shots the notes touch, then rerun the
-gates on every shot so a fix does not bring back an old defect. A note the user gives twice becomes a check in
-`qa-and-gates.md`.
+End every preview with two or three concrete next directions (one line each, the recommended one first) and a "you
+decide" choice. The user's answer picks the round:
+
+- **Notes or changes:** a fix round. Update `brief.md` or `LOOK.md` first, then redo only the shots the notes touch,
+  then rerun the gates on every shot so a fix does not bring back an old defect. A note the user gives twice becomes
+  a check in `qa-and-gates.md`.
+- **Approved:** render the final, then offer the next directions again.
+- **Continue in a direction** (one of the offered ones or the user's own idea): start a new round at the earliest
+  step the direction changes, usually step 3 (new beats) or step 4 (new look), and follow the user's direction even
+  where another seems better; say the concern once in one line.
+- **"You decide" / free creative mode:** the agent picks the next direction itself from the brief, the references and
+  what the last round lacked, writes the choice and its reason as a new line under `## Progress`, and runs the round
+  through the same steps, choosing its own option at step 4. It sends the WIP and the preview of each round without
+  waiting, and keeps going until the user stops it, the brief's done condition is met, or three rounds have run;
+  then it reports and offers the next directions. Free mode never publishes, spends money or deletes anything.
 
 ## Steps per mode
 

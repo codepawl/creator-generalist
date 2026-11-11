@@ -30,16 +30,19 @@ Craft skills for single steps: `animate-characters` (keys, timing, cycles, actin
 
 Run the eight steps of `references/pipeline-spine.md` in order, in every mode. Each step writes its file into
 `{{WORK_DIR}}` and its line under `## Progress` in `brief.md`; start a step only from the files of the one above it.
-The user decides twice: the look at step 4 and the preview at step 8. The spine says which steps shrink per mode.
+The user sees the work three times: the choice at step 4 (prep sheet, sketch and options), a WIP demo of the
+first finished shot at step 6 (sent without waiting), and the preview at step 8. After the preview the user's
+answer picks the next round: fix, continue in a direction, or "you decide" free creative mode (spine, last section). The spine says
+which steps shrink per mode.
 
 | Step | Writes | 3D rules for the step |
 |---|---|---|
 | 1. Brief | `brief.md` | `references/intent-brief.md`: five slots, at most 4 questions, then go |
 | 2. Reference | `refs/`, `refs/NOTES.md` | two views per hero subject, real footage for place, light and weather; real CC0 / CC BY assets before primitives: `references/assets-and-kitbash.md` |
 | 3. Script and beats | `script.md`, beat table, scratch voice, cue list | hook at 0 to 3 s with the picture already moving, 5 to 7 `But <failure> -> So <fix>` rounds, a flip, a stress test, a closer, sources on top: `references/shorts-storytelling.md` |
-| 4. Look gate | style frames A/B/C, grey blockout or animatic with real cameras, then `LOOK.md`, `cameras.json` | the user picks; `references/technique-atlas.md` picks the technique, `references/camera-and-lighting.md` the light, `references/clay-reveal.md` the clay pass |
+| 4. Prep and look gate | `plan.md` (sketch, tools checked, resources downloaded), style frames A/B/C, grey blockout or animatic with real cameras, then `LOOK.md`, `cameras.json` | the user picks; `references/technique-atlas.md` picks the technique, `references/camera-and-lighting.md` the light, `references/clay-reveal.md` the clay pass |
 | 5. Assets and check | `assets/`, `CREDITS.md`, measured bounds | fit on real vertex bounds (`Box3.setFromObject(model, true)`), scale the world to the character, no clipping at shot distance: `references/assets-and-kitbash.md`, `references/characters-and-rigs.md` |
-| 6. Build and animate | shots | one continuous dressed set with ambient life, cutaway by section plane: `references/worlds-and-cutaways.md`; head leads turns 4 to 6 frames, staggered stops, anticipation, physics baked so every frame is `f(t)`: `references/acting-and-motion.md`; under 1 hard cut per 10 s, camera keys 5 to 8 frames apart, spine fill light, DoF on the subject, 6-subframe 180-degree blur, then bloom, vignette and grain as `LOOK.md` sets them: `references/camera-and-lighting.md`; drawn FX: `references/hybrid-2d-3d-fx.md` |
+| 6. Build and animate | shots, WIP demo after the first | one continuous dressed set with ambient life, cutaway by section plane: `references/worlds-and-cutaways.md`; head leads turns 4 to 6 frames, staggered stops, anticipation, physics baked so every frame is `f(t)`: `references/acting-and-motion.md`; under 1 hard cut per 10 s, camera keys 5 to 8 frames apart, spine fill light, DoF on the subject, 6-subframe 180-degree blur, then bloom, vignette and grain as `LOOK.md` sets them: `references/camera-and-lighting.md`; drawn FX: `references/hybrid-2d-3d-fx.md` |
 | 7. Sound | final voice, SFX, music, mix | `design-sound`: tail silences over 0.12 s trimmed, one-word captions within ±0.05 s, a soft real SFX for every visible event, -14 LUFS |
 | 8. QA, preview, final | gate report, 540p preview with sound | every gate in `references/qa-and-gates.md` (contact and slip: `scripts/check_contact_and_slip.mjs`; look match: `scripts/compare_look.py`; sheets: `scripts/contact-sheet.sh`), then the user approves the preview before the full render |
 

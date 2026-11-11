@@ -31,16 +31,18 @@ Before building a look, pick the named technique instead of brute force: the 3D 
 
 Run the eight steps of `references/pipeline-spine.md` in order, for every mode. Each
 step writes its file and its line under `## Progress` in `brief.md`; start a step only from the files of the one
-above it. The user decides twice: the look at step 4 and the preview at step 8.
+above it. The user sees the work three times: the choice at step 4 (prep sheet, sketch and options), a WIP demo of the
+first finished shot at step 6 (sent without waiting), and the preview at step 8. After the preview the user's
+answer picks the next round: fix, continue in a direction, or "you decide" free creative mode (spine, last section).
 
 | Step | Writes | 2D rules for the step |
 | --- | --- | --- |
 | 1. Brief | `brief.md` | `references/intent-brief.md`; run `scripts/check_vox_toolchain.py` and mention only missing tools |
 | 2. Reference | `refs/`, `refs/NOTES.md` | real photos, scans, documents and footage via `scripts/fetch_images.py` (`references/real-images.md`); real data for maps and charts; a Vox look starts from `references/vox-modern-measured.md` |
 | 3. Script and beats | `script.md`, `beats.md`, scratch voice, cue list | `references/explainer-script.md` |
-| 4. Look gate | style frames A/B/C, animatic of the beats, then `LOOK.md`, `recipe.json` | the user picks; one anchor with asymmetric scale and the Look-Away / Look-Back Test (`references/vox-psychology-and-design.md`); default flat paper and print borders, grain, ink bleed, torn edges and halftone only when the pick is a stylised option (`references/textures-retro-and-shading.md`); then `scripts/validate_vox_recipe.py --recipe recipe.json` (the recipe's `look` is `flat` by default, `stylised` only when `LOOK.md` picks it) |
+| 4. Prep and look gate | `plan.md` (sketch, tools checked, photos and data downloaded), style frames A/B/C, animatic of the beats, then `LOOK.md`, `recipe.json` | the user picks; one anchor with asymmetric scale and the Look-Away / Look-Back Test (`references/vox-psychology-and-design.md`); default flat paper and print borders, grain, ink bleed, torn edges and halftone only when the pick is a stylised option (`references/textures-retro-and-shading.md`); then `scripts/validate_vox_recipe.py --recipe recipe.json` (the recipe's `look` is `flat` by default, `stylised` only when `LOOK.md` picks it) |
 | 5. Assets and check | `assets/`, `CREDITS.md` | `scripts/rework_image.py` for cut-outs, `scripts/generate_vox_assets.py` for the filters and ruler timelines the recipe uses; every picture sourced or the search named |
-| 6. Build and animate | scenes | Remotion + SVG filters + Three.js, Fusion (`ImagePlane3D`, `Camera3D`) or Blender Grease Pencil per `references/2d-3d-toolchain-matrix.md`; mode references above; posterize graphics at 8 to 12 fps only when `LOOK.md` picks a stylised look (flat and `vox-now`: no posterize), camera never posterized; finish with 35mm DoF, vignette and a light unsharp, grain and chromatic aberration only if `LOOK.md` says |
+| 6. Build and animate | scenes, WIP demo after the first | Remotion + SVG filters + Three.js, Fusion (`ImagePlane3D`, `Camera3D`) or Blender Grease Pencil per `references/2d-3d-toolchain-matrix.md`; mode references above; posterize graphics at 8 to 12 fps only when `LOOK.md` picks a stylised look (flat and `vox-now`: no posterize), camera never posterized; finish with 35mm DoF, vignette and a light unsharp, grain and chromatic aberration only if `LOOK.md` says |
 | 7. Sound | final voice, SFX, music, mix | `design-sound`: every visible stroke, pop and wipe gets its own sound at its frame |
 | 8. QA, preview, final | gate report, 540p preview with sound | `scripts/check_render.py` and the contact sheet per `references/qa-and-gates.md`, look match with `scripts/compare_look.py`; the user approves the preview before the full render |
 

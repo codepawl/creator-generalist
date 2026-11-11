@@ -143,9 +143,11 @@ npx skills add codepawl/creator-generalist
 ## 3d-generalist
 
 Give your agent a premise, a story, an object or a world. Both generalists follow the same eight-step production
-spine: brief, reference, script and beats, look gate, assets, build and animate, sound, then QA with a preview and the
-final. You make two decisions: the look at step 4 (style frames A/B/C) and the 540p preview before the final render.
-Nothing renders at full quality until you approve the preview.
+spine: brief, reference, script and beats, prep and look gate, assets, build and animate, sound, then QA with a preview
+and the final. Before building, the agent sketches the piece, checks its tools and downloads the resources, then lets
+you choose between style frames A/B/C. You get a WIP demo of the first finished shot while it keeps working, and a
+540p preview before the final render. After each preview you pick the next round: fix notes, continue in a direction
+you name, or let the agent decide and keep creating on its own. Nothing renders at full quality until you approve.
 
 Type `/3dg` alone to see the modes (`/3d-generalist:3dg` in Claude Code). Type a mode and a subject to start one.
 
@@ -174,7 +176,7 @@ Type `/3dg` alone to see the modes (`/3d-generalist:3dg` in Claude Code). Type a
 Editorial explainer graphics in the footage-led Vox look: flat paper cards, print-bordered real photos, highlighters,
 maps, charts and true-scale timelines. Torn paper, halftone and grain are opt-in stylised looks. The skill runs on
 free tools: Blender, DaVinci Resolve Fusion, Remotion with SVG and Three.js, and FFmpeg. It follows the same eight-step
-production spine as `3d-generalist` (look gate and 540p preview included).
+production spine as `3d-generalist` (prep and look gate, WIP demo, 540p preview and next rounds included).
 
 Type `/2dg` alone to see the modes (`/2d-generalist:2dg` in Claude Code). Type a mode and a subject to start one.
 
