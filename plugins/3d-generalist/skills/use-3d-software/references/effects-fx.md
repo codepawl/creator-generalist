@@ -9,6 +9,7 @@ Reading map
 - Liquid: wiggling text, chrome blobs, droplets, splatter
 - Cloth: modifier skirt, Cloth Dynamics node, pressure pop
 - Quick physics recipes: cloth drapes, cheese, flag, pillow, shirt, web, rigid body, Quick Liquid, ripples, fur, grass, ocean
+- Explosions: blast layers, VDB fire and smoke in Cycles, debris, dust, thrown props, pop-out bars
 - Glitch: pixelate, VHS, ASCII, painterly filter
 
 ## 5.x names
@@ -68,6 +69,23 @@ Short cloth, fluid, hair and ocean setups. Panel names are the default Propertie
 - **Fur ball with hair dynamics**: UV Sphere, Shade Smooth, Particles > + > Hair. Hair Length 0.4 m, Segments 5, Advanced on, Hair Dynamics on, Quality Steps 10. Physics > Forces > Brownian 0.15 (makes it fuzzy). Children Interpolated, Display 21, Render 100. Bake. Stiffness 2.0 is `unverified`.
 - **Grass tuft from a plane**: Plane with an Image Texture in Base Color, Particles > Hair, Advanced, Emission Number 3000, Hair Length 0.15 m, Segments 5, Brownian 0.12, Children Interpolated. Roughness Endpoint 0.1, Random 0.17 `unverified`.
 - **Ocean modifier with foam**: Plane, Add Modifier > Ocean. Waves Scale 1.5, Choppiness 1.78, Alignment 0.395, Direction 6.5 deg, Damping 0.201 (only Scale and Choppiness were verified). Foam on, Data Layer "Foam", Coverage 0.3. Material: Base Color about #3B576C, Roughness about 0.33, Transmission Weight 1.0. Add Shader after the Principled, Emission to its second socket, Attribute node (Geometry, Name "Foam") through a Color Ramp into Emission Color. The name must match the Data Layer exactly. Animate Time: 1.00 at frame 1, 6.51 at frame 250. Finish with Resolution 12, Random Seed 16, Repeat X and Y 3.
+
+## Explosions
+
+Built and rendered in Blender 5.3 Cycles (2026-11). No fluid bake: the fire and smoke are a ready VDB sequence.
+
+- **Order of layers in a real blast**: flash (a few frames), shock front, fireball, soot and smoke column, ground dust ring, ejecta trails and debris, sparks and embers, scorch mark, props thrown. High explosive alone gives a short flash and dirty grey smoke. A long orange fireball needs fuel in the scene (gas tank, jerrycans).
+- **Fire and smoke from a VDB sequence**: use a CC0 simulation (the free JangaFX VDB packs have `density` and `flames` grids). `bpy.ops.object.volume_import(filepath=first_file, files=[...])`, set `volume.is_sequence = True`, `frame_start` to the blast frame, `sequence_mode = "CLIP"`. Scale the object to the set, since packs are in their own units. The data thins out near the end of the sequence, so end the shot or fade before it does.
+- **Volume shader that renders fast**: Volume Info (or Attribute `flames`) -> Color Ramp (black, dark red, orange, pale yellow) -> Emission, added to a Principled Volume that only does density and a dark smoke colour. Lower the density where `flames` is high so the fire is not buried in smoke. Trap, Blender 5.3: a Blackbody node and a Map Range into Principled Volume "Emission Color" left Cycles stuck on one frame for 10+ minutes. The Color Ramp version renders in seconds.
+- **Cycles settings for volumes**: OIDN on, 64 to 128 samples, few volume bounces. Render one blast frame small first: it is the slowest frame of the shot.
+- **Light from the blast**: a point light at the charge keyed over 3 to 6 frames (huge on the blast frame, a tenth two frames later, zero by frame 8) plus the volume's own emission. Too strong a first frame whites out the picture: check the blast frame and the two after it.
+- **Debris and sparks**: particle systems from a small disc at the charge, all born inside 2 to 4 frames, high normal velocity with random spread, rotation on, lifetime past the end of the shot. Sparks are tiny emissive spheres. Embers are a second slow system with gravity weight near zero or slightly negative so they drift up.
+- **Ejecta dust trails**: compute ballistic arcs in Python (20 or more, grouped in a few azimuth clusters), drop a point every few milliseconds along each arc into a point cloud, then Points to Volume. Jitter each point by less than half its radius, or the trail reads as beads.
+- **Ground dust ring**: a flat volume cylinder with a procedural ring density that grows over time. Make the cylinder much wider than the visible set and hide it before the blast, or its wall shows as a hard dark wedge on the floor.
+- **Thrown props**: animate each prop on a ballistic path with spin, raycast the ground for the landing height, and forbid resting on thin rims or edges (push the landing point outward until it falls to the floor). Write the landing frames to a JSON file so the sound cues come from the same sim.
+- **Crater and scorch**: a shape key on the ground that drops on the blast frame, deep enough that nothing under the slab shows through, and a dark radial decal that fades in over 2 frames.
+- **Pop-out bars in comp**: render a second pass with Film > Transparent where everything that does not fly is a holdout (flying props, debris and fire stay visible), low samples. Draw two thin vertical bars on the main picture, then overlay the main picture again through the matte alpha. The flying things now pass in front of the bars. In ffmpeg: `format=rgba,alphaextract,format=gray` makes the mask, `drawbox` the bars, then `alphamerge` and `overlay`.
+- **Comp finish**: glow from a thresholded blur screened at about 0.3, a chromatic shift for the 10 frames after the blast only, a light vignette. No lens-flare streaks.
 
 ## Glitch and screen effects
 

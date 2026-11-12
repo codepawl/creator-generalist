@@ -38,7 +38,7 @@ mobile or cross-platform game with a big asset store; Unreal for a photoreal rea
 | Quick Blender recipes: bevel and extrude keys, holes, bridges, lathe, array, lattice, shrinkwrap decals, pipes, gears, stairs, fences, rails, bookshelves, food | `references/quick-modeling-recipes.md` |
 | Blender armatures, Rigify, IK, binding, weight paint, face rigs | `references/rigging-and-weights.md` |
 | Blender keyframes, walk cycles, NLA, camera rigs, loops | `references/animation-and-nla.md` |
-| Blender fire, lightning, liquid, cloth drapes, ocean, hair and fur, glitch | `references/effects-fx.md` |
+| Blender fire, explosions from VDB, lightning, liquid, cloth drapes, ocean, hair and fur, glitch | `references/effects-fx.md` |
 | Blender hotkeys, bpy recipes, add-ons, free vs paid | `references/workflow-and-addons.md` |
 | A web page: GLB loading, compression, animation, lights, colour, export from Blender | `references/threejs.md` |
 | Godot 4: import, materials, AnimationTree, controller, camera, build | `references/godot.md` |
