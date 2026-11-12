@@ -37,7 +37,8 @@ The engine is a brief slot, not a mode: web (three.js, Phaser or plain canvas) w
 Godot or Unity for a light native game (ask once, record the pick); Unreal for photoreal or when a jam requires it.
 Details and the jam checklist: `references/engine-and-ship.md`.
 Idea check, lore as mechanic, readability and trailer order: `references/idea-lore-trailer.md` (read at steps 1, 2 and
-8). A C++ Unreal game built headless, its scripted capture and the web target: `references/unreal-jam-build.md`.
+8).
+workers), run at steps 6 to 8: `references/lessons-from-shipping.md`. A C++ Unreal game built headless, its scripted capture and the web target: `references/unreal-jam-build.md`.
 
 ## Order of work: the production spine
 
