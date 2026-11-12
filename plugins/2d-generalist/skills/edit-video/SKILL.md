@@ -61,6 +61,9 @@ Long references open with a reading map. Find the exact entry, then read the who
 
 - Extract frames at each cut, at the peak of each effect and at the end, and look at them. Check that text fits
   inside the platform safe zone, edges show no ghosting, and speed ramps land on the beat.
+- No eyebrow or helper text: no small muted line under or above a title (taglines, "humans: X / agents: Y",
+  "paste into ..."), and no corner caption naming the shot, step or tool. The voice carries it; text on screen is
+  only what the viewer must read (the title itself, code, a command).
 - Measure the loudness of the export (`references/ffmpeg.md`, "Measure loudness") against the platform target.
 - Check duration, resolution, frame rate and codec with `ffprobe` against the platform limits.
 - Say which paid or Studio-only features were used and which free fallback replaced them.

@@ -44,7 +44,7 @@ which steps shrink per mode.
 | 5. Assets and check | `assets/`, `CREDITS.md`, measured bounds | fit on real vertex bounds (`Box3.setFromObject(model, true)`), scale the world to the character, no clipping at shot distance: `references/assets-and-kitbash.md`, `references/characters-and-rigs.md` |
 | 6. Build and animate | shots, WIP demo after the first | one continuous dressed set with ambient life, cutaway by section plane: `references/worlds-and-cutaways.md`; head leads turns 4 to 6 frames, staggered stops, anticipation, physics baked so every frame is `f(t)`: `references/acting-and-motion.md`; under 1 hard cut per 10 s, camera keys 5 to 8 frames apart, spine fill light, DoF on the subject, 6-subframe 180-degree blur, then bloom, vignette and grain as `LOOK.md` sets them: `references/camera-and-lighting.md`; drawn FX: `references/hybrid-2d-3d-fx.md` |
 | 7. Sound | final voice, SFX, music, mix | `design-sound`: tail silences over 0.12 s trimmed, one-word captions within ±0.05 s, a soft real SFX for every visible event, -14 LUFS |
-| 8. QA, preview, final | gate report, 540p preview with sound | every gate in `references/qa-and-gates.md` (contact and slip: `scripts/check_contact_and_slip.mjs`; look match: `scripts/compare_look.py`; sheets: `scripts/contact-sheet.sh`), then the user approves the preview before the full render |
+| 8. QA, preview, final | gate report, 540p preview with sound | every gate in `references/qa-and-gates.md` (contact and slip: `scripts/check_contact_and_slip.mjs`; Blender frame fill and floating props: `scripts/blender_frame_audit.py`; look match: `scripts/compare_look.py`; sheets: `scripts/contact-sheet.sh`), then the user approves the preview before the full render |
 
 ## Hard anti-slop rules
 

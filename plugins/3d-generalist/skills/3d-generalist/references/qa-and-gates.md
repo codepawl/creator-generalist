@@ -9,7 +9,7 @@ the sound, never in place of the look gate at step 4.
 
 Run these checks across the entire film at 30 fps (`window.placeTime(t)` for fast geometry checks without rendering, and
 real page renders for visibility checks). **One failure blocks the preview.** `scripts/check_contact_and_slip.mjs`
-measures gates 1 to 4 only; grip, clearance, exits, chips and caption sync need the project's own checks. Gates 8
+measures gates 1 to 4 only (three.js pages; a Blender set uses gate 14's script); grip, clearance, exits, chips and caption sync need the project's own checks. Gates 8
 and 9 apply to narrated pieces with label chips.
 
 | Gate | Threshold / Rule | What it catches |
@@ -26,6 +26,7 @@ and 9 apply to narrated pieces with label chips.
 | **10. Contact Sheet Visual Review** | Inspect `scripts/contact-sheet.sh` grids at 1 fps (and per-shot stills) to verify silhouettes, elbow angles, pour alignment, water levels and lighting. | Backward carts, backwards arms, black `NaN` water patches, dark faces inside cutaways. |
 | **11. Look Match** | `scripts/compare_look.py --style <picked style frame> <preview>`: mean luma within 20 of 255, mean saturation within 0.08, mean hue turned under 20 degrees, on every sampled second. Light direction and lens checked by eye on one still per shot against `LOOK.md`. | Shots rendered darker, greyer or in another colour cast than the look the user picked; parallel shots drifting apart in grade. |
 | **12. Phone Check** | The contact sheet looked at 360 px wide: the subject reads in every shot, the hero is separated from the background by value, and readable text is at least 5% of frame height and clear of the platform UI (bottom 15%, right edge on vertical video). | Subjects lost in a busy set, labels too small on a phone, captions under the like button. |
+| **14. Frame Audit (Blender sets)** | `scripts/blender_frame_audit.py` on the film's camera, before the first still goes to the user and after every prop move: no object reported `FLOATS` (hung, leaning and resting things touch their support; a hook passes through the hole, measured), no hero prop `cut by the frame edge` or under 3% of the frame unless meant, no bare surface over about 15% of the frame left undressed. Then one zoomed crop of each spot that changed, read before sending. | Ladles hovering beside their hooks, vegetables cropped at the edge, empty wall and counter the user has to point at, three rounds on one fix because only the full frame was looked at. |
 | **13. Brief Drift** | `brief.md` compared slot by slot with the preview: purpose, format, length, subject beats, look, constraints. | A film that is well made but is not what was asked for. |
 
 ## 2. Keeping QA checks fast (<30 seconds)
