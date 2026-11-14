@@ -15,7 +15,7 @@ Route for a stylized low-poly character (about 300 to 1,200 triangles) with an u
 
 2. **Block Out Separate Low-Poly Body Chunks.**
    Follow [modeling-and-topology.md](modeling-and-topology.md). Never sculpt or use high-density subdivisions. Build distinct anatomical chunks so clothing cuffs and hair layers create natural silhouette steps:
-   - **Foot:** Cube (`bevel: 0`) + 2 vertical loop cuts; pull toe forward and sole flat on $Z=0$ (Blender) / $Y=0$ (Three.js/67js).
+   - **Foot:** Cube (`bevel: 0`) + 2 vertical loop cuts; pull toe forward and sole flat on $Z=0$ (Blender) / $Y=0$ (Three.js/Crucible).
    - **Leg:** 5-vertex open cylinder (caps deleted), 3–4 horizontal loops around the knee for clean deformation and knee-pad UV isolation, slight forward knee bend.
    - **Waist / Shorts:** Mirrored cube on centerline + `Bridge Edge Loops` (`bridge` op) to leg cuffs.
    - **Torso / Jacket:** Extruded mirrored cube with collar inset/extrude; **delete all internal cap faces** between mirrored halves and inside sleeve/neck openings.

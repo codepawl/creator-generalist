@@ -1,7 +1,7 @@
 # Agent guide for `codepawl/creator-generalist`
 
 This repository is the `creator-generalist` skill pack for content creators: `3d-generalist` (3D studio across
-Blender, Three.js and 67js, with `model-characters` for 3D characters in any style), `2d-generalist` (2D
+Blender, Three.js and Crucible, with `model-characters` for 3D characters in any style), `2d-generalist` (2D
 editorial motion graphics) and `game-generalist` (playable games on web, Godot, Unity or Unreal). To use a skill, read its `SKILL.md` under `plugins/<plugin>/skills/<skill>/`.
 
 ## Hard rules when editing this repository

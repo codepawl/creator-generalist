@@ -25,7 +25,7 @@ This guide distills a complete low-poly character modeling workflow (Parts 1–6
   - Disable scene lights/world lighting in Material Preview when painting unlit/emission textures.
 
 ### 1.2 Aligning Front & Side Turnaround Planes
-- **Front Reference Plane:** Placed behind the character (`Y > 0` in Blender, `Z < 0` in Three.js/67js), facing the front orthographic camera.
+- **Front Reference Plane:** Placed behind the character (`Y > 0` in Blender, `Z < 0` in Three.js/Crucible), facing the front orthographic camera.
 - **Side Reference Plane:** Rotated $90^\circ$ around the vertical axis, offset to the side (`X < 0`) so it does not slice through the mesh in perspective view.
 - **Image Object Settings (Blender):**
   - Set `Depth` to **`Back`** and check **`Side: Front`** (one-sided) so the reference image never blocks the mesh when orbiting behind it.
