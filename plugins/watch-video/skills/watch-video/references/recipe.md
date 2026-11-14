@@ -85,7 +85,7 @@ One file owns every time. Whatever renders the pictures, beats and cues come fro
 |---|---|
 | `type`, `ui`, `graphic`, `image` | `snapcn` with the matching `remotion-*` workflow. Beats become scenes, `cues[]` becomes the sound cue list; pick the tempo so the cut times fall on beats |
 | `3d`, sharing the page's timeline (a tilting card, a product turntable, particles) | a three.js canvas inside a Remotion scene, driven by the frame number; nothing reads the clock |
-| `3d`, a world or landscape | a three.js or 67js scene rendered to frames |
+| `3d`, a world or landscape | `build-crucible-scene`, then `render-crucible-media` for the clip |
 | `3d`, a rendered room, product or camera move with real lighting | Blender 5.2, headless: `blender -b <file.blend> -P <script.py>` (full path to `blender.exe` where it is not on PATH); render an image sequence at the brief's frame rate and bring it in as a footage layer. Below normal priority, through the machine's GPU queue if it has one |
 | `footage` | the user's own recording or CC0 stock. It is in `not_reproduced` for a reason: ask, do not copy |
 | A React project that already uses Remotion | Remotion with the same `brief.json` as its only clock. Not installed here; installing needs the user's yes |

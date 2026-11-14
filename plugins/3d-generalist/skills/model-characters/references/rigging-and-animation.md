@@ -1,6 +1,6 @@
 # Low-Poly Character Rigging, Weight Painting, Face/Eye Rigs & Animation
 
-This reference distills Parts 9 to 11 of a low-poly character series plus its eyes video and animation video—covering skeletal rigging, hard/flat weight painting, secondary hair/skirt bones, 2D UV-offset facial rigs, 3D inset low-poly eyes, and cyclic animation—and maps every technique across **Blender**, **Three.js**, and **67js**.
+This reference distills Parts 9 to 11 of a low-poly character series plus its eyes video and animation video—covering skeletal rigging, hard/flat weight painting, secondary hair/skirt bones, 2D UV-offset facial rigs, 3D inset low-poly eyes, and cyclic animation—and maps every technique across **Blender**, **Three.js**, and **Crucible**.
 
 <!-- skill-navigation:start -->
 ## Reading Map
@@ -22,8 +22,8 @@ This reference distills Parts 9 to 11 of a low-poly character series plus its ey
   - Enable the built-in `Rigify` addon (`Edit -> Preferences -> Add-ons -> Rigging: Rigify`).
   - Spawn **`Add -> Armature -> Rigify Meta-Rigs -> Basic Human`** (NOT the full `Human` meta-rig, which includes dozens of facial and finger bones that a low-poly character with mitten hands does not need).
   - Under `Object Data Properties -> Viewport Display`, enable **`In Front`** so bones stay visible inside the mesh.
-- **67js (`preset: "humanoid"`):**
-  - In a `67js` scene recipe, add an armature entry:
+- **Crucible (`preset: "humanoid"`):**
+  - In a `Crucible` scene recipe, add an armature entry:
     ```json
     "armatures": [{
       "id": "rig",
@@ -49,7 +49,7 @@ This reference distills Parts 9 to 11 of a low-poly character series plus its ey
    - Place the **head bone** (`spine.006` head) at the base of the skull where the 3-vertex neck meets the jaw, and its tail at the crown of the head.
 4. **Never Leave Knees or Elbows Dead-Straight ($180^\circ$):**
    - In Side View (`Numpad 3`), ensure the **knee joint sits slightly forward** of the hip-to-ankle line, and the **elbow joint sits slightly backward** of the shoulder-to-wrist line.
-   - *Why:* Both Blender's `Generate Rig` IK solver and `67js` `motion.ik` (`jointAxisProblems: ["straight-chain", "knee-bends-backward"]`) use the rest-pose bend angle to determine which way the limb folds.
+   - *Why:* Both Blender's `Generate Rig` IK solver and `Crucible` `motion.ik` (`jointAxisProblems: ["straight-chain", "knee-bends-backward"]`) use the rest-pose bend angle to determine which way the limb folds.
 5. **Apply Transforms Before Binding:**
    - The series keeps the Mirror modifiers on the limbs and binds with `Ctrl+P -> With Automatic Weights` (Part 9). Applying them first is skill guidance for engine export (glTF needs real geometry). Run `Ctrl+A -> All Transforms` before binding and apply mirrors before exporting.
    - If you tweak meta-rig bone positions later in Blender, click **`Re-Generate Rig`**—your existing mesh bindings and weight paints are preserved.
@@ -62,7 +62,7 @@ Automatic weights (`Bone Heat`) always bleed across separated low-poly chunks: r
 
 ### 2.1 The Golden Rules of Low-Poly Weight Painting
 1. **Turn ON `Auto Normalize` (`Options -> Auto Normalize`):**
-   - Mandatory in Blender Weight Paint mode (and required by `glTF` / Three.js / `67js`). When you paint weight onto one bone, Blender automatically subtracts weight from competing bones so the vertex sum stays `1.0`.
+   - Mandatory in Blender Weight Paint mode (and required by `glTF` / Three.js / `Crucible`). When you paint weight onto one bone, Blender automatically subtracts weight from competing bones so the vertex sum stays `1.0`.
 2. **Use `Flat` Brush Falloff (Flat curve preset, Falloff Shape stays `Sphere` with `Front Faces Only` on; `Projected` is only for painting through the model, Part 10):**
    - Low-poly meshes have very few vertices. Smooth Gaussian falloff leaves stray `0.12` weights on neighboring vertices. A **Flat** falloff curve paints crisp `1.0` (`100%` red) or `0.0` (`0%` blue) weights in a single click.
 3. **Isolate the `DEF` (Deformation) Bone Collection:**
@@ -117,8 +117,8 @@ export function setFaceExpression(eyeMaterial, mouthMaterial, eyeIndex, mouthInd
 }
 ```
 
-#### C. 67js (`STEP` Keyframe Tracks or Material/Morph Drivers)
-In `67js`, author discrete expression swaps using **`interpolation: "STEP"`** on morph weight tracks (`kind: "morph"`, where each expression is a relative UV/plane morph target) or stepped node tracks that swap recessed/decal face cards (`decal: true`, `depthLayer: 1`).
+#### C. Crucible (`STEP` Keyframe Tracks or Material/Morph Drivers)
+In `Crucible`, author discrete expression swaps using **`interpolation: "STEP"`** on morph weight tracks (`kind: "morph"`, where each expression is a relative UV/plane morph target) or stepped node tracks that swap recessed/decal face cards (`decal: true`, `depthLayer: 1`).
 
 ---
 
@@ -166,13 +166,13 @@ For an $N$-frame loop (e.g., $25$ frames, Timeline `Start = 1, End = 25`):
   - If a breathing or bounce motion feels too stiff or too exaggerated, select its F-curve in the Graph Editor (with pivot set to `2D Cursor` or `Individual Centers`) and press **`S -> Y`** to scale the vertical amplitude without re-keying poses.
 
 ### 5.4 Mandatory `Constant` / `STEP` Interpolation for 2D Face Rigs
-- When keying `eye_control` or `mouth_control` (2D UV sprite swap), select all keyframes on those bones in the Timeline / Dope Sheet and press **`T -> Constant`** (`interpolation: "STEP"` in `67js` / Three.js `InterpolateDiscrete`).
+- When keying `eye_control` or `mouth_control` (2D UV sprite swap), select all keyframes on those bones in the Timeline / Dope Sheet and press **`T -> Constant`** (`interpolation: "STEP"` in `Crucible` / Three.js `InterpolateDiscrete`).
 - *Why:* Bezier/Linear interpolation sweeps the bone smoothly from $Z = 0$ to $Z = 0.3$, which rapidly scrolls through every intermediate facial expression on the sprite sheet like a slot machine!
 
 ### 5.5 Two-Handed Props (`Child Of` / `Dynamic Parent`)
 - When a character holds a prop (sword, umbrella, rifle) with both hands:
   - Always initialize the `Child Of` constraint (`influence: 1.0`) or `Dynamic Parent` at **Frame `1`** in the base pose before animating the parent hand (`hand_ik.R`).
-  - In `67js`, use `motion.constraints`:
+  - In `Crucible`, use `motion.constraints`:
     ```json
     "constraints": [
       { "node": "prop-umbrella", "type": "child_of", "target": "rightHand", "inverse": "rest" }

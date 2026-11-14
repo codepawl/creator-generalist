@@ -17,7 +17,7 @@ test it on one shot before a full piece.
 | Sim plus sprite merge | A big effect needs volume and a drawn look | Render the sim in two flat tones, mix drawn sprites into it so the seam is hidden [S] |
 | Toon FX meshes | Stylized fire, smoke and impact shapes in 3D | EEVEE Shader to RGB plus a Constant colour ramp, animated on twos (section 3) [S] |
 | Grease Pencil in 3D | Lines, speed lines, smears that live in depth | Line Art plus Noise boil, hand-drawn strokes on keys (section 4) [S] |
-| Flipbook sprites (web) | three.js or 67js scenes | Sprite sheet on a billboard, stepped frame (section 5) [U] |
+| Flipbook sprites (web) | three.js or Crucible scenes | Sprite sheet on a billboard, stepped frame (section 5) [U] |
 
 ## 2. Drawn FX cards (the most reliable route)
 
@@ -45,7 +45,7 @@ test it on one shot before a full piece.
 - Hand-drawn strokes on key poses plus procedural lines read best together: drawn lines carry intent, procedural lines
   carry detail [S]. Edge detection in comp alone looks mechanical [S].
 
-## 5. Flipbook sprites on the web (three.js, 67js) [U]
+## 5. Flipbook sprites on the web (three.js, Crucible) [U]
 
 - Plane or `Sprite` with the sheet texture, `uvScale = (1/columns, 1/rows)`, frame `floor(time * 12) % frameCount`,
   offset per frame (V runs bottom-up).

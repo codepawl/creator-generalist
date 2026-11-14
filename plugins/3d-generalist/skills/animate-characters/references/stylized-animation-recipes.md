@@ -307,7 +307,7 @@ are not repeated: see the end of the file.
   3. Noise Color > Vector Math Subtract with a vector of 0.5 (Math Add 0.0 + 0.5) to centre on zero > Rotate Instances Rotation (Local Space on).
   4. Expose the Divide value as group input "Animation Speed" and wrap Rotate Instances in a Switch (Geometry) with a Boolean "Animation Toggle".
 - Principle: noise sampled at position plus time on X drifts smoothly across the field; subtracting 0.5 makes instances lean both ways.
-- Other tools: vertex shader rotating instances by simplex noise(position + time) in three.js or 67js, Unity or Unreal shader graph with a Time node. Untested.
+- Other tools: vertex shader rotating instances by simplex noise(position + time) in three.js or Crucible, Unity or Unreal shader graph with a Time node. Untested.
 - Pitfall: a bigger divisor is calmer. Pin and rename the modifier so the node group matches the stack.
 
 ## Physics and particles

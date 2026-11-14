@@ -158,7 +158,7 @@ class LowPolyCharacterSkillTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             tdir = pathlib.Path(tmp)
             good_recipe = {
-                "format": "67js.scene",
+                "format": "crucible.scene",
                 "schemaVersion": 1,
                 "geometries": [{"id": "leg", "type": "mesh", "base": {"type": "cylinder", "radialSegments": 5}}],
                 "materials": [{"id": "mat", "tag": "unlit", "color": [0.9, 0.8, 0.7]}],

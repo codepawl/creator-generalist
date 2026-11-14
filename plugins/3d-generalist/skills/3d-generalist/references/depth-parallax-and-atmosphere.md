@@ -38,7 +38,7 @@ the hue slides toward the haze colour. Do not grade each of those by hand; mix t
 | Blender Cycles/EEVEE | World or a box with Principled Volume or Volume Scatter | Density is about sigma per metre: `3.912 / V` [P]; anisotropy 0.3 to 0.8 for sun shafts [R] |
 | Blender compositor | Mist pass (Start, Depth, Falloff) drives a Mix toward the haze colour | Falloff Quadratic or Inverse Quadratic, Depth near V [R] |
 | three.js | `scene.fog = new THREE.FogExp2(hazeColor, density)` | `FogExp2` keeps `exp(-(density*d)^2)`, so 2% at V means `density = 1.978 / V` [P] |
-| 67js | `environment.fogColor` and `fogDensity` (fog colour is linear RGB); `volumeFog` for lit shafts and shadows | `volumeFog` needs `{ hdr: true, depth: true }`; read the checkout's `docs/volumetric.md` first [H] |
+| Crucible | `environment.fogColor` and `fogDensity` (fog colour is linear RGB); `volumeFog` for lit shafts and shadows | `volumeFog` needs `{ hdr: true, depth: true }`; read the checkout's `docs/volumetric.md` first [H] |
 | Remotion, SVG, DOM | Each layer gets `mix(layerColor, haze, 1 - T)`: a haze-coloured rectangle over the layer at opacity `1 - T` | Same T table as painted planes |
 | Painted (Krita) | One haze-colour layer per depth plane, Normal mode at `1 - T` opacity, then flatten lightly | Lift the darkest value of each plane first |
 
@@ -66,7 +66,7 @@ the camera trucking by `x`, a layer at distance `z` moves on screen by `x * f / 
 
 | Medium | Route | Pitfall |
 | --- | --- | --- |
-| Blender, three.js, 67js | Put cards or models at their real depth and move a real camera; parallax is free and correct | A pan instead of a truck kills it |
+| Blender, three.js, Crucible | Put cards or models at their real depth and move a real camera; parallax is free and correct | A pan instead of a truck kills it |
 | After Effects style 2D (Remotion, SVG, DOM) | `layerX = cameraX * (zSubject / zLayer)`, same for Y | Foreground layers must be wider than the frame by `cameraTravel * speed` |
 | Still photo to 2.5D | Depth map, cut 3 to 5 layers, fill behind each cut (clone or inpaint), or displace a subdivided plane | Keep camera travel under about 5 to 10% of frame width or the stretch shows [R] |
 | Painted multiplane | Paint each plane on its own layer with overpaint at its edges, then the AE style route | Paint the hidden part behind each plane before animating |

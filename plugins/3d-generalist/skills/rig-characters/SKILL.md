@@ -15,7 +15,7 @@ This skill owns the rigging method: skeleton, skinning, controls, face rigs and 
 - A rig deforms badly: pinched joints, a reversed elbow, a hand that follows the wrong bone.
 - A face needs expressions: bones, shape keys or a texture atlas.
 - A rigid machine needs joints without a skeleton.
-- A rig must work in Unity (Mecanim), Godot, three.js, 67js or glTF.
+- A rig must work in Unity (Mecanim), Godot, three.js, Crucible or glTF.
 
 Exact Blender button recipes are in `use-3d-software/references/rigging-and-weights.md`. Read it for those steps.
 This skill adds the method around them and the other tools.
@@ -64,7 +64,7 @@ it over. When a generalist skill called this one with a brief, use that brief an
 | IK with pole targets, IK/FK choice and switching, snapping, bone collections, ready rigs | `references/ik-fk-and-controls.md` |
 | Shape keys, eye and mouth bones, 2D face atlas driven by a bone, blinking | `references/face-rigs.md` |
 | A robot arm or machine without bones, a 2D cut-out puppet from Krita layers | `references/mechanical-and-cutout.md` |
-| Rig to Unity Mecanim, Godot, three.js, 67js, glTF | `references/export-to-engines.md` |
+| Rig to Unity Mecanim, Godot, three.js, Crucible, glTF | `references/export-to-engines.md` |
 | A creature spine with controller bones, bendy bones, IK legs, Damped Track tails, Rigify frog or custom face, wind on bones, Bake Action | `references/creature-and-stylized-rigs.md` |
 | Stylized recipes: image-sequence faces, Rigify samples for non-humanoids, rubber-hose and squash rigs, hard-weight toy rigs, ragdoll proxies, eye rigs | `references/stylized-rig-recipes.md` |
 | A character holds, picks up, carries, hands over or puts down a prop; two-handed props; grip, weight, fingers; any software | `references/props-grip-and-contact.md` |

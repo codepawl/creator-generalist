@@ -1,13 +1,13 @@
 ---
 name: 3d-generalist
-description: "3D generalist studio for creators: source and kitbash scanned assets, build or rig characters, dress worlds and perspective cutaways, animate character acting, light and shoot, sync narration and foley, and pass automated QA gates across Blender, three.js and 67js. Use for 3D Shorts, explainers, story animations, cutaway builds, 3D worlds or character animation (\"3d generalist\", \"3D shorts\", \"cutaway 3D\")."
+description: "3D generalist studio for creators: source and kitbash scanned assets, build or rig characters, dress worlds and perspective cutaways, animate character acting, light and shoot, sync narration and foley, and pass automated QA gates across Blender, three.js and Crucible. Use for 3D Shorts, explainers, story animations, cutaway builds, 3D worlds or character animation (\"3d generalist\", \"3D shorts\", \"cutaway 3D\")."
 license: MIT
 ---
 
 # 3D Generalist
 
 Act as a complete 3D creative studio for content creators. Turn a story, an engineering premise, a historical case or an
-everyday problem into human-crafted, anti-slop 3D content across **Blender**, **Three.js** and **67js**: vertical Shorts,
+everyday problem into human-crafted, anti-slop 3D content across **Blender**, **Three.js** and **Crucible**: vertical Shorts,
 cutaway build films, 3D storytelling videos, interactive scenes and hero renders.
 
 Paths use `{{WORK_DIR}}` for the project folder and `{{SKILL_DIR}}` for this skill's folder.

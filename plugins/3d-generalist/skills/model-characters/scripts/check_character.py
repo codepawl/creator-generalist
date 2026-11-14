@@ -6,7 +6,7 @@
 #   "pillow>=10.3.0",
 # ]
 # ///
-"""Validate a low-poly character GLB, glTF, or 67js scene recipe JSON.
+"""Validate a low-poly character GLB, glTF, or Crucible scene recipe JSON.
 
 Checks:
 1. Triangle & vertex budget (low-poly range: min_tris..max_tris).
@@ -14,7 +14,7 @@ Checks:
 3. Skin weight normalization (every skinned vertex sum(weights) == 1.0 +/- 0.01, max 4 influences).
 4. Grounding (lowest vertex planted near Y=0) and symmetry bounds.
 5. Power-of-Two (POT) texture dimensions if embedded images are present.
-6. For 67js recipes: armature presence, unlit/neutral look configuration, and stepped 2D face tracks.
+6. For Crucible recipes: armature presence, unlit/neutral look configuration, and stepped 2D face tracks.
 """
 
 from __future__ import annotations
@@ -225,8 +225,8 @@ def check_67js_recipe(path: pathlib.Path) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
 
-    if recipe.get("format") not in ("67js.scene", "67js.asset"):
-        errors.append("Recipe format must be '67js.scene' or '67js.asset'.")
+    if recipe.get("format") not in ("crucible.scene", "crucible.asset"):
+        errors.append("Recipe format must be 'crucible.scene' or 'crucible.asset'.")
 
     geoms = {g["id"]: g for g in recipe.get("geometries", [])}
     for gid, g in geoms.items():
@@ -262,7 +262,7 @@ def check_67js_recipe(path: pathlib.Path) -> dict[str, Any]:
 
     return {
         "ok": len(errors) == 0,
-        "kind": "67js.recipe",
+        "kind": "Crucible.recipe",
         "geometries": len(geoms),
         "nodes": len(recipe.get("nodes", [])),
         "armatures": len(armatures),
@@ -282,7 +282,7 @@ def validate_character(path: pathlib.Path, max_tris: int = 1800, min_tris: int =
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("target", type=pathlib.Path, help="Path to character .glb or 67js .recipe.json")
+    parser.add_argument("target", type=pathlib.Path, help="Path to character .glb or Crucible .recipe.json")
     parser.add_argument("--max-tris", type=int, default=1800, help="Maximum triangle budget (default: 1800)")
     parser.add_argument("--min-tris", type=int, default=20, help="Minimum triangle budget (default: 20)")
     args = parser.parse_args()

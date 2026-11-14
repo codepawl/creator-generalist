@@ -1,6 +1,6 @@
 # Low-Poly Route
 
-Route for a stylized low-poly character (about 300 to 1,200 triangles) with an unlit power-of-two atlas, hard-weighted rig and stepped 2D or inset 3D face, in Blender, three.js or 67js. Pick the look first in `style-presets.md`. `{{SKILL_DIR}}` is the skill folder.
+Route for a stylized low-poly character (about 300 to 1,200 triangles) with an unlit power-of-two atlas, hard-weighted rig and stepped 2D or inset 3D face, in Blender, three.js or Crucible. Pick the look first in `style-presets.md`. `{{SKILL_DIR}}` is the skill folder.
 
 ## Steps
 
@@ -27,8 +27,8 @@ Route for a stylized low-poly character (about 300 to 1,200 triangles) with an u
 
 3. **Unwrap UVs & Paint the Unlit Texture Atlas.**
    Follow [uv-and-texturing.md](uv-and-texturing.md):
-   - Use **Unlit / Emission (`strength = 1.0`) + `Standard` View Transform** in Blender (`MeshBasicMaterial` + `SRGBColorSpace` in Three.js; `tag: "unlit"` + `viewTransform: "neutral"` in 67js) so painted hex colors render 1:1 without grey tone-mapping.
-   - Unwrap planar groups with **Project from View** (`uv_project` in 67js) with Mirror modifier `On Cage` preview disabled so left/right islands don't double-overlap.
+   - Use **Unlit / Emission (`strength = 1.0`) + `Standard` View Transform** in Blender (`MeshBasicMaterial` + `SRGBColorSpace` in Three.js; `tag: "unlit"` + `viewTransform: "neutral"` in Crucible) so painted hex colors render 1:1 without grey tone-mapping.
+   - Unwrap planar groups with **Project from View** (`uv_project` in Crucible) with Mirror modifier `On Cage` preview disabled so left/right islands don't double-overlap.
    - Paint flat base swatches first, then 3-step ramp bands (highlight / mid / shadow). Rotate triangle UVs across a dark/light boundary on the atlas to get diagonal hair/clothing shadows without adding geometry.
 
 4. **Rig, Weight-Paint, and Add Face/Eye Controls.**

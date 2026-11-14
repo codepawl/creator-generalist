@@ -1,6 +1,6 @@
 # Export to engines
 
-Send a rig out of Blender to Unity, Godot, three.js, 67js or any glTF viewer. The Unity Mecanim steps come from the tutorial notes.
+Send a rig out of Blender to Unity, Godot, three.js, Crucible or any glTF viewer. The Unity Mecanim steps come from the tutorial notes.
 The glTF, Godot and three.js parts are general method, not tested against a tutorial. Test them with one clip.
 
 ## Reading Map
@@ -11,7 +11,7 @@ The glTF, Godot and three.js parts are general method, not tested against a tuto
 - Configure the Humanoid avatar
 - Test the avatar
 - Godot
-- glTF, three.js and 67js
+- glTF, three.js and Crucible
 - Gaps in the notes
 
 ## Before any export
@@ -75,7 +75,7 @@ The same Humanoid retargeting shares clips between characters.
 - Use Rigify DEF bones for the skin, as for Unity. Controls and IK bones can stay out of the export.
 - A 2D rig is a Skeleton2D (see `mechanical-and-cutout.md`).
 
-## glTF, three.js and 67js
+## glTF, three.js and Crucible
 
 - glTF stores a skin as joints and inverse bind matrices. Each vertex has up to 4 joints and weights. Keep influences at 4 or fewer
   per vertex in Blender (Weights > Limit Total, 4) or the exporter cuts them and the mesh shifts.

@@ -40,7 +40,7 @@ those on its own too.
 
 | Skill | Ask for | You get |
 |---|---|---|
-| **[3d-generalist](plugins/3d-generalist/skills/3d-generalist/SKILL.md)** | a 3D Short, a cutaway build, a story scene, a world, a rigged character, a hero asset | A scripted and animated 3D piece in Blender, Three.js or [67js](https://github.com/codepawl/67.js), built from real CC0 and CC BY scans and checked by a QA gate before you see a preview |
+| **[3d-generalist](plugins/3d-generalist/skills/3d-generalist/SKILL.md)** | a 3D Short, a cutaway build, a story scene, a world, a rigged character, a hero asset | A scripted and animated 3D piece in Blender, Three.js or [Crucible](https://github.com/codepawl/crucible), built from real CC0 and CC BY scans and checked by a QA gate before you see a preview |
 | **[2d-generalist](plugins/2d-generalist/skills/2d-generalist/SKILL.md)** | a Vox or Johnny Harris style explainer graphic | A footage-led Vox look with flat paper cards, print-bordered real photos, highlighters, maps, charts and true-scale timelines (torn paper, halftone and grain only as opt-in stylised looks), made with free tools |
 | **[game-generalist](plugins/game-generalist/skills/game-generalist/SKILL.md)** | a game prototype, a small original game, a game jam entry, a feel and QA pass on a playable | A playable greybox you try before any art, a locked look, an original game on web (three.js, Phaser, canvas), Godot, Unity or Unreal, and a playtest report from scripted bots (errors, win and lose paths, restart, determinism, frame time, softlocks) with a playable link and a 30 to 60 s capture |
 

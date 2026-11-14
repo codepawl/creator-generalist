@@ -17,7 +17,7 @@ Read `local.md` next to this file when it exists (machine paths).
 - Refining an AI base mesh (Tripo Studio) or a scanned mesh: re-cutting planes, eyelids, mouth corners, folds.
 - A realistic close-up asset from AI: generate in parts, retopo, bake to a low poly (`references/ai-mesh-to-game-ready.md`).
 - Turning one picture (AI image, render, figurine photo, drawing) into a sculpt measured against it.
-- Baking sculpt detail onto a low-poly mesh for a game engine, three.js or 67js.
+- Baking sculpt detail onto a low-poly mesh for a game engine, three.js or Crucible.
 
 Not this skill: stylised cartoon character sculpts step by step (`~/.claude/skills/model-characters/references/sculpt-stylized.md`),
 machined parts at exact dimensions (`model-parts-in-cad`), drawing anatomy in 2D (`draw-and-paint-art`).

@@ -59,7 +59,7 @@ atlases, postcards. Small wear (a water ring, dust on the sill, candle soot) sel
   in one loop. That only works because every motion (wind, camera) is a pure function of time.
 - Masters: HDR10 (PQ, BT.2020, 10-bit HEVC) plus SDR, through ffmpeg.
 
-## Porting to a path tracer (67js Cook, measured 2026-11-13)
+## Porting to a path tracer (Crucible Cook, measured 2026-11-13)
 
 What changed and what it cost when the same room was traced live instead of baked:
 
@@ -79,7 +79,7 @@ What changed and what it cost when the same room was traced live instead of bake
   The sunrise look has exposure about 9, a neutral white balance and a warm highlight tint.
 - Reuse one native session per pass and send only the camera per frame.
   Measured: 0.55 s a frame at 480x270 and 32 spp, RTX 3060, 349k triangles.
-- Cook has no thin diffuse transmission yet (67js issue 1058), so curtains and leaves that the bake lit from behind
+- Cook has no thin diffuse transmission yet (Crucible issue 1058), so curtains and leaves that the bake lit from behind
   read darker. Lifting their albedo a little narrows the gap.
 
 Source: Leon Lin, "room-at-dawn" (MIT), github.com/Leonxlnx/room-at-dawn.

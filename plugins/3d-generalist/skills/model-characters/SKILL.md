@@ -1,6 +1,6 @@
 ---
 name: model-characters
-description: "Model 3D characters from a 2D image, turnaround, sketch or idea in any style: low-poly (PS1, chibi, anime), stylized sculpt, clean quad base mesh, and realistic humans from generators and scans, then hand off to rigging, texturing and animation. Works in Blender, three.js, 67js, Godot, Unity and Unreal. Use for \"model a character\", \"3D character from this drawing\", \"low poly character\", \"base mesh\"."
+description: "Model 3D characters from a 2D image, turnaround, sketch or idea in any style: low-poly (PS1, chibi, anime), stylized sculpt, clean quad base mesh, and realistic humans from generators and scans, then hand off to rigging, texturing and animation. Works in Blender, three.js, Crucible, Godot, Unity and Unreal. Use for \"model a character\", \"3D character from this drawing\", \"low poly character\", \"base mesh\"."
 license: MIT
 ---
 
@@ -60,7 +60,7 @@ human from nothing. Credit it.
 
 ## More references
 
-- `references/modeling-and-topology.md`: part-by-part low-poly recipes in Blender, three.js and 67js.
+- `references/modeling-and-topology.md`: part-by-part low-poly recipes in Blender, three.js and Crucible.
 - `references/more-build-methods.md`: Wind Waker style head, cylinder bodies, clothes as shells, hats, face atlas.
 - `references/npr-shading-and-painted-look.md`: toon shader, two-sun rim rig, outlines, painted layers, bake.
 - `references/stylized-character-process.md`: painted character build order, head, hands, hair, design lessons.

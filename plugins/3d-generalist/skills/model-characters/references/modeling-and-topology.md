@@ -1,6 +1,6 @@
 # Low-Poly Character Modeling & Topology from 2D References
 
-This guide distills a complete low-poly character modeling workflow (Parts 1–6) and translates every step into **Blender** (interactive & `bpy` headless script), **Three.js** (`BufferGeometry`), and **67js** (`mesh` recipe operations).
+This guide distills a complete low-poly character modeling workflow (Parts 1–6) and translates every step into **Blender** (interactive & `bpy` headless script), **Three.js** (`BufferGeometry`), and **Crucible** (`mesh` recipe operations).
 
 <!-- skill-navigation:start -->
 ## Reading Map
@@ -17,7 +17,7 @@ This guide distills a complete low-poly character modeling workflow (Parts 1–6
 ## 1. Scene & 2D Reference Calibration
 
 ### 1.1 Coordinate & Scale Conventions
-- **World Height:** Scale the character to real human/stylized height ($1.60\text{ m}$ to $1.80\text{ m}$) with the **soles of the feet planted at ground level** ($Z = 0$ in Blender; $Y = 0$ in Three.js and 67js) and the **centerline on $X = 0$**.
+- **World Height:** Scale the character to real human/stylized height ($1.60\text{ m}$ to $1.80\text{ m}$) with the **soles of the feet planted at ground level** ($Z = 0$ in Blender; $Y = 0$ in Three.js and Crucible) and the **centerline on $X = 0$**.
 - **Rigify Scale Anchor (Blender):** Enable the built-in `Rigify` addon first and spawn `Add -> Armature -> Human (Meta-Rig)`. Scale your 2D reference images to match the meta-rig height ($~1.75\text{ m}$) before modeling so automatic weights and IK solvers never suffer from microscopic or giant unit scales.
 - **Unlit Viewport Setup (Blender):**
   - Set Render Engine to `EEVEE`.
@@ -79,7 +79,7 @@ Why 5 vertices? A 4-sided leg looks overly boxy from 3/4 angles, while 6–8 sid
 1. Spawn a Cube at the pelvis, delete half of it, and add a **Mirror Modifier** on $X$ with **`Clipping` enabled**.
 2. **Delete the internal face** on the mirror plane ($X=0$) immediately so no hidden geometry is trapped inside the pelvis.
 3. Shape the outer hip and crotch profile in Front and Side views.
-4. Series method (Part 3): add loop cuts around where each leg opening goes, delete the faces over it, then select the front and back edges of the opening and run **`Edge -> Bridge Edge Loops`** (`bridge` in 67js) to seal the crotch. Sealing the opening is the bridge's job, not connecting to a cuff.
+4. Series method (Part 3): add loop cuts around where each leg opening goes, delete the faces over it, then select the front and back edges of the opening and run **`Edge -> Bridge Edge Loops`** (`bridge` in Crucible) to seal the crotch. Sealing the opening is the bridge's job, not connecting to a cuff.
 5. Skill guidance for a cuff: duplicate (`Shift+D`) the top ring of the leg cylinder, scale it slightly outward, and extrude it into a cuff. Keep the shorts an open hollow shell.
 
 ### 2.4 Torso / Jacket (`Extruded Mirrored Cube`)
@@ -99,7 +99,7 @@ Why 5 vertices? A 4-sided leg looks overly boxy from 3/4 angles, while 6–8 sid
 - **Hand (Low-Poly Mitten):**
   1. Spawn a Cube at the wrist, scale it into a flat palm block, and rotate it to match the arm angle.
   2. Extrude one face toward the fingertip (Part 3).
-  3. **Taper to a point:** in opaque solid view select the two front vertices, `F3 -> Merge -> At Center`, then the two back vertices the same way (`collapse` in 67js).
+  3. **Taper to a point:** in opaque solid view select the two front vertices, `F3 -> Merge -> At Center`, then the two back vertices the same way (`collapse` in Crucible).
   4. Widen it on Y a little so it is not flat (Part 3).
   5. **Thumb (skill guidance, not in the series):** extrude a side quad outward and merge its tip into a wedge.
 
@@ -110,7 +110,7 @@ Why 5 vertices? A 4-sided leg looks overly boxy from 3/4 angles, while 6–8 sid
 - **Face:** full steps, the head rule and the proportion check are in [head-and-face.md](head-and-face.md). Short form:
   1. Plane facing Front, cut at $X=0$, Mirror (`Clipping: On`).
   2. Knife only the edges the drawing shows (eye line, nose, cheek step, mouth, jaw). Do not cut a rectangular eye box, the eyes are painted.
-  3. Side View is mandatory: pull the nose tip out first, then brow and chin, then temple, cheek and jaw corner back (`+Y` in Blender / `-Z` in Three.js & 67js). Front view alone leaves a flat plate.
+  3. Side View is mandatory: pull the nose tip out first, then brow and chin, then temple, cheek and jaw corner back (`+Y` in Blender / `-Z` in Three.js & Crucible). Front view alone leaves a flat plate.
   4. Under-jaw faces: extrude the jaw edge back toward the neck and fill with `F`, map to the dark shadow swatch.
 
 ---
@@ -147,8 +147,8 @@ When building low-poly character parts directly in Three.js without Blender:
 - Construct the 3-sided neck with `new THREE.CylinderGeometry(rTop, rBot, height, 3, 1, true)`.
 - Use `geometry.toNonIndexed()` + `geometry.computeVertexNormals()` when you want crisp faceted low-poly normals, or `THREE.MeshBasicMaterial({ map: atlasTexture })` for authentic unlit shading where normals are ignored and lighting is 100% painted into the texture atlas.
 
-### 4.3 67js (`mesh` Recipe Operations)
-In `67js` (`@codepawlhq/67js`), build each character chunk as a declarative `mesh` geometry in the scene recipe:
+### 4.3 Crucible (`mesh` Recipe Operations)
+In `Crucible` (`@codepawlhq/crucible`), build each character chunk as a declarative `mesh` geometry in the scene recipe:
 - **5-Sided Leg:** Start with `base: { type: "cylinder", radialSegments: 5, heightSegments: 3, bevel: 0 }`, delete `top` and `bottom` caps (`{ op: "delete", faces: { tag: ["top", "bottom"] } }`), and translate the knee ring forward.
 - **Mirrored Torso / Waist:** Model the right (`+X`) half from a `box` (`bevel: 0`), delete the `left` seam face (`{ op: "delete", faces: { tag: "left" } }`), use `extrude`, `inset`, and `translate` on tagged faces (`top`, `bottom`, `right`), and place `{ op: "mirror", axis: "x", mergeThreshold: 0.001 }` in the `stack`.
 - **Wedge Mitten Hand:** Start with `base: { type: "box", bevel: 0 }`, use `loop_cut` across the palm, `extrude` the thumb from a side face, and `collapse` the distal fingertip edge into a wedge.

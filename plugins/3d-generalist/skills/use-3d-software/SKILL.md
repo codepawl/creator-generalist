@@ -1,6 +1,6 @@
 ---
 name: use-3d-software
-description: "Exact steps in the 3D tool the job needs: Blender (geometry nodes, shaders, modeling, rigging, animation, bpy), three.js and 67js, Godot, Unity and Unreal, and moving assets between them (GLB, FBX, USD, scale, axes). Maps Cinema 4D, Houdini, Maya and 3ds Max habits to free tools. Use for any step inside a 3D app or engine, \"geometry nodes\", \"bpy script\", \"import to Unity\", \"export GLB to three.js\" (\"node Blender\")."
+description: "Exact steps in the 3D tool the job needs: Blender (geometry nodes, shaders, modeling, rigging, animation, bpy), three.js and Crucible, Godot, Unity and Unreal, and moving assets between them (GLB, FBX, USD, scale, axes). Maps Cinema 4D, Houdini, Maya and 3ds Max habits to free tools. Use for any step inside a 3D app or engine, \"geometry nodes\", \"bpy script\", \"import to Unity\", \"export GLB to three.js\" (\"node Blender\")."
 license: MIT
 ---
 
@@ -54,7 +54,7 @@ link. Open the source link only when an entry is thin.
 
 ## Move assets between tools
 
-- GLB (glTF 2.0) is the default between Blender, three.js, 67js and Godot. FBX is the default into Unity and Unreal.
+- GLB (glTF 2.0) is the default between Blender, three.js, Crucible and Godot. FBX is the default into Unity and Unreal.
   USD for big scenes and Omniverse or SimReady assets.
 - Apply scale and rotation before export. Blender is Z up. glTF, three.js, Godot and Unity are Y up. Unreal is Z up
   in centimetres. Check the forward axis on the first import with a test cube and an arrow.

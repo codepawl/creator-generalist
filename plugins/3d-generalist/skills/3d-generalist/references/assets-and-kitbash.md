@@ -48,7 +48,7 @@ tiers, has a 3D viewer Space for search, and keeps the source's licence and cred
 | [codepawl/ct-anatomy-glb](https://huggingface.co/datasets/codepawl/ct-anatomy-glb) ([viewer](https://huggingface.co/spaces/codepawl/ct-anatomy-glb-viewer)) | 7 CT bodies, 20 organs, 115 structures | CC BY 4.0 | Anatomy explainers, medical cutaways |
 | [codepawl/100style-glb](https://huggingface.co/datasets/codepawl/100style-glb) ([viewer](https://huggingface.co/spaces/codepawl/100style-viewer)) | 810 100STYLE mocap clips, 100 walking styles, retargeted onto one free character | CC BY 4.0 | Walks, runs and stylised locomotion |
 
-Load them in the browser with three.js or [67js](https://github.com/codepawl/67.js) (`npm install 67js@npm:@codepawlhq/67js meshoptimizer`).
+Load them in the browser with three.js or [Crucible](https://github.com/codepawl/crucible) (`npm install @codepawlhq/crucible meshoptimizer`).
 In Blender, Godot, Unity or Unreal, import the `engine/` tier: it keeps PNG and JPEG textures, because Blender cannot read KTX2.
 
 ## 2. Fitting and scaling rules (zero float, real bounds)
@@ -88,7 +88,7 @@ Pick the first rung that holds up at the closest distance the camera reaches, an
 1. **Texture only:** a scanned PBR set (Poly Haven, ambientCG, Quixel) with base colour, roughness and normal at
    real texel density. Enough for ground, walls, brick, tiles, asphalt and ballast seen from more than a few metres.
 2. **Displacement or parallax:** the same set's height map. Blender: Subdivision plus Displacement (Cycles adaptive
-   when it is close). Web (67js, three.js): a parallax or height-driven normal, or a displaced grid for the near patch only.
+   when it is close). Web (Crucible, three.js): a parallax or height-driven normal, or a displaced grid for the near patch only.
 3. **Scattered instances:** a few sourced rocks, tufts or debris pieces (5 to 20 variants) instanced over the textured
    ground. Blender Geometry Nodes Distribute Points on Faces plus Instance on Points, or hair particles Render As
    Collection; web `InstancedMesh`. Density mask by distance and clumps. Thousands of instances cost one mesh.

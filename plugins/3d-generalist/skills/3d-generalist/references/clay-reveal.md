@@ -66,7 +66,7 @@ vignette or emissive. **Render pass:** filmic or AgX view transform, light haze 
 | Unity | Override material in a Render Objects feature (URP) or a custom pass (HDRP) | Recorder, two takes |
 | Godot | A world-wide override material on the viewport (debug draw or `material_override` per mesh) | Movie Maker mode, two runs |
 | three.js | `scene.overrideMaterial` plus alpha-tested exceptions | Headless frame-by-frame capture of each pass |
-| 67js | Replace `part.material` before building the renderer | Frame-by-frame capture of each pass |
+| Crucible | Replace `part.material` before building the renderer | Frame-by-frame capture of each pass |
 
 **The wipe, in any editor:** a hard linear wipe at 45 degrees from one corner, about 1 s, no feather.
 

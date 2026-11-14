@@ -1,6 +1,6 @@
 # Low-Poly UV Unwrapping & Hand-Painted / Pixel Texture Atlases
 
-This reference covers a complete UV unwrapping and unlit texture-atlas workflow (Parts 7–8), plus how to configure identical color-accurate shaders in **Blender**, **Three.js**, and **67js**.
+This reference covers a complete UV unwrapping and unlit texture-atlas workflow (Parts 7–8), plus how to configure identical color-accurate shaders in **Blender**, **Three.js**, and **Crucible**.
 
 <!-- skill-navigation:start -->
 ## Reading Map
@@ -66,11 +66,11 @@ const material = new THREE.MeshBasicMaterial({
 ```
 - Also set `renderer.outputColorSpace = THREE.SRGBColorSpace` and `renderer.toneMapping = THREE.NoToneMapping` (or `THREE.NeutralToneMapping` if mixing with a lit stage) so character colors match the 2D reference 1:1.
 
-### 2.3 67js (`tag: "unlit"` + `viewTransform: "neutral"`)
-- For procedural/flat-colored low-poly parts in a `67js` recipe, set `tag: "unlit"` on the material and `environment.viewTransform: "neutral"`.
+### 2.3 Crucible (`tag: "unlit"` + `viewTransform: "neutral"`)
+- For procedural/flat-colored low-poly parts in a `Crucible` recipe, set `tag: "unlit"` on the material and `environment.viewTransform: "neutral"`.
 - For GLB characters exported from Blender with an unlit/emissive atlas:
   - Export the texture into `baseColorTexture` (and/or `emissiveTexture` with `emissiveFactor: [1, 1, 1]`).
-  - In `67js`, set `environment.viewTransform: "neutral"` and balance `ambientIntensity` / `keyIntensity` so the character's painted gradients read cleanly without harsh specular blowout (`roughness: 1.0, metallic: 0.0`).
+  - In `Crucible`, set `environment.viewTransform: "neutral"` and balance `ambientIntensity` / `keyIntensity` so the character's painted gradients read cleanly without harsh specular blowout (`roughness: 1.0, metallic: 0.0`).
 
 ---
 

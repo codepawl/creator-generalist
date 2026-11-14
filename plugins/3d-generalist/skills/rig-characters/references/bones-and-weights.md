@@ -71,7 +71,7 @@ meta-rig scale 1, roll checked on every limb, bones inside the mesh.
 - Hard weights suit robots, armour, cut-outs and low-poly shoes. Each vertex gets weight 1 on one bone.
 - Blender: Ctrl+P > With Empty Groups, Edit Mode, select the part (L), weight 1, Assign. Or Ctrl+P > Bone for a whole object.
   Quantize 1 in the weight brush options hardens painted weights.
-- three.js and 67js skinned meshes also take one bone per rigid part: weight 1 on one joint, or parent the mesh node to a bone node.
+- three.js and Crucible skinned meshes also take one bone per rigid part: weight 1 on one joint, or parent the mesh node to a bone node.
   See `export-to-engines.md`.
 - A low-poly or retro style wants hard or two-bone weights. A cartoon-soft or realistic style wants smooth weights and extra joint loops.
 - "Bone heat weighting failed" means overlapping or non-manifold parts. Remesh, split into objects or use hard weights.

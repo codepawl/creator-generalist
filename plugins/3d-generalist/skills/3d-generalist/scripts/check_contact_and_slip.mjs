@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Automated 30-fps anti-slop QA checker for Three.js / 67js 3D scenes.
+ * Automated 30-fps anti-slop QA checker for Three.js / Crucible 3D scenes.
  * Checks:
  *  1. Teleport / excessive speed (>0.30 m/frame or >2.0 m/s over 0.3 s)
  *  2. Foot slip (<0.25 m/s when heel or toe is within 3 cm of ground)

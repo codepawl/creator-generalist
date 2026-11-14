@@ -2,7 +2,7 @@
 
 Steps for putting a Blender asset or scene on a web page with three.js: export, load, compress, animate, light,
 colour and performance. Written from the official three.js docs and examples (threejs.org/docs,
-threejs.org/examples), names checked against r187 (2026-11). 67js scenes follow the same export rules.
+threejs.org/examples), names checked against r187 (2026-11). Crucible scenes follow the same export rules.
 
 Version names
 - `outputEncoding` and `sRGBEncoding` are gone. Use `renderer.outputColorSpace = THREE.SRGBColorSpace` (the default)
@@ -29,7 +29,7 @@ Version names
 - [Video and stills from a page](#video-and-stills-from-a-page)
 <!-- skill-navigation:end -->
 
-Ready assets: CodePawl's free GLB packs on Hugging Face (https://huggingface.co/codepawl) ship web, KTX2, LOD and mobile tiers made for three.js, each with a viewer Space. An agent-driven engine on top of WebGL2: [67js](https://github.com/codepawl/67.js).
+Ready assets: CodePawl's free GLB packs on Hugging Face (https://huggingface.co/codepawl) ship web, KTX2, LOD and mobile tiers made for three.js, each with a viewer Space. An agent-driven engine on top of WebGL2: [Crucible](https://github.com/codepawl/crucible).
 
 ## From Blender to three.js
 
