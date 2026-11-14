@@ -1,6 +1,6 @@
 ---
 name: 3d-generalist
-description: "Full-pipeline 3D generalist studio for content creators: source and kitbash scanned CC0/CC BY assets (Poly Haven, ambientCG, Sketchfab, BlenderKit), build or rig characters (HumanGen, Mixamo, Quaternius UAL, low-poly), dress worlds and perspective cutaways, animate expressive character acting with grounded foot/hand IK and slapstick timing, light and shoot with eye-tracked cameras, Depth of Field and 180-degree motion blur, sync narration and foley to ±0.05 s, and pass automated anti-slop QA gates across Blender, Three.js and 67js. Use when asked to create 3D Shorts, explainers, storytelling animations, cutaway builds, 3D worlds, or character animations (\"3d generalist\", \"3D shorts\", \"cutaway 3D\")."
+description: "3D generalist studio for creators: source and kitbash scanned assets, build or rig characters, dress worlds and perspective cutaways, animate character acting, light and shoot, sync narration and foley, and pass automated QA gates across Blender, three.js and 67js. Use for 3D Shorts, explainers, story animations, cutaway builds, 3D worlds or character animation (\"3d generalist\", \"3D shorts\", \"cutaway 3D\")."
 license: MIT
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: game-generalist
-description: "Playable-game studio for creators: from a one-sentence promise to a playable greybox the user tries, a locked look, a built original game and a measured playtest report, on web (three.js, Phaser, canvas), Godot, Unity or Unreal. Runs scripted bots and gates for errors, win and lose paths, restart, determinism, frame time and softlocks, then ships a playable link and a 30-60 s capture. Use for \"make a game\", \"game prototype\", \"game jam entry\", \"web game\", \"game maker\", \"game dev\", \"playtest my game\", \"game feel pass\" (\"dev game\", \"game maker\", \"prototype game\", \"game jam\")."
+description: "Playable-game studio for creators: from a one-sentence promise to a greybox the user plays, a locked look, a built original game and a measured playtest report, on web (three.js, Phaser, canvas), Godot, Unity or Unreal. Scripted bots gate errors, win and lose paths, restart, frame time and softlocks. Use for \"make a game\", \"game prototype\", \"game jam entry\", \"web game\", \"playtest my game\", \"game feel pass\" (\"dev game\", \"game maker\", \"prototype game\", \"game jam\")."
 license: MIT
 ---
 

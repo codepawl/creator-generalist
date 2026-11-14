@@ -1,6 +1,6 @@
 ---
 name: paint-stylized-backgrounds
-description: "Make stylized background and environment art for films, Shorts, games and illustrations in any style (anime, Ghibli-like painterly, cartoon, retro, stylized realistic): Blender render settings, 3D blockout then paint-over, painting over photos, brushes, atmosphere and light, time-of-day variants, 2.5D parallax, Blender image-card backgrounds, foliage, grass, stylized water and animated background elements. Use for anime background, paint-over, environment art, background parallax, wind on grass, water glitter, day to night variant (\"background anime\", \"paint over\")."
+description: "Make stylized background and environment art for films, Shorts, games and illustrations in any style (anime, painterly, cartoon, retro): Blender blockout then paint-over, painting over photos, brushes, atmosphere and light, time-of-day variants, 2.5D parallax, foliage, water and animated background elements. Use for anime background, paint-over, environment art, parallax, day to night variant (\"background anime\", \"paint over\")."
 license: MIT
 ---
 
@@ -8,6 +8,8 @@ license: MIT
 
 This craft skill owns stylized background art: the base render or photo, the paint-over, the light, the colour variants and the motion in the background.
 `2d-generalist`, `3d-generalist`, `use-3d-software` and `edit-video` call it. They keep the look and the order of the whole project.
+
+Read `local.md` next to this file first when it exists (machine paths and local rules).
 
 ## When to use
 

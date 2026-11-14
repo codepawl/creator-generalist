@@ -1,6 +1,6 @@
 ---
 name: watch-video
-description: "Watch a video file or link as a viewer does (frames, cuts, SFX and music, speech in many languages, tone of voice) and learn it into a checked recipe to remake for another product. Use to understand, summarize, critique, fact-check, post about or copy the style of a video, to tell what it is for, what is right, wrong or out of date and what is worth learning, to learn a tutorial, playlist or channel with its free resources, to turn a tutorial channel into a verified skill, and to subtitle or translate a video or tell who speaks when (\"watch this video\", \"subtitle this\", \"who is speaking\", \"learn this channel into a skill\")."
+description: "Watch a video file or link as a viewer does (frames, cuts, sound, speech in many languages, tone of voice) and turn it into a checked recipe to remake. Use to understand, summarize, critique or fact-check a video, to learn a tutorial, playlist or channel into a skill, and to subtitle, translate or tell who speaks (\"watch this video\", \"subtitle this\")."
 license: MIT
 ---
 

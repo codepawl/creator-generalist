@@ -1,6 +1,6 @@
 ---
 name: design-sound
-description: "Make, find, choose and mix SFX and music for a video, game, reel or episode: search one indexed sound library by meaning, fetch real sounds from the web (Freesound via Openverse, archive.org, meme clips, YouTube), generate them with ElevenLabs (SFX, music, plans, stems, music from a video) or as foley from the picture with a video-to-audio model (HunyuanVideo-Foley, local or hosted on fal), build the foley stem, fit music to the cut, mix to platform loudness and check every cue is right, in sync, audible over the music and on a phone. Licences are warned, never blocking. Use automatically for sound design, SFX, foley, soundtrack, mixing."
+description: "Make, find, choose and mix SFX and music for a video, game or reel: search the sound library, fetch real sounds from the web, generate with ElevenLabs or as foley from the picture, fit music to the cut, mix to platform loudness and check every cue. Licences are warned, never blocking. Use automatically for sound design, SFX, foley, soundtrack, mixing."
 license: MIT
 ---
 

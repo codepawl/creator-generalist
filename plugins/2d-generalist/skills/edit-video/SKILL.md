@@ -1,6 +1,6 @@
 ---
 name: edit-video
-description: "Edit video in the tool the user has: DaVinci Resolve (Edit, Fusion, Color, Deliver, scripting), CapCut, Premiere Pro and After Effects, Kdenlive and Shotcut, or FFmpeg by command. Covers cutting for Shorts, Reels, TikTok and YouTube, pacing, beat sync, captions, transitions, shakes, speed ramps, titles, colour grade, loudness and export settings per platform, plus a map from paid plugins to free tools. Use for any editing step, \"edit this video\", \"cut a Short\", \"speed ramp\", \"transition\", \"camera shake\", \"color grade\", \"burn captions\", \"export for TikTok\", \"Fusion macro\" (\"edit video\")."
+description: "Edit video in the tool the user has: DaVinci Resolve (Edit, Fusion, Color, Deliver, scripting), CapCut, Premiere Pro and After Effects, Kdenlive, Shotcut or FFmpeg. Covers cutting Shorts and long videos, pacing, beat sync, captions, transitions, speed ramps, titles, grade, loudness, export per platform and a map from paid plugins to free tools. Use for any editing step, \"edit this video\", \"cut a Short\", \"speed ramp\", \"color grade\", \"burn captions\", \"Fusion macro\" (\"edit video\")."
 license: MIT
 ---
 

@@ -9,6 +9,8 @@ license: MIT
 A tool skill. The generalist and craft skills decide what to make. This one says how to do it in the tool the user
 has or the target needs, by script or by the exact UI path, with current names.
 
+Read `local.md` next to this file first when it exists (machine paths and local rules).
+
 ## When to use
 
 - Any step inside a 3D app or engine: a node tree, a material, a rig, a modifier stack, a bake, a headless render,

@@ -9,6 +9,8 @@ license: MIT
 This craft skill owns 2D drawing and digital painting: gesture, construction, anatomy, light, colour, Krita and Grease Pencil.
 `2d-generalist`, `3d-generalist`, `model-characters` and `use-3d-software` call it. They keep the look and the order of work.
 
+Read `local.md` next to this file first when it exists (machine paths and local rules).
+
 ## When to use
 
 - You draw or paint a figure, a character, a prop or a painted texture.
