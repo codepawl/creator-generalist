@@ -1,6 +1,6 @@
 ---
 name: rig-characters
-description: "Rig characters and props for animation in 2D and 3D: bone naming, meta-rig fitting, Rigify, automatic and hard weights, IK with pole targets, IK/FK switching, bone collections, face rigs, mechanical rigs without bones, 2D cut-out rigs and export to game engines. Use for rigging a biped, a prop or a cut-out puppet, fixing bad deformation, building a face or mouth rig, or exporting a rig to Unity, Godot, three.js or glTF (\"weight paint\", \"rig 2D cut-out\")."
+description: "Rig characters and props for animation in 2D and 3D: bone naming, Rigify, weights, IK with pole targets, IK/FK switching, face rigs, mechanical rigs, 2D cut-out rigs and export to game engines. Use for rigging a biped, prop or puppet, fixing bad deformation, a face or mouth rig, or exporting a rig to Unity, Godot, three.js or glTF (\"weight paint\", \"rig 2D cut-out\")."
 license: MIT
 ---
 

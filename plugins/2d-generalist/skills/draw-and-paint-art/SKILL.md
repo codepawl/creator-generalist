@@ -1,6 +1,6 @@
 ---
 name: draw-and-paint-art
-description: "Draw and paint figures, characters, light and colour in any style, with Krita 5.x, Blender Grease Pencil v3 or code, and check a figure or character sheet for anatomy and pose errors. Use for drawing from gesture and construction, anatomy, foreshortening, painting light and form, colouring a grayscale painting, Krita setup, hand-painting textures for 3D and turnaround or style sheets (\"anatomy\", \"Krita\")."
+description: "Draw and paint figures, characters, light and colour in any style with Krita, Blender Grease Pencil or code, and check a figure or character sheet for anatomy and pose errors. Use for gesture, construction, anatomy, foreshortening, painting light and form, hand-painted textures and turnaround sheets (\"anatomy\", \"Krita\")."
 license: MIT
 ---
 

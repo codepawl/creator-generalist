@@ -1,6 +1,6 @@
 ---
 name: 2d-generalist
-description: "Design and animate Vox, Johnny Harris and WSJ style explainer motion graphics in 2D, 2.5D and 3D with free tools (Blender, Fusion, Remotion, FFmpeg): flat paper cards, print-bordered photos, highlighters, maps, charts, timelines; torn paper and halftone as opt-in looks. Use for \"create a Vox style video\", \"Vox map or chart animation\", \"2D/3D editorial motion graphics\", \"2d generalist\", \"2D motion graphics\"."
+description: "Design and animate Vox, Johnny Harris and WSJ style explainer motion graphics in 2D, 2.5D and 3D with free tools: paper cards, bordered photos, highlighters, maps, charts, timelines. Use for \"create a Vox style video\", \"Vox map or chart animation\", \"editorial motion graphics\", \"2d generalist\", \"2D motion graphics\"."
 license: MIT
 ---
 

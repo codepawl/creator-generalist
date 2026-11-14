@@ -1,6 +1,6 @@
 ---
 name: animate-characters
-description: "Animate characters, creatures and props in 2D and 3D in any style: the 12 principles, timing and spacing, keys and breakdowns, graph editor curves, cycles, IK or FK per shot, shape key and face swaps, frame by frame and cut-out, and playblast checks. Use for character animation, walk cycle, run cycle, idle loop, squash and stretch, anticipation, overshoot, on twos, Dope Sheet, Graph Editor, Grease Pencil animation, Krita animation, cut-out animation (\"walk cycle\")."
+description: "Animate characters, creatures and props in 2D and 3D in any style: the 12 principles, timing and spacing, keys and breakdowns, graph editor curves, cycles, IK or FK, face swaps, frame by frame, cut-out and playblast checks. Use for character animation, walk, run and idle cycles, squash and stretch, Grease Pencil or Krita animation (\"walk cycle\")."
 license: MIT
 ---
 

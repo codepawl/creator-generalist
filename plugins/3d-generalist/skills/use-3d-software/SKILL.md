@@ -1,6 +1,6 @@
 ---
 name: use-3d-software
-description: "Exact steps in the 3D tool the job needs: Blender (geometry nodes, shaders, modeling, sculpt, rigging, weight paint, animation, NLA, effects, bpy), three.js and 67js on the web, Godot, Unity and Unreal Engine, and moving assets between them (GLB, FBX, USD, scale, axes, rigs, materials). Also maps Cinema 4D, Houdini, Maya and 3ds Max habits to free tools. Use for any step done inside a 3D app or engine, \"geometry nodes\", \"bpy script\", \"import to Unity\", \"export GLB to three.js\", \"Godot\", \"Unreal\" (\"node Blender\")."
+description: "Exact steps in the 3D tool the job needs: Blender (geometry nodes, shaders, modeling, rigging, animation, bpy), three.js and 67js, Godot, Unity and Unreal, and moving assets between them (GLB, FBX, USD, scale, axes). Maps Cinema 4D, Houdini, Maya and 3ds Max habits to free tools. Use for any step inside a 3D app or engine, \"geometry nodes\", \"bpy script\", \"import to Unity\", \"export GLB to three.js\" (\"node Blender\")."
 license: MIT
 ---
 
