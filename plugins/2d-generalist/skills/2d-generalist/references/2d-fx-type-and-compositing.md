@@ -2,8 +2,10 @@
 
 Use this for 2D effects built from blur plus levels (goo, smoke, fire, liquid, rain, lava), loops and kaleidoscopes, mattes, transitions, kinetic type, and for putting graphics into footage. Each entry gives the After Effects (AE) recipe with exact values, the principle, and the free route (Fusion, Blender, web/CSS/SVG/canvas, Remotion). Route notes marked "untested" were not run.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
+- [2D FX, Mattes, Transitions, Type and Compositing (After Effects recipes, free-tool routes)](#2d-fx-mattes-transitions-type-and-compositing-after-effects-recipes-free-tool-routes)
 - [How to read an entry](#how-to-read-an-entry)
 - [Currency notes](#currency-notes)
 - [1. Mattes](#1-mattes)
@@ -21,6 +23,7 @@ Use this for 2D effects built from blur plus levels (goo, smoke, fire, liquid, r
 - [7. Putting graphics into footage](#7-putting-graphics-into-footage)
   - Camera track; match the plate; reflections; multiply onto a wall; ink under skin; growth-matte title; cinematic title stack; gradient map (CC Toner); small effects; EbSynth and tracker repair; project hygiene
 - [Licences, paid items and dropped material](#licences-paid-items-and-dropped-material)
+<!-- skill-navigation:end -->
 
 ## How to read an entry
 

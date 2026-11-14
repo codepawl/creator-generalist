@@ -2,19 +2,22 @@
 
 Photoshop steps stay, with the free tool beside them. Krita 5.x and GIMP replace Photoshop for every painting step. The Krita and GIMP mappings are the skill author's own and are marked "mapped".
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Five-step workflow
-- Layer split and clipping
-- Bevel-line painting
-- Sky and clouds
-- Trees, grass and brushes
-- Make cloud, leaf and star brushes
-- Glowing edge lines
-- Rain
-- Final touches
-- Photo paint-over order
-- Painting in 3D with Grease Pencil
+- [Paint-over and brushes](#paint-over-and-brushes)
+- [Five-step workflow](#five-step-workflow)
+- [Layer split and clipping](#layer-split-and-clipping)
+- [Bevel-line painting](#bevel-line-painting)
+- [Sky and clouds](#sky-and-clouds)
+- [Trees, grass and brushes](#trees-grass-and-brushes)
+- [Make cloud, leaf and star brushes](#make-cloud-leaf-and-star-brushes)
+- [Glowing edge lines](#glowing-edge-lines)
+- [Rain](#rain)
+- [Final touches](#final-touches)
+- [Photo paint-over order](#photo-paint-over-order)
+- [Painting in 3D with Grease Pencil](#painting-in-3d-with-grease-pencil)
+<!-- skill-navigation:end -->
 
 ## Five-step workflow
 

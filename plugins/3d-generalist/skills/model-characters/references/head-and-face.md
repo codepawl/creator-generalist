@@ -5,7 +5,7 @@ Read this whole file before modelling a head. It exists because a box head with 
 <!-- skill-navigation:start -->
 ## Reading Map
 
-- [Head, Face, Eyes and Hair Shell](#head-face-eyes-and-hair-shell-crashsune-parts-4-to-8-eyes-video-part-11)
+- [Head, Face, Eyes and Hair Shell](#head-face-eyes-and-hair-shell)
 - [1. What the head is](#1-what-the-head-is)
 - [2. Face relief patch steps](#2-face-relief-patch-steps)
 - [3. Hair shell that frames the face](#3-hair-shell-that-frames-the-face)

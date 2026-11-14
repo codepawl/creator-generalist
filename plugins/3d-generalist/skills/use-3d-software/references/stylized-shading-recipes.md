@@ -8,21 +8,24 @@ Texture (4.1+); Eevee Bloom and Screen Space Reflections checkboxes are gone (Ee
 the Compositor); Eevee Blend Mode is now Material Settings > Render Method (Dithered or Blended); Grease Pencil is v3 since 4.3.
 Complements `shading-and-textures.md`, `geometry-nodes.md` and `modeling.md`.
 
-## Reading map
+<!-- skill-navigation:start -->
+## Reading Map
 
-- Clay and plastic: clay fingerprint material, clay to plastic toy, Eevee clay preview, soft displacement, stop-motion boil
-- Painterly and brush looks: faceted normals, brush normal map, outline shell, Compositor Paint Filter (5.2), stroke tracking and layers, Kuwahara in a shader, painterly grass
-- Outlines and line art: Line Art modifier, blueprint look, light contour and priority
-- Comic toon shader: scene rig, mask method, cell shade, screen tone, hatch, flat chibi shading, backface outline, rim light, glow, Grease Pencil ink outline
-- Pixel art: render small, Pixel Blender Kit, pixel texture node
-- Wear, grime and mapping: dirty vertex colours, edge and cavity masks, positional gradient, mixing two materials, box mapping, displacement setup, Node Wrangler PBR, Principled reference
-- Skin, wax and thickness: thickness masks, fake SSS with Layer Weight, skin shader with painted blush
-- Glass and transparency: believable glass, Eevee glass, RGB split glass, Thin Wall, bubbles and tears
-- Fabric: sheen and fuzz, cotton character
-- Procedural effects and materials: Is Camera Ray, rim and falloff, energy trail, toon water, hologram, light rays, speed lines, caustics, flame, rock, wood, coffee, leaf, ground splat, dynamic palette, Raycast
-- Texture painting: painterly brush, second UV sticker, painted details
-- Hair and fur: Quick Fur stack, needle felt, fabric fuzz, stylized curve hair, feathers, per-strand colour, legacy particle hair, combing, dynamics
-- Add-ons
+- [Stylized shading, looks, hair and line art](#stylized-shading-looks-hair-and-line-art)
+- [Clay and plastic](#clay-and-plastic): clay fingerprint material, clay to plastic toy, Eevee clay preview, soft displacement, stop-motion boil
+- [Painterly and brush looks](#painterly-and-brush-looks): faceted normals, brush normal map, outline shell, Compositor Paint Filter (5.2), stroke tracking and layers, Kuwahara in a shader, painterly grass
+- [Outlines and line art](#outlines-and-line-art): Line Art modifier, blueprint look, light contour and priority
+- [Comic toon shader: cell shade, screen tone, outline, rim light, glow (Eevee)](#comic-toon-shader-cell-shade-screen-tone-outline-rim-light-glow-eevee): scene rig, mask method, cell shade, screen tone, hatch, flat chibi shading, backface outline, rim light, glow, Grease Pencil ink outline
+- [Pixel art](#pixel-art): render small, Pixel Blender Kit, pixel texture node
+- [Wear, grime and mapping](#wear-grime-and-mapping): dirty vertex colours, edge and cavity masks, positional gradient, mixing two materials, box mapping, displacement setup, Node Wrangler PBR, Principled reference
+- [Skin, wax and thickness](#skin-wax-and-thickness): thickness masks, fake SSS with Layer Weight, skin shader with painted blush
+- [Glass and transparency](#glass-and-transparency): believable glass, Eevee glass, RGB split glass, Thin Wall, bubbles and tears
+- [Fabric](#fabric): sheen and fuzz, cotton character
+- [Procedural effects and materials](#procedural-effects-and-materials): Is Camera Ray, rim and falloff, energy trail, toon water, hologram, light rays, speed lines, caustics, flame, rock, wood, coffee, leaf, ground splat, dynamic palette, Raycast
+- [Texture painting](#texture-painting): painterly brush, second UV sticker, painted details
+- [Hair and fur](#hair-and-fur): Quick Fur stack, needle felt, fabric fuzz, stylized curve hair, feathers, per-strand colour, legacy particle hair, combing, dynamics
+- [Add-ons](#add-ons)
+<!-- skill-navigation:end -->
 
 ## Clay and plastic
 

@@ -4,8 +4,10 @@ This reference covers how to build natural and urban environments in Blender 5.x
 
 Each entry ends with `Check: verified` (the value was read on screen in the source video) or `Check: unverified` (heard only, or not shown). Values read from the video are exact. Where a value changed between Blender versions, treat the number as a starting point and tune by eye.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
+- [Blender environments](#blender-environments)
 - [Version map](#version-map)
 - [Build a scene in layers](#build-a-scene-in-layers)
 - [Terrain](#terrain)
@@ -23,6 +25,7 @@ Each entry ends with `Check: verified` (the value was read on screen in the sour
 - [Add-ons and assets](#add-ons-and-assets)
 - [Unverified](#unverified)
 - [Remastering a game scene](#remastering-a-game-scene)
+<!-- skill-navigation:end -->
 
 ## Version map
 

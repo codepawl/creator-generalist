@@ -3,15 +3,19 @@
 How to cut a piece so people keep watching, in any editor. The steps name the idea, and each tool reference gives
 the buttons. Platform numbers change often, so check the platform's help page before relying on a limit.
 
-Reading map
-- Plan the cut
-- Hook and pacing
-- Cuts that feel smooth
-- Beat sync
-- Captions and text
-- Framing for vertical
-- Sound in the edit
-- Platform export
+<!-- skill-navigation:start -->
+## Reading map
+
+- [Editing Craft for Any Editor](#editing-craft-for-any-editor)
+- [Plan the cut](#plan-the-cut)
+- [Hook and pacing](#hook-and-pacing)
+- [Cuts that feel smooth](#cuts-that-feel-smooth)
+- [Beat sync](#beat-sync)
+- [Captions and text](#captions-and-text)
+- [Framing for vertical](#framing-for-vertical)
+- [Sound in the edit](#sound-in-the-edit)
+- [Platform export](#platform-export)
+<!-- skill-navigation:end -->
 
 ## Plan the cut
 
@@ -62,7 +66,7 @@ Reading map
 ## Captions and text
 
 **Captions for Shorts**
-1. Generate captions with the editor's auto captions or a speech-to-text tool, then fix names and numbers by hand.
+1. Generate captions with the editor's auto captions or the `watch-video` skill (`references/speech.md`), then fix names and numbers by hand.
 2. Keep 1 to 4 words on screen at a time, synced to the spoken word within about 0.1 s.
 3. Use a bold sans font with an outline or a shadow, large enough to read on a phone.
 4. Place captions inside the safe zone (below).

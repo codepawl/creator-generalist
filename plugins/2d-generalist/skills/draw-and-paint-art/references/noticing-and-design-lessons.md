@@ -3,20 +3,23 @@
 Habits that lift any piece (a painting, a render, a background plate) from flat to finished. They apply to anime, painterly and realistic work.
 Every entry comes from one source series. Blender-specific build steps are in `paint-stylized-backgrounds` `references/blender-card-backgrounds.md`.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Plan light and silhouette first
-- Art of noticing
-- Detail comparison
-- Value check in grayscale
-- Ugly-phase checklist
-- Final attack checklist
-- Composition and focus
-- Colour and variety
-- Five ingredients of beautiful stylized art
-- Tips that apply to characters and props
-- Reference habits
-- Process habits
+- [Noticing, composition and design lessons](#noticing-composition-and-design-lessons)
+- [Plan light and silhouette first](#plan-light-and-silhouette-first)
+- [Art of noticing](#art-of-noticing)
+- [Detail comparison](#detail-comparison)
+- [Value check in grayscale](#value-check-in-grayscale)
+- [Ugly-phase checklist](#ugly-phase-checklist)
+- [Final attack checklist](#final-attack-checklist)
+- [Composition and focus](#composition-and-focus)
+- [Colour and variety](#colour-and-variety)
+- [Five ingredients of beautiful stylized art](#five-ingredients-of-beautiful-stylized-art)
+- [Tips that apply to characters and props](#tips-that-apply-to-characters-and-props)
+- [Reference habits](#reference-habits)
+- [Process habits](#process-habits)
+<!-- skill-navigation:end -->
 
 ## Plan light and silhouette first
 

@@ -4,15 +4,19 @@ Command recipes for editing jobs without an editor: trim, join, reframe, caption
 encodes. Written from the official FFmpeg documentation (ffmpeg.org/ffmpeg-filters.html). Run each command on a
 copy and check the output with `ffprobe` and a few extracted frames.
 
-Reading map
-- Inspect
-- Trim and join
-- Reframe and scale
-- Captions and text
-- Speed and transitions
-- Audio and loudness
-- Encode for platforms
-- Frames and GIFs
+<!-- skill-navigation:start -->
+## Reading map
+
+- [FFmpeg](#ffmpeg)
+- [Inspect](#inspect)
+- [Trim and join](#trim-and-join)
+- [Reframe and scale](#reframe-and-scale)
+- [Captions and text](#captions-and-text)
+- [Speed and transitions](#speed-and-transitions)
+- [Audio and loudness](#audio-and-loudness)
+- [Encode for platforms](#encode-for-platforms)
+- [Frames and GIFs](#frames-and-gifs)
+<!-- skill-navigation:end -->
 
 ## Inspect
 
@@ -90,8 +94,9 @@ Reading map
 - Source: [loudnorm filter](https://ffmpeg.org/ffmpeg-filters.html#loudnorm)
 
 **Normalize to -14 LUFS**
-1. `ffmpeg -i in.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:v copy out.mp4`
-- Use when / pitfalls: a two-pass run (feed the measured values back) is more exact than one pass.
+1. `ffmpeg -i in.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -ar 48000 -c:v copy out.mp4`
+- Use when / pitfalls: a two-pass run (feed the measured values back) is more exact than one pass. Keep `-ar 48000`:
+  `loudnorm` upsamples to 192 kHz inside, and without it the AAC track comes out at 96 kHz (measured, FFmpeg 9.0.2).
 - Source: [loudnorm filter](https://ffmpeg.org/ffmpeg-filters.html#loudnorm)
 
 **Duck music under a voice**
@@ -101,9 +106,9 @@ Reading map
 ## Encode for platforms
 
 **H.264 MP4 that every platform accepts**
-1. `ffmpeg -i master.mov -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -profile:v high -r 30 -c:a aac -b:a 192k -ar 48000 -movflags +faststart upload.mp4`
-- Use when / pitfalls: `yuv420p` avoids black or failed uploads from 10-bit or 4:4:4 sources. Keep the source frame
-  rate (24, 30 or 60) rather than forcing 30. Check each platform's current length and size limits before upload.
+1. `ffmpeg -i master.mov -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -profile:v high -c:a aac -b:a 192k -ar 48000 -movflags +faststart upload.mp4`
+- Use when / pitfalls: `yuv420p` avoids black or failed uploads from 10-bit or 4:4:4 sources. The command keeps the
+  source frame rate (24, 30 or 60); add `-r 30` only when the platform needs a different rate. Check each platform's current length and size limits before upload.
 - Source: [H.264 encoding guide](https://trac.ffmpeg.org/wiki/Encode/H.264)
 
 **Low quality preview**

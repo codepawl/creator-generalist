@@ -17,6 +17,7 @@ Reading map
 - Render engine id is `BLENDER_EEVEE` in 5.2 (Eevee Next). Old `BLENDER_EEVEE_NEXT` and `BLENDER_EEVEE_LEGACY` ids are gone.
 - Node idnames use the pattern `GeometryNode...`, `ShaderNode...`, `FunctionNode...`. Renamed nodes keep working only under the new idname, for example `FunctionNodeAlignRotationToVector`.
 - Group interface uses `tree.interface.new_socket(...)` since 4.0.
+- Video output by script (5.0+): set `scene.render.image_settings.media_type = "VIDEO"` before `file_format = "FFMPEG"`. Without it the assignment raises `enum "FFMPEG" not found` (seen on 5.3).
 
 ## Headless and bpy recipes
 

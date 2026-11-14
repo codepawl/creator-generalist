@@ -1,7 +1,7 @@
 # Compositing for a 2D look and the 2D plus 3D process
 
 Compositor stacks that unify a stylized render, the finishing checklist, and the process of rendering in Blender and painting over in Clip Studio Paint or Krita.
-Steps use Blender 4.2+ and 5.x names. Blender 5.0 has no "Use Nodes" button: open the Compositing workspace and press New. In 4.2+ set Render properties > Compositor to Always so the viewport shows the result. Box Sharpen is the Filter node type that older builds label "Sharpen". There is no standalone Laplace node: it is the Filter node, type Laplace.
+Steps use Blender 4.2+ and 5.x names. Blender 5.0 has no "Use Nodes" button: open the Compositing workspace and press New. From 5.0 the tree ends in a Group Output node; where a step says Composite, read Group Output. In 4.2+ set Render properties > Compositor to Always so the viewport shows the result. Box Sharpen is the Filter node type that older builds label "Sharpen". There is no standalone Laplace node: it is the Filter node, type Laplace.
 
 ## Reading Map
 

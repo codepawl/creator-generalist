@@ -5,8 +5,10 @@ manga hatching, rendered in EEVEE. Shading, outlines and the painted layers are 
 `npr-shading-and-painted-look.md`. Rigs and animation belong to `rig-characters` and `animate-characters`. Blender 4.2+ and 5.x
 names are used. Free extensions F2 and LoopTools come from extensions.blender.org since 4.2 (Preferences > Get Extensions).
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
+- [Stylized Character Process: anime-semireal, painted and manga](#stylized-character-process-anime-semireal-painted-and-manga)
 - [1. Presets](#1-presets)
 - [2. Build order](#2-build-order)
 - [3. Head](#3-head)
@@ -16,6 +18,7 @@ names are used. Free extensions F2 and LoopTools come from extensions.blender.or
 - [7. Hair](#7-hair)
 - [8. Creature and animal notes](#8-creature-and-animal-notes)
 - [9. Design lessons](#9-design-lessons)
+<!-- skill-navigation:end -->
 
 ## 1. Presets
 

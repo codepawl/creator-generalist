@@ -2,16 +2,20 @@
 
 Getting a Blender asset or scene into Unity 6: import, terrain, lighting, a character controller, animation, a follow camera, simple AI, a menu and a build. The series predates URP and HDRP (Unity 4/5 era, UnityScript code), so every name and path below is mapped to Unity 6 where I am sure.
 
-Reading map
-- Version names: read first
-- From Blender to Unity
-- Project setup and terrain
-- Lighting and sky
-- Character and camera
-- Animation
-- Enemy AI
-- Menu and build
-- Video output
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Unity](#unity)
+- [Version names](#version-names): read first
+- [From Blender to Unity](#from-blender-to-unity)
+- [Project setup and terrain](#project-setup-and-terrain)
+- [Lighting and sky](#lighting-and-sky)
+- [Character and camera](#character-and-camera)
+- [Animation](#animation)
+- [Enemy AI](#enemy-ai)
+- [Menu and build](#menu-and-build)
+- [Video output](#video-output)
+<!-- skill-navigation:end -->
 
 ## Version names
 

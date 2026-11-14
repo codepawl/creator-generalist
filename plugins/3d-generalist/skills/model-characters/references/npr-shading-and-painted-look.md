@@ -7,8 +7,10 @@ transform is replaced by AgX (default since 4.0) and Standard, and the Laplace "
 Shader to RGB works in EEVEE only, never in Cycles. Paid add-ons (Stylized Asset Suite, Windy Armature, Anime Ocean) are named
 only to map them to the plain-node route. Do not buy them.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
+- [NPR Shading, Outlines and Painted Textures](#npr-shading-outlines-and-painted-textures)
 - [1. Toon shader and view transform](#1-toon-shader-and-view-transform)
 - [2. Lighting rigs for characters](#2-lighting-rigs-for-characters)
 - [3. Rim, edge and gloss masks](#3-rim-edge-and-gloss-masks)
@@ -20,6 +22,7 @@ only to map them to the plain-node route. Do not buy them.
 - [9. Bake and export](#9-bake-and-export)
 - [10. Compositor finish](#10-compositor-finish)
 - [11. Paid add-on to plain-node map](#11-paid-add-on-to-plain-node-map)
+<!-- skill-navigation:end -->
 
 ## 1. Toon shader and view transform
 

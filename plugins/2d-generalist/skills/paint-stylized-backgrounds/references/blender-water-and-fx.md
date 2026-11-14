@@ -3,23 +3,26 @@
 Waterfalls, pools, oceans, rain, smoke and fire made with plain nodes in EEVEE. They loop, so they suit backgrounds and 2D-looking shots.
 Node Wrangler (`Ctrl+T` for Texture Coordinate and Mapping) is bundled. Shader to RGB works in EEVEE only.
 
-Names mapped to Blender 4.2+ and 5.x: "Blend Mode = Alpha Blend" is Material > Settings > Render Method = Blended (a Dithered plane looks dusty). "Screen Space Refraction" is a legacy EEVEE setting. In 4.2+ use the material's raytraced transmission option (unverified: check the name in your build). Shift+right-click drag on a link makes a reroute point.
+Names mapped to Blender 4.2+ and 5.x: "Blend Mode = Alpha Blend" is Material > Settings > Render Method = Blended (a Dithered plane looks dusty). "Screen Space Refraction" is a legacy EEVEE setting. In 4.2+ reflections come from Render Properties > Raytracing, and see-through refraction from Material > Settings > Raytraced Transmission, which needs Render Method = Dithered (Blender 5.3 manual, 2026-11-14). Shift+right-click drag on a link makes a reroute point.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Rules for every mask in this file
-- Waterfall with cascading gradients
-- Waterfall geometry and motion
-- Foam from two Voronoi textures
-- Foam ring, splash and bubbles
-- Pool, bath water and ripples
-- Shallow water from stacked planes
-- Anime ocean and water shader (with Ocean modifier values)
-- Loops and stepped timing
-- Rain
-- Smoke and steam
-- Fire
-- Stepped wind and dust streaks
+- [Blender stylized water and background FX](#blender-stylized-water-and-background-fx)
+- [Rules for every mask in this file](#rules-for-every-mask-in-this-file)
+- [Waterfall with cascading gradients](#waterfall-with-cascading-gradients)
+- [Waterfall geometry and motion](#waterfall-geometry-and-motion)
+- [Foam from two Voronoi textures](#foam-from-two-voronoi-textures)
+- [Foam ring, splash and bubbles](#foam-ring-splash-and-bubbles)
+- [Pool, bath water and ripples](#pool-bath-water-and-ripples)
+- [Shallow water from stacked planes](#shallow-water-from-stacked-planes)
+- [Anime ocean and water shader](#anime-ocean-and-water-shader)
+- [Loops and stepped timing](#loops-and-stepped-timing)
+- [Rain](#rain)
+- [Smoke and steam](#smoke-and-steam)
+- [Fire](#fire)
+- [Stepped wind and dust streaks](#stepped-wind-and-dust-streaks)
+<!-- skill-navigation:end -->
 
 ## Rules for every mask in this file
 
@@ -48,7 +51,7 @@ Falling stripes: a Wave texture gives ribbons. A second horizontal Wave plus Noi
 
 Toon light on top: Diffuse BSDF > Shader to RGB > Color Ramp (Constant). Add it to the manual gradient with an Add Mix and tick Clamp. A final Mix sets white at the top and bluish dark at the bottom.
 
-Reflective floor: build the colour with nodes, then plug it into the Principled BSDF Base Color as the last node. Add a raytraced refraction or transmission option so the reflection shows. Add centre-only reflection noise (Map Range, multiply with a Quadratic Sphere).
+Reflective floor: build the colour with nodes, then plug it into the Principled BSDF Base Color as the last node. Turn on Render Properties > Raytracing so the reflection shows (legacy EEVEE: Screen Space Reflections plus the material's Screen Space Refraction). Add centre-only reflection noise (Map Range, multiply with a Quadratic Sphere).
 
 ## Waterfall geometry and motion
 
@@ -77,7 +80,7 @@ Reflective floor: build the colour with nodes, then plug it into the Principled 
 2. Shader: toon blue into a Mix Shader with Transparent BSDF, Blended.
 3. Lower pool: Gradient Texture (Quadratic Sphere is smoother than Spherical) with Color Ramp (Constant), moved with Mapping. Insert a Mix between Mapping and the gradient with Noise in B (Divide, raise Factor). Brighter outside, darker inside.
 4. Ripples: Wave texture type Rings, Z direction, Object coordinates, Map Range, multiply with a spherical gradient so rings exist only in the middle. Color Ramp (Constant), Mix with white B, Mix Shader with Transparent BSDF.
-5. Reflection plane: duplicate the water plane, new material with low-roughness Glossy BSDF, place it below the transparent water, and enable the refraction or transmission option.
+5. Reflection plane: duplicate the water plane, new material with low-roughness Glossy BSDF, place it below the transparent water, and turn on Render Properties > Raytracing so it reflects (legacy EEVEE: Screen Space Reflections plus the material's Screen Space Refraction). The Blended water above it cannot be raytraced itself.
 6. Fix shadow artefacts with Shadows Cascade Size 2048 (legacy EEVEE setting).
 
 ## Shallow water from stacked planes

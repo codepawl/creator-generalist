@@ -11,17 +11,21 @@ Version names
 - Live Coding, Interchange import and the Packaging menu paths changed across 5.x. Nothing in the video settles them, so check in the editor.
 - The video's speech-to-text calls the project "social mix". Names such as "peakable" are the speaker's own class names (Pickable).
 
-Reading map
-- Setup and editor basics
-- Assets and Blueprints
-- Gameplay framework and character
-- Input
-- Animation blueprint
-- UI and interaction
-- Materials and events
-- Coming from Unity or Godot
-- From Blender to Unreal
-- Cinematics for video
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Unreal Engine](#unreal-engine)
+- [Setup and editor basics](#setup-and-editor-basics)
+- [Assets and Blueprints](#assets-and-blueprints)
+- [Gameplay framework and character](#gameplay-framework-and-character)
+- [Input](#input)
+- [Animation blueprint](#animation-blueprint)
+- [UI and interaction](#ui-and-interaction)
+- [Materials and events](#materials-and-events)
+- [Coming from Unity or Godot](#coming-from-unity-or-godot)
+- [From Blender to Unreal](#from-blender-to-unreal)
+- [Cinematics for video](#cinematics-for-video)
+<!-- skill-navigation:end -->
 
 ## Setup and editor basics
 

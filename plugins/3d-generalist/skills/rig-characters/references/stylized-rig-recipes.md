@@ -6,31 +6,34 @@ Routes are checked against Blender 5.2 (from notes made in Blender 2.8 to 4.4). 
 and the old name is mentioned. `(heard)` means no value in the entry was seen on a frame. `untested` marks a route the note
 infers. Base Rigify, bone roll and shape key basics are in `bones-and-weights.md` and `face-rigs.md`.
 
-## Reading map
+<!-- skill-navigation:start -->
+## Reading Map
 
-- Corrective shape key driven by a bone
-- Slider handle that drives a shape key
-- Image-sequence face driven by a bone
-- Slider ticks and custom bone shape
-- Attach a face plane to a head
-- LCD pixel face on a screen
-- Ten-shape lip sync with no mouth bones
-- Eye rig: blink key, aim bone, master control
-- One shape key for a whole-body pose
-- Stretch To with absolute handles (bendy chains)
-- Rubber-hose rig
-- Hard-weight rigid rigs (empty groups)
-- Control circle and parent order
-- Single-axis toy rig (LEGO minifig)
-- Rigify built from samples
-- Fix automatic weights
-- Cloth cage with Surface Deform
-- Squash and stretch lattice
-- Ragdoll proxy bones
-- Voxel Remesh rig for blobby characters
-- Transformation constraint instead of drivers
-- Add-ons
-- Already covered elsewhere
+- [Stylized rig recipes (rigging, weights, face rigs)](#stylized-rig-recipes-rigging-weights-face-rigs)
+- [Corrective shape key driven by a bone](#corrective-shape-key-driven-by-a-bone)
+- [Slider handle that drives a shape key](#slider-handle-that-drives-a-shape-key)
+- [Image-sequence face driven by a bone](#image-sequence-face-driven-by-a-bone)
+- [Slider ticks and custom bone shape](#slider-ticks-and-custom-bone-shape)
+- [Attach a face plane to a head](#attach-a-face-plane-to-a-head)
+- [LCD pixel face on a screen](#lcd-pixel-face-on-a-screen)
+- [Ten-shape lip sync with no mouth bones](#ten-shape-lip-sync-with-no-mouth-bones)
+- [Eye rig: blink key, aim bone, master control](#eye-rig-blink-key-aim-bone-master-control)
+- [One shape key for a whole-body pose](#one-shape-key-for-a-whole-body-pose)
+- [Stretch To with absolute handles (bendy chains)](#stretch-to-with-absolute-handles-bendy-chains)
+- [Rubber-hose rig](#rubber-hose-rig)
+- [Hard-weight rigid rigs (empty groups)](#hard-weight-rigid-rigs-empty-groups)
+- [Control circle and parent order](#control-circle-and-parent-order)
+- [Single-axis toy rig (LEGO minifig)](#single-axis-toy-rig-lego-minifig)
+- [Rigify built from samples](#rigify-built-from-samples)
+- [Fix automatic weights](#fix-automatic-weights)
+- [Cloth cage with Surface Deform](#cloth-cage-with-surface-deform)
+- [Squash and stretch lattice](#squash-and-stretch-lattice)
+- [Ragdoll proxy bones](#ragdoll-proxy-bones)
+- [Voxel Remesh rig for blobby characters](#voxel-remesh-rig-for-blobby-characters)
+- [Transformation constraint instead of drivers](#transformation-constraint-instead-of-drivers)
+- [Add-ons](#add-ons)
+- [Already covered elsewhere](#already-covered-elsewhere)
+<!-- skill-navigation:end -->
 
 ## Corrective shape key driven by a bone
 

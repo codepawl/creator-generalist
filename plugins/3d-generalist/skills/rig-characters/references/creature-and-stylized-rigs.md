@@ -7,17 +7,20 @@ the voice-over only, `verified` means a frame confirmed it. Base Rigify steps ar
 Old Blender names are mapped: armature layers and bone groups are bone collections (4.0+), and Rigify is an extension
 from 4.2.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Quick Rigify biped
-- Rigify on a frog or an animal
-- Rigify body with a custom face, hair and eyes
-- Creature spine with controller bones
-- IK limbs on a creature
-- Damped Track chains
-- Wind on bones without the paid add-on
-- Fix deformation and rigid parts
-- Bake Action before export
+- [Creature and stylized rigs](#creature-and-stylized-rigs)
+- [Quick Rigify biped](#quick-rigify-biped)
+- [Rigify on a frog or an animal](#rigify-on-a-frog-or-an-animal)
+- [Rigify body with a custom face, hair and eyes](#rigify-body-with-a-custom-face-hair-and-eyes)
+- [Creature spine with controller bones](#creature-spine-with-controller-bones)
+- [IK limbs on a creature](#ik-limbs-on-a-creature)
+- [Damped Track chains](#damped-track-chains)
+- [Wind on bones without the paid add-on](#wind-on-bones-without-the-paid-add-on)
+- [Fix deformation and rigid parts](#fix-deformation-and-rigid-parts)
+- [Bake Action before export](#bake-action-before-export)
+<!-- skill-navigation:end -->
 
 ## Quick Rigify biped
 

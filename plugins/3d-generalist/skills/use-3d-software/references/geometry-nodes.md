@@ -1,14 +1,18 @@
 # Geometry nodes
 
-Reading map
-- 5.x names: renamed nodes, read first
-- Basics and rules: setup, fields, capture, replacements
-- Instancing and scattering
-- Points, volumes and meshes from points
-- Environment scenes: dust motes in a sunbeam, footpath carved by a curve, forest with slope and paint masks, random lit windows, snow layer
-- Curves and generators
-- Generators by subject: wall, wire, frosting, fuzz, text, cobweb, greeble, mazes
-- Grease Pencil (4.3+)
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Geometry nodes](#geometry-nodes)
+- [5.x names (read first)](#5x-names-read-first): renamed nodes, read first
+- [Basics and rules](#basics-and-rules): setup, fields, capture, replacements
+- [Instancing and scattering](#instancing-and-scattering)
+- [Points, volumes and meshes from points](#points-volumes-and-meshes-from-points)
+- [Environment scenes](#environment-scenes): dust motes in a sunbeam, footpath carved by a curve, forest with slope and paint masks, random lit windows, snow layer
+- [Curves and generators](#curves-and-generators)
+- [Generators by subject](#generators-by-subject): wall, wire, frosting, fuzz, text, cobweb, greeble, mazes
+- [Grease Pencil (4.3+)](#grease-pencil-43)
+<!-- skill-navigation:end -->
 
 Related: fire, lightning, liquid, cloth and glitch builds live in `effects-fx.md`. Shader side of any attribute lives in `shading-and-textures.md`.
 

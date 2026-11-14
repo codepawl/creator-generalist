@@ -1,18 +1,22 @@
 # Godot
 Getting a Blender asset or scene running in Godot 4: nodes and scenes, import, materials, environment, lights, scripting in C#, input, character body, camera look-at, triggers, UI, shaders and builds.
-Reading map
-- Version names: read first
-- Orientation and Unity/Unreal map
-- Scenes and nodes
-- From Blender to Godot
-- Materials, environment and lights
-- Scripting in C#
-- Input and character movement
-- Look-at, triggers and spawning
-- UI
-- Shaders
-- Build and export
-- Rotations and quaternions
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Godot](#godot)
+- [Version names](#version-names): read first
+- [Orientation and Unity/Unreal map](#orientation-and-unityunreal-map)
+- [Scenes and nodes](#scenes-and-nodes)
+- [From Blender to Godot](#from-blender-to-godot)
+- [Materials, environment and lights](#materials-environment-and-lights)
+- [Scripting in C](#scripting-in-c)
+- [Input and character movement](#input-and-character-movement)
+- [Look-at, triggers and spawning](#look-at-triggers-and-spawning)
+- [UI](#ui)
+- [Shaders](#shaders)
+- [Build and export](#build-and-export)
+- [Rotations and quaternions](#rotations-and-quaternions)
+<!-- skill-navigation:end -->
 ## Version names
 The 3.5 hour video was recorded on Godot 3.x (Mono build). It says Godot 4.0 is "coming". Everything below is rewritten with Godot 4 names. The video only covers the editor, scripting, UI and shaders. It does not cover mesh import, animation or export, so those entries say "not in the video" and follow the Godot 4 manual. Check the editor when a name differs.
 - Spatial is now Node3D. MeshInstance is MeshInstance3D. Camera is Camera3D. Area is Area3D. RayCast is RayCast3D.

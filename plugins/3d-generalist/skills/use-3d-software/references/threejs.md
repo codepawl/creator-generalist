@@ -2,25 +2,32 @@
 
 Steps for putting a Blender asset or scene on a web page with three.js: export, load, compress, animate, light,
 colour and performance. Written from the official three.js docs and examples (threejs.org/docs,
-threejs.org/examples), checked against r16x names. 67js scenes follow the same export rules.
+threejs.org/examples), names checked against r187 (2026-11). 67js scenes follow the same export rules.
 
 Version names
 - `outputEncoding` and `sRGBEncoding` are gone. Use `renderer.outputColorSpace = THREE.SRGBColorSpace` (the default)
   and `texture.colorSpace = THREE.SRGBColorSpace` on colour maps only.
 - `physicallyCorrectLights` is gone. Physical light units are the default, so old intensity values look dark.
   Multiply point and spot intensities by about 4 pi as a start, then tune by eye.
+- `THREE.Clock` is deprecated since r183: use `THREE.Timer` (`timer.update()` once per frame, then `timer.getDelta()`).
+- `RGBELoader` is deprecated since r180: use `HDRLoader` from `three/addons/loaders/HDRLoader.js`.
+- `PCFSoftShadowMap` is deprecated since r186 and falls back to `PCFShadowMap`, which now filters soft.
 - Import addons from `three/addons/...` (an import map or a bundler), not from `examples/js`.
 - Check any other name in the current docs when it does not resolve.
 
-Reading map
-- From Blender to three.js
-- Loading and compression
-- Materials and colour
-- Animation
-- Lights, shadows and environment
-- Camera and controls
-- Performance
-- Video and stills from a page
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [three.js](#threejs)
+- [From Blender to three.js](#from-blender-to-threejs)
+- [Loading and compression](#loading-and-compression)
+- [Materials and colour](#materials-and-colour)
+- [Animation](#animation)
+- [Lights, shadows and environment](#lights-shadows-and-environment)
+- [Camera and controls](#camera-and-controls)
+- [Performance](#performance)
+- [Video and stills from a page](#video-and-stills-from-a-page)
+<!-- skill-navigation:end -->
 
 Ready assets: CodePawl's free GLB packs on Hugging Face (https://huggingface.co/codepawl) ship web, KTX2, LOD and mobile tiers made for three.js, each with a viewer Space. An agent-driven engine on top of WebGL2: [67js](https://github.com/codepawl/67.js).
 
@@ -85,7 +92,7 @@ Ready assets: CodePawl's free GLB packs on Hugging Face (https://huggingface.co/
 **Play and blend clips**
 1. `const mixer = new THREE.AnimationMixer(gltf.scene);`
 2. `const walk = mixer.clipAction(THREE.AnimationClip.findByName(gltf.animations, 'Walk'));` then `walk.play()`.
-3. Each frame: `mixer.update(clock.getDelta())`.
+3. Each frame: `timer.update()`, then `mixer.update(timer.getDelta())` with `const timer = new THREE.Timer()`.
 4. Blend: `idle.crossFadeTo(walk, 0.3, true)`.
 - Use when / pitfalls: a character that slides needs root motion handled in code or removed in Blender. A clip that
   pops at the loop needs first and last keys equal.
@@ -99,13 +106,13 @@ Ready assets: CodePawl's free GLB packs on Hugging Face (https://huggingface.co/
 ## Lights, shadows and environment
 
 **Image-based light**
-1. Load an HDR from Poly Haven with `RGBELoader` (or `HDRLoader` in newer releases; check the docs).
+1. Load an HDR from Poly Haven with `HDRLoader` (`RGBELoader` before r180).
 2. `scene.environment = pmrem.fromEquirectangular(hdr).texture` with a `PMREMGenerator`.
 - Use when / pitfalls: one HDR gives most of a realistic look. Add a directional light only for crisp shadows.
 - Source: [PMREMGenerator docs](https://threejs.org/docs/#api/en/extras/PMREMGenerator)
 
 **Shadows**
-1. `renderer.shadowMap.enabled = true`, `renderer.shadowMap.type = THREE.PCFSoftShadowMap`.
+1. `renderer.shadowMap.enabled = true`, `renderer.shadowMap.type = THREE.PCFShadowMap` (the default).
 2. On the light: `castShadow = true`, set `shadow.camera` left, right, top and bottom tight around the scene,
    `shadow.mapSize` 2048, `shadow.bias` about -0.0005, `shadow.normalBias` about 0.02.
 3. `castShadow` and `receiveShadow` on meshes.

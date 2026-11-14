@@ -1,7 +1,20 @@
 # Music (real tracks first, score.py for sketches)
 
-Reading map: Real tracks, The library, Search, fit_music.py, Credits, score.py (sketch only), Score format, Writing a
-score from a film's beats, Limits.
+<!-- skill-navigation:start -->
+## Reading map
+
+- [Music (real tracks first, score.py for sketches)](#music-real-tracks-first-scorepy-for-sketches)
+- [Real tracks](#real-tracks)
+- [The library](#the-library)
+- [Search](#search)
+- [fit_music.py](#fit_musicpy)
+- [Credits](#credits)
+- [score.py (sketch only)](#scorepy-sketch-only)
+- [Score format](#score-format)
+- [Writing a score from a film's beats](#writing-a-score-from-a-films-beats)
+- [Owner verdicts that apply here](#owner-verdicts-that-apply-here)
+- [Limits](#limits)
+<!-- skill-navigation:end -->
 
 Not for finished music (2026-10-29, on the pass 2 demo: the effects were fine, the music was weak). A score built
 from repitched one-shots sounds like a MIDI sketch. Use it only as a timing sketch or a placeholder. Finished music

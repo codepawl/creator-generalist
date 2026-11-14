@@ -2,8 +2,10 @@
 
 Grain, paper, halftone, dither, CRT, VHS, risograph and misregistration, engraving, boil, duotone and grit finishing stacks, flat shading (form shadow, AO, reflected light, highlights), stacked shadows and glows, chromatic split, psychedelic colour, stop-motion cutout looks and blur tricks. Every entry gives what it makes, the exact After Effects (AE) steps, the principle, free-tool routes (Fusion, Blender, web/SVG/canvas, Remotion), a pitfall, source links and how far it was verified.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
+- [Textures, Retro and Print Looks, Shading, Colour and Blur (After Effects recipes with free-tool routes)](#textures-retro-and-print-looks-shading-colour-and-blur-after-effects-recipes-with-free-tool-routes)
 - [How to read an entry](#how-to-read-an-entry)
 - [Rules that repeat across every recipe](#rules-that-repeat-across-every-recipe)
 - [1. Grain and noise](#1-grain-and-noise)
@@ -82,6 +84,7 @@ Grain, paper, halftone, dither, CRT, VHS, risograph and misregistration, engravi
   - [Procedural light leaks](#procedural-light-leaks)
   - [Scan lines and dirt patches](#scan-lines-and-dirt-patches)
 - [Licences, paid items and plugin stand-ins](#licences-paid-items-and-plugin-stand-ins)
+<!-- skill-navigation:end -->
 
 ## How to read an entry
 

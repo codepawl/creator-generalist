@@ -1,16 +1,19 @@
 # Light, colour and time of day
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Light types and lighting preview
-- Coloured two-sun lighting
-- Three-point lighting
-- Glow and fog glow
-- Light rays, lens flare, haze
-- Teal-orange grade
-- One background for evening, night and rain
-- Stars, vignette and night conversion
-- Animated light
+- [Light, colour and time of day](#light-colour-and-time-of-day)
+- [Light types and lighting preview](#light-types-and-lighting-preview)
+- [Coloured two-sun lighting](#coloured-two-sun-lighting)
+- [Three-point lighting](#three-point-lighting)
+- [Glow and fog glow](#glow-and-fog-glow)
+- [Light rays, lens flare, haze](#light-rays-lens-flare-haze)
+- [Teal-orange grade](#teal-orange-grade)
+- [One background for evening, night and rain](#one-background-for-evening-night-and-rain)
+- [Stars, vignette and night conversion](#stars-vignette-and-night-conversion)
+- [Animated light](#animated-light)
+<!-- skill-navigation:end -->
 
 ## Light types and lighting preview
 
@@ -45,7 +48,7 @@ Glow is a soft, Screen-blended copy of the whole image.
 
 - Photoshop: select all artwork layers and drag them to New Layer to duplicate. Press Ctrl+E to merge. Apply Filter > Blur > Gaussian Blur sized to the resolution. Set blend mode Screen (or Linear Dodge) and lower the opacity. Add a layer mask with a soft brush to limit it.
 - After Effects: Layer > New > Adjustment Layer, Effect > Blur & Sharpen > Gaussian Blur with a high Blurriness, blend Screen, feathered mask.
-- Blender compositor: Compositing workspace, Use Nodes, a Viewer node. Use a Glare node (type Bloom or Fog Glow in Blender 5.x, mapped), or a Blur node mixed over Render Layers with a Mix node set to Screen. Connect the Mix to Composite and Viewer.
+- Blender compositor: Compositing workspace, Use Nodes (5.0+: press New instead, and the final node is Group Output, not Composite), a Viewer node. Use a Glare node (type Bloom or Fog Glow in Blender 5.x, mapped), or a Blur node mixed over Render Layers with a Mix node set to Screen. Connect the Mix to Composite and Viewer.
 - Krita: Filter > Blur > Gaussian Blur and layer blend Screen. GIMP: Filters > Blur and layer mode Screen. Fusion: a Blur node merged with Screen apply mode (mapped).
 - Lighter Color blend ties character lines into the background colours without brightening everything. Screen and Linear Dodge brighten the whole art. Radial Zoom blur gives light-ray glow.
 
@@ -100,7 +103,7 @@ Ghibli-like: warm lamp tones and soft blue dusk. Stylized realistic: graded LUTs
 
 - Twinkling stars in the World shader: Voronoi Texture with Texture Coordinate (Camera) and Mapping, 4D, Feature F1, Distance Manhattan (hard diamond shapes). Plug the distance into a Color Ramp (star size). Then use a Mix node set to Color Dodge over the vertical sky gradient, and plug it into Background. Animate the Voronoi W value by tiny amounts. Large values move the stars.
 - Night conversion in Blender: darken and desaturate the colours and push hues toward blue. Lower the Sun strength from about 5 to just under 2. Remove the clouds. Same source.
-- Vignette in the compositor: turn on Use Nodes and add an Ellipse Mask sized to the render. Blur it with a Gaussian Blur. Put it over the image with a Mix node (Multiply).
+- Vignette in the compositor: turn on Use Nodes (5.0+: press New) and add an Ellipse Mask sized to the render. Blur it with a Gaussian Blur. Put it over the image with a Mix node (Multiply).
 - Night ocean: warm ramp for sunset, dark cold ramp for night, Emission for glowing foam. See `animate-backgrounds.md`.
 
 ## Animated light

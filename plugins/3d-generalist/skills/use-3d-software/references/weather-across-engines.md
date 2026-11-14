@@ -5,15 +5,18 @@ three.js, and which ready assets to start from. Checked 2026-11-07 (three.js r18
 and stars are at check time. Before you rely on a pick, check its date and version again: tutorials age fast, and a
 newer official sample beats an old video.
 
-## Reading map
+<!-- skill-navigation:start -->
+## Reading Map
 
-- Rain
-- Wind
-- Storms
-- Sun and sky
-- Snow and fog
-- Weather systems and learning
-- Not found
+- [Weather and nature across engines](#weather-and-nature-across-engines)
+- [Rain](#rain)
+- [Wind](#wind)
+- [Storms](#storms)
+- [Sun and sky](#sun-and-sky)
+- [Snow and fog](#snow-and-fog)
+- [Weather systems and learning](#weather-systems-and-learning)
+- [Not found](#not-found)
+<!-- skill-navigation:end -->
 
 Step-by-step Blender builds for these effects (rain kit, ground fog, god rays, grass, wind) are in
 `environments.md`. This file is the cross-engine map.

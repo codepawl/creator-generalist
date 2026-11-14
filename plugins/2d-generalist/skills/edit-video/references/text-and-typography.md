@@ -61,7 +61,7 @@ AI captions into styled Text+.
   - Steps: Timeline > Create Subtitles from Audio, max characters per line 25. Drag a saved Text+ preset above; lock the other tracks. Workspace > Scripts > Comp > "Subtitle to Text Plus" (Tikido scripts, launched through the Tikido launcher), choose subtitle track 1 and the Text+ video layer (e.g. V2), Convert. Disable the original subtitle track.
 
 - Second note, same technique (Subtitle track to Text+ (free script, Studio not required)): styled captions from an SRT.
-    - Steps: get an .srt (Whisper cloud/local, free) > File > Import > Subtitle, drag the track to the timeline. Install script: Fusion bottom-right numbers > Path Map > Scripts > open folder > Edit, drop the .lua in. Make a Text+ styled template (Effects Library > Titles > Text+), drop it in the Media Pool, rename it. Workspace > Scripts > the script: type the template name, subtitle track number (1), tick close gaps > OK. Resolve 21 can bulk-edit all generated Text+ at once.
+    - Steps: get an .srt (the `watch-video` skill: captions or a local transcript, then `scripts/make_srt.py build`; free) > File > Import > Subtitle, drag the track to the timeline. Install script: Fusion bottom-right numbers > Path Map > Scripts > open folder > Edit, drop the .lua in. Make a Text+ styled template (Effects Library > Titles > Text+), drop it in the Media Pool, rename it. Workspace > Scripts > the script: type the template name, subtitle track number (1), tick close gaps > OK. Resolve 21 can bulk-edit all generated Text+ at once.
     - Use when / pitfalls: free version of Resolve has no auto-subtitle; the script uses "ask user" dialogue instead of UI Manager.
 
 ### PSD import with layers

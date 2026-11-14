@@ -2,16 +2,20 @@
 
 Keyframing, walk cycles, NLA, camera, seamless loops, Commotion.
 
-Reading map
-- 5.x names: read first
-- Keyframing and graph editor
-- Walk cycle and foot slide
-- NLA and actions
-- Camera
-- Seamless loops
-- Commotion and offsetting
-- Empties, parenting and hooks
-- Toolbox and add-ons
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Animation, NLA and loops](#animation-nla-and-loops)
+- [5.x names](#5x-names): read first
+- [Keyframing and graph editor](#keyframing-and-graph-editor)
+- [Walk cycle and foot slide](#walk-cycle-and-foot-slide)
+- [NLA and actions](#nla-and-actions)
+- [Camera](#camera)
+- [Seamless loops](#seamless-loops)
+- [Commotion and offsetting](#commotion-and-offsetting)
+- [Empties, parenting and hooks](#empties-parenting-and-hooks)
+- [Toolbox and add-ons](#toolbox-and-add-ons)
+<!-- skill-navigation:end -->
 
 Keyframing also holds bounce easing, stepped interpolation, `#frame` clock drivers and motion paths. Camera also holds the Track To orbit rig and focus pull.
 

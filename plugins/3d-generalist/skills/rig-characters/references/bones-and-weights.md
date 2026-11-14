@@ -4,16 +4,19 @@ Method across tools. Blender recipes for a custom armature from one bone, root a
 weight paint settings, modifier order and cloth pins are in `use-3d-software/references/rigging-and-weights.md`.
 This file adds the meta-rig route, the checks and the deltas from other tutorials.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Prepare the mesh
-- Fit a Rigify meta-rig
-- Bone roll
-- Generate and skin
-- Hard weights and rigid parts
-- Weight fixes
-- Naming and mirroring
-- Blender 5.x names
+- [Bones and weights](#bones-and-weights)
+- [Prepare the mesh](#prepare-the-mesh)
+- [Fit a Rigify meta-rig](#fit-a-rigify-meta-rig)
+- [Bone roll](#bone-roll)
+- [Generate and skin](#generate-and-skin)
+- [Hard weights and rigid parts](#hard-weights-and-rigid-parts)
+- [Weight fixes](#weight-fixes)
+- [Naming and mirroring](#naming-and-mirroring)
+- [Blender 5.x names](#blender-5x-names)
+<!-- skill-navigation:end -->
 
 ## Prepare the mesh
 

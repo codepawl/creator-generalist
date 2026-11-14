@@ -1,20 +1,23 @@
 # Grease Pencil drawing in Blender
 
-Version mapping (mine): the sources use legacy Grease Pencil (GPv2, up to Blender 4.2). Blender 4.3 and 5.x use Grease Pencil v3 (GPv3). The v3 notes below come from the source captions and from general knowledge, not from the 2.82 video. Check names in the UI. Blender 2.82 "Stroke Placement" is the Drawing Plane option in the Draw mode header.
+Version mapping (mine): the sources use legacy Grease Pencil (GPv2, up to Blender 4.2). Blender 4.3 and 5.x use Grease Pencil v3 (GPv3). The v3 notes below come from the source captions and from general knowledge, not from the 2.82 video. Check names in the UI. The Draw mode header has two separate selectors, in 2.82 and in 5.x alike: Stroke Placement (where a stroke sits: Origin, 3D Cursor, Surface, Stroke) and Drawing Plane (which plane it lies on: View, Front, Side, Top, Cursor). Checked against the Blender 5.3 manual, 2026-11-14.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Setup for tablet drawing
-- Drawing plane and reproject
-- Layers, materials, stroke and fill
-- Edit, sculpt and eraser tools
-- Line Art outlines for 3D meshes
-- Draw on mesh surfaces
-- Layered 2D background
-- Distance fog and wind
-- Modifiers for loops and variation
-- Frame-by-frame drawing
-- Version mapping table
+- [Grease Pencil drawing in Blender](#grease-pencil-drawing-in-blender)
+- [Setup for tablet drawing](#setup-for-tablet-drawing)
+- [Drawing plane and reproject](#drawing-plane-and-reproject)
+- [Layers, materials, stroke and fill](#layers-materials-stroke-and-fill)
+- [Edit, sculpt and eraser tools](#edit-sculpt-and-eraser-tools)
+- [Line Art outlines for 3D meshes](#line-art-outlines-for-3d-meshes)
+- [Draw on mesh surfaces](#draw-on-mesh-surfaces)
+- [Layered 2D background](#layered-2d-background)
+- [Distance fog and wind](#distance-fog-and-wind)
+- [Modifiers for loops and variation](#modifiers-for-loops-and-variation)
+- [Frame-by-frame drawing](#frame-by-frame-drawing)
+- [Version mapping table](#version-mapping-table)
+<!-- skill-navigation:end -->
 
 ## Setup for tablet drawing
 
@@ -26,11 +29,11 @@ Version mapping (mine): the sources use legacy Grease Pencil (GPv2, up to Blende
 
 ## Drawing plane and reproject
 
-1. In the Draw mode header set the Drawing Plane (2.82: Stroke Placement): View, Front X-Z, Side Y-Z, Top X-Y, 3D Cursor or Surface.
+1. In the Draw mode header set the Drawing Plane: View, Front X-Z, Side Y-Z, Top X-Y or Cursor. The selector beside it, Stroke Placement, sets the depth: Origin, 3D Cursor, Surface (on a mesh) or Stroke (on other strokes).
 2. View projects onto the camera view. Front X-Z flattens everything on that plane even when the viewport is rotated.
 3. Overlay > Canvas (or Guides) shows a grid on that plane. It is centred on the object origin, not on the cursor.
 4. To flatten strokes drawn at different depths: Edit mode, select all, then Grease Pencil > Clean Up > Reproject Strokes and choose Front. In v3, find it in the Stroke menu.
-5. Surface placement draws on top of a mesh with an Offset. Too low and strokes intersect the mesh. Too high and they float.
+5. Stroke Placement = Surface draws on top of a mesh with an Offset (tick Project Onto Selected to stick only to selected objects). Too low and strokes intersect the mesh. Too high and they float.
 
 - Fills project from the view too. Fill while looking straight at the right plane, or the fill skews.
 
@@ -64,8 +67,8 @@ Version mapping (mine): the sources use legacy Grease Pencil (GPv2, up to Blende
 
 ## Draw on mesh surfaces
 
-- Add a layer "line art" above "mesh" (Use Lights off). In Draw mode set the plane to Surface and adjust the Offset. A wireframe overlay shows where you draw.
-- For grass or free drawing, use the 3D Cursor plane. Shift + right-click moves the cursor, and the Canvas overlay shows the plane.
+- Add a layer "line art" above "mesh" (Use Lights off). In Draw mode set Stroke Placement to Surface and adjust the Offset. A wireframe overlay shows where you draw.
+- For grass or free drawing, set Stroke Placement to 3D Cursor (and Drawing Plane to Cursor to follow its tilt). Shift + right-click moves the cursor, and the Canvas overlay shows the plane.
 - Lock the other layers to avoid erasing them. Break outlines occasionally for interest. Put strokes that appear in front of the line art on a layer below the mesh layer.
 
 ## Layered 2D background
@@ -105,7 +108,7 @@ Version mapping (mine): the sources use legacy Grease Pencil (GPv2, up to Blende
 | Source name | Blender 4.3+ and 5.x |
 | --- | --- |
 | Grease Pencil (GPv2) object | Grease Pencil v3 object (same Add menu entry) |
-| Stroke Placement | Drawing Plane in the Draw mode header |
+| Stroke Placement, Drawing Plane | Same two selectors in the Draw mode header |
 | Draw on Back | Draw Mode: Behind |
 | Layer Masks | Layer masks (same idea, check the panel) |
 | Reproject Strokes | In the Stroke menu |

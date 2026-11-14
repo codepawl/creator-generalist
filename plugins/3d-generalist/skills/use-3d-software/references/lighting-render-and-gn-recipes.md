@@ -4,27 +4,31 @@ Tricks for lighting, Cycles and EEVEE render cost, color management, the composi
 Checked against Blender 5.2: every route below is given in the 5.2 names, and where the video used an older name the old name is
 written after "was". An entry marked `(heard)` has no value that was seen on a frame. `untested` marks a route the note only inferred.
 
-## Reading map
+<!-- skill-navigation:start -->
+## Reading Map
 
-- Lighting: Light roles and classic setups; Light types, power, Exposure and Normalize; Key to fill ratio, falloff and colour;
+- [Lighting, render speed, color, geometry nodes and workflow recipes](#lighting-render-speed-color-geometry-nodes-and-workflow-recipes)
+- [Lighting](#lighting): Light roles and classic setups; Light types, power, Exposure and Normalize; Key to fill ratio, falloff and colour;
   HDRI as fill, not as the light; IES profiles and gobos; Cards and flags; Light Linking and Shadow Linking; Window glass shadow
   off; Aim lights with Track To and Tri-lighting; Negative light power (unverified); Light Groups and
   flicker in post; Night lighting recipe; Cozy interior stack; Soft focus and backlit sun for phone scans
-- Fog and volumes: Cheaper camera-only volume; Array-sphere fake fog; Camera-parented plane fog; Gradient fake fog in emission;
+- [Fog and volumes](#fog-and-volumes): Cheaper camera-only volume; Array-sphere fake fog; Camera-parented plane fog; Gradient fake fog in emission;
   Mist pass haze and underwater mix; Light-ray node group and ground fog; Cone light ray; Mesh-to-volume fog with falloff
-- Render speed: Cycles settings checklist; Light Tree; Denoise: passes, OIDN and OptiX; Temporal denoise of an animation;
+- [Render speed](#render-speed): Cycles settings checklist; Light Tree; Denoise: passes, OIDN and OptiX; Temporal denoise of an animation;
   Render at 75 percent and upscale; Indirect Only layers and Alpha Over; EEVEE ray tracing and shadows; EEVEE depth of field (legacy)
-- Cheap backgrounds: Baked 2D asset with normal map; Distance LOD swap; Camera culling; Mist depth map as displaced plane;
+- [Cheap backgrounds](#cheap-backgrounds): Baked 2D asset with normal map; Distance LOD swap; Camera culling; Mist depth map as displaced plane;
   Camera projection mapping; Decimate, photo cut-outs and flat photo displacement
-- Color and camera: AgX, ACES 2.0, Standard and curves; Grade EXRs in Resolve; Compositor glow, streaks and dispersion; Glass look
+- [Color and camera](#color-and-camera): AgX, ACES 2.0, Standard and curves; Grade EXRs in Resolve; Compositor glow, streaks and dispersion; Glass look
   from an abstract world texture; Compositor 5.x settings are input sockets; 5.0 presets and Glare Sun Beams; Kuwahara; Vignette
   and Split; Pixelate, Posterize and Lens Distortion; Dolly zoom, Lens Shift and orthographic; Camera shake with a Noise modifier;
   Cinematic camera; Ray Portal BSDF; Looking Glass quilt
-- Geometry nodes: Scatter with masks, exposed controls and wind; Mesh from image alpha; New Array modifier and Curve to Tube;
+- [Geometry nodes](#geometry-nodes): Scatter with masks, exposed controls and wind; Mesh from image alpha; New Array modifier and Curve to Tube;
   Free Normal blend; Mesh Bevel panel cuts; Camera speed lines; Simulation Zone and the sparkler; Automatic plant growth; Books and
   floor planks; Node Tools and tool-style groups; Circle array and stitch generator; Grease Pencil rope; Procedural castle; Gaussian splats
-- Workflow: Asset Browser libraries and tools; Simplify and viewport speed; Video Sequencer basics; Hotkey sheet
-- Add-ons; Dropped or covered elsewhere
+- [Workflow](#workflow): Asset Browser libraries and tools; Simplify and viewport speed; Video Sequencer basics; Hotkey sheet
+- [Add-ons](#add-ons)
+- [Dropped or covered elsewhere](#dropped-or-covered-elsewhere)
+<!-- skill-navigation:end -->
 
 ## Lighting
 
@@ -64,7 +68,7 @@ written after "was". An entry marked `(heard)` has no value that was seen on a f
   to 0.25 once lights carry the shot (frame: empty warehouse HDRI at 0.150). Sky Texture for a stylised scene: Sun Size 10, Sun Intensity 1.5, then tune
   Elevation and Rotation so the sun hits from the side. Model at real scale because DOF and Area size depend on it.
 - Principle: HDRI-only lighting is flat; a low HDRI keeps reflections and fill, creative lights add shape.
-- Other tools: three.js RGBELoader plus PMREMGenerator into scene.environment.
+- Other tools: three.js HDRLoader (RGBELoader before r180) plus PMREMGenerator into scene.environment.
 
 **IES profiles and gobos (textured lights)**: real bulb falloff, and a pattern cast through a spot.
 - Steps: IES: light properties, tick Use Nodes on the light, add an IES Texture node (External, load the .ies file),

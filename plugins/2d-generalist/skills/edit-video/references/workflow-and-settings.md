@@ -164,7 +164,7 @@ Check Help > About Resolve before using any row. Rows come from the notes and ar
 | Feature | Edition | Free fallback |
 | --- | --- | --- |
 | Magic Mask | Studio | Polygon mask with keyframes, Chroma Keyer trick, or Runway ML plus Photopea cutout (see fusion-effects.md) |
-| Auto subtitles (18.5) | Studio | Subtitle to Text+ script with an .srt made by Whisper (see text-and-typography.md) |
+| Auto subtitles (18.5) | Studio | Subtitle to Text+ script with an .srt from the `watch-video` skill (see text-and-typography.md) |
 | Lens Flare node | Studio | Lens Flares fuse from Reactor (MiloLab) or a flare texture on a Merge in Add mode |
 | Warp-O-Matic and Tween based macros | Studio | Displace plus Create Bump Map warp (see fusion-effects.md) |
 | Speed Warp retime | Studio | Optical Flow retime with a cleaned frame, Render in Place (see retime-and-speed.md) |
@@ -217,7 +217,7 @@ Second note:
 - Instant Saver (Inolator) - paid about $10 - quicker saver/loader -
 - Expression cheat sheet (online since 2021), VFXPedia, We Suck Less, GitHub search "DaVinci Resolve macros/fuses" - free references -
 - Photopea (free web), Affinity (free), Figma plus PSD Export plugin (five free exports per month), AutoHotkey, SF Pro fonts - UI import pipeline -
-- Whisper (local/cloud, free, via Kevin Stratford videos) - make .srt for subtitle script -
+- An .srt for the subtitle script (the video names Whisper; here use the `watch-video` skill's captions or local transcript and `make_srt.py`) -
 - Real Twixtor (paid third party), BCC lens blur (paid), CC Time Blend (After Effects) - named as the originals these workflows imitate -
 - Studio-only items named: Speed Warp, Frame io panel (Studio). Free-version notes: Inertia modifier and Text+ script work in free; Guides are in both; Resolve 21 adds Combine Selected Tools, pop-out spline panel, Spherize/Time Mapper/Rasterize built-ins.
 

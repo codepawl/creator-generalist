@@ -53,7 +53,7 @@ Reading map
 - **Pressure force and tearing**: Custom Force node in Effectors. Vector = Normal x Scale (~300), minus Field Average of the same vector so the mesh does not drift. Key Pressure or Stretchiness to inflate. To pop, apply pressure 2 to 3 frames then zero. Gravity off while floating. Pop on a frame: Scene Time -> Compare Equal (Epsilon) -> Mix between pressures, gravity Compare Greater Than, pin Compare Less Than. Tearing threshold as a field: Voronoi 4D Distance to Edge scale 2 -> Map Range 1.2 to 5. Smooth only torn edges via Edge Neighbors face count = 1. Delete lone faces with Face Neighbors count 0.
 - **Hair dynamics**: Hair particle system with Pin Goal Strength 0.1 for sag. See modeling entries for density painting.
 
-## Quick physics recipes
+## Quick physics recipes (Blender 4.2+)
 
 Short cloth, fluid, hair and ocean setups. Panel names are the default Properties editor. Values are as seen on screen, and `unverified` marks a value no frame confirmed.
 

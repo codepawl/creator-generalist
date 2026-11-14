@@ -5,21 +5,24 @@ For toon colouring of a leaf (edge light, veins, random value) the steps are sho
 
 Names mapped to Blender 4.2+: Sapling Tree Gen is a free extension (Preferences > Get Extensions, extensions.blender.org). Older builds list it as the add-on "Add Curve: Sapling Tree Gen". Render Method = Blended replaces "Blend Mode = Alpha Blend". The tutorials show hair particle systems, which still work. A Geometry Nodes route (Distribute Points on Faces > Instance on Points) does the same job and is lighter.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Leaf plane with a painted alpha
-- Leaf shader
-- Quick tree with Sapling Tree Gen
-- Better tree: icosphere hair particles
-- Pastel and watercolor trees
-- Bushes and ground vegetation
-- Solid leaf-mass cluster (no leaf planes)
-- Falling leaves and petals
-- Foliage wind
-- Anime grass field
-- Grass patches
-- Pastel crayon look for a whole scene
-- Baking a tree for another engine
+- [Blender foliage, trees and grass](#blender-foliage-trees-and-grass)
+- [Leaf plane with a painted alpha](#leaf-plane-with-a-painted-alpha)
+- [Leaf shader](#leaf-shader)
+- [Quick tree with Sapling Tree Gen](#quick-tree-with-sapling-tree-gen)
+- [Better tree: icosphere hair particles](#better-tree-icosphere-hair-particles)
+- [Pastel and watercolor trees](#pastel-and-watercolor-trees)
+- [Bushes and ground vegetation](#bushes-and-ground-vegetation)
+- [Solid leaf-mass cluster (no leaf planes)](#solid-leaf-mass-cluster-no-leaf-planes)
+- [Falling leaves and petals](#falling-leaves-and-petals)
+- [Foliage wind](#foliage-wind)
+- [Anime grass field](#anime-grass-field)
+- [Grass patches](#grass-patches)
+- [Pastel crayon look for a whole scene](#pastel-crayon-look-for-a-whole-scene)
+- [Baking a tree for another engine](#baking-a-tree-for-another-engine)
+<!-- skill-navigation:end -->
 
 ## Leaf plane with a painted alpha
 

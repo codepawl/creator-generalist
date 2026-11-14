@@ -5,25 +5,28 @@ Node Wrangler (`Ctrl+T` adds Texture Coordinate and Mapping, `Ctrl+Shift+click` 
 
 Names mapped to Blender 4.2+ and 5.x: "Blend Mode = Alpha Blend" is now Material > Settings > Render Method = Blended. "Eevee Next" is just EEVEE. Blender 5.0 has no "Use Nodes" button in the compositor: open the Compositing workspace and press New.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Order of work for a whole scene
-- Image-card clouds
-- Painterly distortion of any image
-- Mountains and trees as billboards
-- Gradient edge fade
-- Aerial perspective
-- Fog plane
-- Sun glow
-- God rays
-- Floating specks
-- Birds from footage
-- Layered dark planes and shadow blocker
-- Warm near, blue far vignette
-- Background colour that ignores lighting
-- Fake glass reflection and dappled light
-- Depth in a 2D plus 3D shot
-- Scene principles that apply to any style
+- [Blender card backgrounds and atmosphere](#blender-card-backgrounds-and-atmosphere)
+- [Order of work for a whole scene](#order-of-work-for-a-whole-scene)
+- [Image-card clouds](#image-card-clouds)
+- [Painterly distortion of any image](#painterly-distortion-of-any-image)
+- [Mountains and trees as billboards](#mountains-and-trees-as-billboards)
+- [Gradient edge fade](#gradient-edge-fade)
+- [Aerial perspective](#aerial-perspective)
+- [Fog plane](#fog-plane)
+- [Sun glow](#sun-glow)
+- [God rays](#god-rays)
+- [Floating specks](#floating-specks)
+- [Birds from footage](#birds-from-footage)
+- [Layered dark planes and shadow blocker](#layered-dark-planes-and-shadow-blocker)
+- [Warm near, blue far vignette](#warm-near-blue-far-vignette)
+- [Background colour that ignores lighting](#background-colour-that-ignores-lighting)
+- [Fake glass reflection and dappled light](#fake-glass-reflection-and-dappled-light)
+- [Depth in a 2D plus 3D shot](#depth-in-a-2d-plus-3d-shot)
+- [Scene principles that apply to any style](#scene-principles-that-apply-to-any-style)
+<!-- skill-navigation:end -->
 
 ## Order of work for a whole scene
 

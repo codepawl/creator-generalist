@@ -4,16 +4,20 @@ Blender recipes for a quick face rig with bones, the easy mouth rig, the audio-d
 `use-3d-software/references/rigging-and-weights.md`. This file holds shape keys in full, the 2D face texture atlas and
 the choice between the three methods.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Choose a method
-- Shape keys
-- Shape key rules
-- Shape key panel
-- Mirror, copy and limit shape keys
-- 2D face texture atlas driven by a bone
-- Blinking eyes on a floating eye mesh
-- Eyes and teeth as separate objects
+- [Face rigs](#face-rigs)
+- [Choose a method](#choose-a-method)
+- [Shape keys](#shape-keys)
+- [Shape key rules](#shape-key-rules)
+- [Shape key panel](#shape-key-panel)
+- [Mirror, copy and limit shape keys](#mirror-copy-and-limit-shape-keys)
+- [2D face texture atlas driven by a bone](#2d-face-texture-atlas-driven-by-a-bone)
+- [Blinking eyes on a floating eye mesh](#blinking-eyes-on-a-floating-eye-mesh)
+- [Eyes and teeth as separate objects](#eyes-and-teeth-as-separate-objects)
+- [Measured in the creator's shape key file](#measured-in-the-creators-shape-key-file)
+<!-- skill-navigation:end -->
 
 ## Choose a method
 

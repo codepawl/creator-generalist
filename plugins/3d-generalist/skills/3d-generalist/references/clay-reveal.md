@@ -1,7 +1,19 @@
 # Clay reveal (render, clay model, render)
 
-Reading map: When · Grammar · Pacing · Build it (any software) · Cutaways under ground · Moving vehicles ·
-Sound · Checks · Traps.
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Clay reveal (render, clay model, render)](#clay-reveal-render-clay-model-render)
+- [When](#when)
+- [Grammar](#grammar)
+- [Pacing](#pacing)
+- [Build it (any software)](#build-it-any-software)
+- [Cutaways under ground](#cutaways-under-ground)
+- [Moving vehicles](#moving-vehicles)
+- [Sound](#sound)
+- [Checks](#checks)
+- [Traps](#traps)
+<!-- skill-navigation:end -->
 
 A short film that shows a finished, lit world, wipes the same moving shot into a flat grey clay model, pulls back to
 show how the whole thing is built, then wipes back to the render. The clay pass is the explanation, so it needs no

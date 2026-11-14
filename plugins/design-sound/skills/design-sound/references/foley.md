@@ -1,7 +1,18 @@
 # Foley (foley.py)
 
-Reading map: Event format, How an event becomes layers, Query words, Size and distance maths, Alignment, Report, What the
-owner rejected, Limits.
+<!-- skill-navigation:start -->
+## Reading map
+
+- [Foley (foley.py)](#foley-foleypy)
+- [Event format](#event-format)
+- [How an event becomes layers](#how-an-event-becomes-layers)
+- [Query words](#query-words)
+- [Size and distance maths](#size-and-distance-maths)
+- [Alignment](#alignment)
+- [Report](#report)
+- [What the owner rejected (carry into every render)](#what-the-owner-rejected-carry-into-every-render)
+- [Limits](#limits)
+<!-- skill-navigation:end -->
 
 `PY foley.py events.json --out foley.wav [--report foley-report.csv] [--seconds N] [--seed 7] [--licence public]`
 `PY` = the pass-1 run line (numpy scipy librosa soundfile pyloudnorm psutil torch transformers). Output is a stereo 48 kHz

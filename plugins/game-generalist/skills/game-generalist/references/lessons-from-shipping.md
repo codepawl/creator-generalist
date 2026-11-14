@@ -3,8 +3,10 @@
 Each rule below came from a real failure. Run them as checks at steps 6 to 8; read the section that matches the work in
 hand, not the whole file.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
+- [Lessons from shipping a jam game (`lessons-from-shipping.md`)](#lessons-from-shipping-a-jam-game-lessons-from-shippingmd)
 - [Scope churn kills the entry](#scope-churn-kills-the-entry)
 - [Onboarding and the first minute](#onboarding-and-the-first-minute)
 - [Screens the bot skips](#screens-the-bot-skips)
@@ -16,6 +18,7 @@ hand, not the whole file.
 - [Mechanics and depth](#mechanics-and-depth)
 - [Parallel workers on one codebase](#parallel-workers-on-one-codebase)
 - [Text, splash art and rebuilds](#text-splash-art-and-rebuilds)
+<!-- skill-navigation:end -->
 
 ## Scope churn kills the entry
 

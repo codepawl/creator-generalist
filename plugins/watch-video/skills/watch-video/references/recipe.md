@@ -1,7 +1,19 @@
 # Learn a video so it can be remade
 
-Reading map: 1 What a recipe is · 2 Extract · 3 Prove · 4 Retarget to another product · 5 Build (which tool per
-beat) · 6 Verify the remake · 7 Limits. Follow 1 to 6 in order; read 5 only for the techniques your brief uses.
+<!-- skill-navigation:start -->
+## Reading map
+
+- [Learn a video so it can be remade](#learn-a-video-so-it-can-be-remade)
+- [1. What a recipe is](#1-what-a-recipe-is)
+- [2. Extract](#2-extract)
+- [3. Prove](#3-prove)
+- [4. Retarget to another product](#4-retarget-to-another-product)
+- [5. Build](#5-build)
+- [6. Verify the remake](#6-verify-the-remake)
+- [7. Limits](#7-limits)
+<!-- skill-navigation:end -->
+
+Follow 1 to 6 in order; in 5 (which tool per beat) read only the techniques your brief uses.
 
 Use this when the user wants a video understood well enough to make another one like it ("make a video like this",
 "the same for <product>", "pull the recipe"). Tool: `{{SKILL_DIR}}/scripts/recipe.py`, run as

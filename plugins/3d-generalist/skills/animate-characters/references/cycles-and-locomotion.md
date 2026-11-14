@@ -5,17 +5,20 @@ the full walk cycle, NLA and Global Transform stay in
 [use-3d-software animation-and-nla](../../use-3d-software/references/animation-and-nla.md), "Walk cycle and foot slide".
 Build the rig with the `rig-characters` skill.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Cycle rules
-- Walk cycle poses (2D and 3D)
-- Run and idle cycles
-- Make Cyclic and the loop seam
-- Foot slide and root travel
-- IK or FK per shot
-- Copy, paste and mirror poses
-- Offsetting and crowds
-- Acting rules for stops and turns
+- [Cycles, locomotion, IK or FK and pose tools](#cycles-locomotion-ik-or-fk-and-pose-tools)
+- [Cycle rules](#cycle-rules)
+- [Walk cycle poses (2D and 3D)](#walk-cycle-poses-2d-and-3d)
+- [Run and idle cycles](#run-and-idle-cycles)
+- [Make Cyclic and the loop seam](#make-cyclic-and-the-loop-seam)
+- [Foot slide and root travel](#foot-slide-and-root-travel)
+- [IK or FK per shot](#ik-or-fk-per-shot)
+- [Copy, paste and mirror poses](#copy-paste-and-mirror-poses)
+- [Offsetting and crowds](#offsetting-and-crowds)
+- [Acting rules for stops and turns](#acting-rules-for-stops-and-turns)
+<!-- skill-navigation:end -->
 
 Ready mocap to study or start from: [codepawl/100style-glb](https://huggingface.co/datasets/codepawl/100style-glb) has 810 clips of 100 walking and running styles (CC BY 4.0), retargeted onto one free character, with a [viewer](https://huggingface.co/spaces/codepawl/100style-viewer) to compare styles side by side. Pick a clip, then key a stylised version over it rather than shipping raw mocap.
 

@@ -1,6 +1,17 @@
 # Mix (mix.py)
 
-Reading map: Run, mix.json, What it does, Whole-mix checks, Listening per stem, Mixing practice, Evidence, Limits.
+<!-- skill-navigation:start -->
+## Reading map
+
+- [Mix (mix.py)](#mix-mixpy)
+- [mix.json](#mixjson)
+- [What it does](#what-it-does)
+- [Whole-mix checks](#whole-mix-checks)
+- [Listening per stem](#listening-per-stem)
+- [Mixing practice](#mixing-practice)
+- [Evidence](#evidence)
+- [Limits](#limits)
+<!-- skill-navigation:end -->
 
 `PY mix.py mix.json --out final.wav [--sheet final-sheet.png] [--no-listen]` with the pass-1 run line (plus matplotlib for
 the sheet). File paths in `mix.json` are relative to its folder.

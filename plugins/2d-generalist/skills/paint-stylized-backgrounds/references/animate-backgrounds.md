@@ -2,21 +2,24 @@
 
 Each entry gives the After Effects (AE) steps from the source, then the free equivalent. The free equivalents are the skill author's own mapping unless the entry says otherwise. They are marked "mapped".
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Parallax with 3D layers
-- Parallax with 2D layers
-- Loops and camera moves
-- Wind sway on stems and grass
-- Leaves and grass field with turbulence
-- Blender plane foliage
-- Blender wind with Displace
-- Grease Pencil wind
-- Birds
-- Water
-- Fireworks
-- Embers and fire
-- Holographic card shine
+- [Animate backgrounds](#animate-backgrounds)
+- [Parallax with 3D layers](#parallax-with-3d-layers)
+- [Parallax with 2D layers](#parallax-with-2d-layers)
+- [Loops and camera moves](#loops-and-camera-moves)
+- [Wind sway on stems and grass](#wind-sway-on-stems-and-grass)
+- [Leaves and grass field with turbulence](#leaves-and-grass-field-with-turbulence)
+- [Blender plane foliage](#blender-plane-foliage)
+- [Blender wind with Displace](#blender-wind-with-displace)
+- [Grease Pencil wind](#grease-pencil-wind)
+- [Birds](#birds)
+- [Water](#water)
+- [Fireworks](#fireworks)
+- [Embers and fire](#embers-and-fire)
+- [Holographic card shine](#holographic-card-shine)
+<!-- skill-navigation:end -->
 
 ## Parallax with 3D layers
 

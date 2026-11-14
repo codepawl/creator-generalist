@@ -2,18 +2,21 @@
 
 Blender names follow Blender 5.x. Where a source used an older name (EEVEE legacy, Blender 2.9x or 3.x), the entry gives the current name. The skill author mapped these names and marks them "mapped".
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Flat-colour render setup
-- Colour management
-- Shadows, AO, bloom and reflections
-- Camera for backgrounds
-- Choose the base: photo or render
-- Blockout and props
-- Trees, bushes and grass
-- Toon material
-- World colour and sky
-- Outlines
+- [Render settings and 3D blockout](#render-settings-and-3d-blockout)
+- [Flat-colour render setup](#flat-colour-render-setup)
+- [Colour management](#colour-management)
+- [Shadows, AO, bloom and reflections](#shadows-ao-bloom-and-reflections)
+- [Camera for backgrounds](#camera-for-backgrounds)
+- [Choose the base: photo or render](#choose-the-base-photo-or-render)
+- [Blockout and props](#blockout-and-props)
+- [Trees, bushes and grass](#trees-bushes-and-grass)
+- [Toon material](#toon-material)
+- [World colour and sky](#world-colour-and-sky)
+- [Outlines](#outlines)
+<!-- skill-navigation:end -->
 
 ## Flat-colour render setup
 
@@ -33,7 +36,7 @@ Another setup uses a square 1080x1080 canvas. Turn High Bit Depth on and soft sh
 ## Colour management
 
 - Standard for cartoon, anime and NPR. It keeps the saturation.
-- AgX for photoreal or arch-viz. Filmic is removed in Blender 5.x (mapped). Khronos PBR Neutral and Standard also remain.
+- AgX for photoreal or arch-viz. Filmic is still in the list in 5.x for old files (seen in the 5.3 colour config, 2026-11-14); AgX is the default since 4.0. Khronos PBR Neutral and Standard also remain.
 - This is the most common beginner mistake: Filmic or AgX makes stylized plates look desaturated.
 
 ## Shadows, AO, bloom and reflections
@@ -46,7 +49,7 @@ Legacy EEVEE settings and their Blender 5.x (EEVEE Next) replacements (mapped):
 | Ambient Occlusion (Distance, Factor) | Contact darkening in crevices | Gone. Use Raytracing and horizon scan, and tune light Shadow > Jitter and Soft Shadows |
 | Bloom (Intensity, Threshold) | Soft glow around bright areas | Gone. Compositor Glare node, type Bloom or Fog Glow |
 | Screen Space Reflections | Glossy floor | Raytracing. Raise Metallic and lower Roughness in the floor material |
-| Screen Space Refraction (material) | Glass | Material option Raytraced Refraction |
+| Screen Space Refraction (material) | Glass | Material > Settings > Raytraced Transmission (Render Method = Dithered), with Render Properties > Raytracing on |
 | Contact Shadows (per light) | Small shadows on fingers and neck | Removed. Use Jitter and Soft Shadows |
 
 - Turn viewport denoising off when characters move. It ghosts.

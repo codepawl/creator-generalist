@@ -4,15 +4,18 @@ Effects that make a 3D shot read as drawn: stepped noise planes, shape-key smoke
 on twos, layered flames and particle splashes. Notes come (Blender). Step size and the `floor` driver are in
 [stepped-2d-look-in-3d.md](stepped-2d-look-in-3d.md). Check tags follow the same meaning: `heard` or `verified`.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Stepped noise VFX plane
-- Rain streaks on twos
-- Grease Pencil rain splash
-- Shape-key smoke and puffs
-- Layered flame and sparks
-- Particle splash and bubbles
-- Shape-key and noise jiggle
+- [Smears and VFX planes in 3D](#smears-and-vfx-planes-in-3d)
+- [Stepped noise VFX plane](#stepped-noise-vfx-plane)
+- [Rain streaks on twos](#rain-streaks-on-twos)
+- [Grease Pencil rain splash](#grease-pencil-rain-splash)
+- [Shape-key smoke and puffs](#shape-key-smoke-and-puffs)
+- [Layered flame and sparks](#layered-flame-and-sparks)
+- [Particle splash and bubbles](#particle-splash-and-bubbles)
+- [Shape-key and noise jiggle](#shape-key-and-noise-jiggle)
+<!-- skill-navigation:end -->
 
 ## Stepped noise VFX plane
 

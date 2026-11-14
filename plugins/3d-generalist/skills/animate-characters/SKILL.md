@@ -9,6 +9,7 @@ license: MIT
 This craft skill owns the motion of a character, creature or prop: poses, timing, curves, cycles and face swaps.
 `3d-generalist`, `2d-generalist`, `model-characters` and `use-3d-software` call it.
 They keep the look and the order of the whole job. For building the rig, use the `rig-characters` skill.
+Read `local.md` next to this file when it exists (machine paths for Krita and OpenToonz).
 
 ## When to use
 

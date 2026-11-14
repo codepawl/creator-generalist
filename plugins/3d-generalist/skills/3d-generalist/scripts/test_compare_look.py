@@ -1,4 +1,7 @@
-"""Tests for compare_look.py with synthetic ffmpeg frames."""
+"""Tests for compare_look.py with synthetic ffmpeg frames.
+
+Run: uv run --no-project --with pytest --with numpy pytest scripts/test_compare_look.py
+"""
 
 import pathlib
 import shutil

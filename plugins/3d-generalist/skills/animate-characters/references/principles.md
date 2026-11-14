@@ -4,22 +4,25 @@ Each entry says how the principle works when you draw it (2D) and when you key a
 Rules hold for any style. The note on style says how the rule changes. Source of the principle set: Thomas and
 Johnston, "The Illusion of Life". Worked demos use Rough Animator and Blender.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Squash and stretch
-- Anticipation
-- Staging
-- Straight ahead and pose to pose
-- Follow through and overlapping action
-- Slow in and slow out
-- Arcs
-- Secondary action
-- Timing
-- Exaggeration
-- Solid drawing and solid posing
-- Appeal
-- Silhouette and pose reading
-- Worked example: a cube that jumps
+- [The 12 principles in 2D and 3D](#the-12-principles-in-2d-and-3d)
+- [Squash and stretch](#squash-and-stretch)
+- [Anticipation](#anticipation)
+- [Staging](#staging)
+- [Straight ahead and pose to pose](#straight-ahead-and-pose-to-pose)
+- [Follow through and overlapping action](#follow-through-and-overlapping-action)
+- [Slow in and slow out](#slow-in-and-slow-out)
+- [Arcs](#arcs)
+- [Secondary action](#secondary-action)
+- [Timing](#timing)
+- [Exaggeration](#exaggeration)
+- [Solid drawing and solid posing](#solid-drawing-and-solid-posing)
+- [Appeal](#appeal)
+- [Silhouette and pose reading](#silhouette-and-pose-reading)
+- [Worked example: a cube that jumps](#worked-example-a-cube-that-jumps)
+<!-- skill-navigation:end -->
 
 ## Squash and stretch
 

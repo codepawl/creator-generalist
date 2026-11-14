@@ -139,7 +139,7 @@ When generating a character procedurally in Blender Python:
 - Build each part in its own `bpy.data.meshes.new(name)` using `bmesh`.
 - For open cylinders (`leg`, `neck`), use `bmesh.ops.create_cone(bm, cap_ends=False, segments=5, radius1=r_bot, radius2=r_top, depth=h)`.
 - Always call `bmesh.ops.recalc_face_normals(bm, faces=bm.faces)` after extrusions, bridges, or mirror-plane welds.
-- Set `poly.use_smooth = False` across all low-poly faces (or use `Autosmooth` at $60^\circ$ only on cylindrical limbs if soft shading is desired; pure PS1/Crashsune style uses **Flat Shading** + hand-painted ramp gradients).
+- Set `poly.use_smooth = False` across all low-poly faces (or use `Shade Auto Smooth`, which replaced the Auto Smooth checkbox in 4.1, at $60^\circ$ only on cylindrical limbs if soft shading is desired; pure PS1 style uses **Flat Shading** + hand-painted ramp gradients).
 
 ### 4.2 Three.js (`BufferGeometry` / Procedural Kit)
 When building low-poly character parts directly in Three.js without Blender:

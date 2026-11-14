@@ -24,7 +24,11 @@ def configure_shorts_render(fps=30, width=1080, height=1920):
             break
         except TypeError:
             continue
-    scene.render.image_settings.file_format = "FFMPEG"
+    image_settings = scene.render.image_settings
+    if hasattr(image_settings, "media_type"):
+        # Blender 5.0+: video formats are only offered after the media type is VIDEO.
+        image_settings.media_type = "VIDEO"
+    image_settings.file_format = "FFMPEG"
     scene.render.ffmpeg.format = "MPEG4"
     scene.render.ffmpeg.codec = "H264"
     if scene.camera and scene.camera.data:
@@ -43,7 +47,9 @@ def add_object_cutaway_shader(mesh_obj_name, empty_name="Cutaway_Guide"):
         empty.name = empty_name
 
     mat = obj.data.materials[0]
-    mat.use_nodes = True
+    if mat.node_tree is None:
+        # Before 5.0 a material may have no node tree yet; 5.0+ always has one and deprecates use_nodes.
+        mat.use_nodes = True
     if hasattr(mat, "blend_method"):
         mat.blend_method = "HASHED"
     nodes = mat.node_tree.nodes

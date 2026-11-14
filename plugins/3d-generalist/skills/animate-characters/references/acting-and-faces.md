@@ -2,17 +2,20 @@
 
 Face swaps, shape keys, blinks, mouth shapes, lip sync, and procedural wiggle or wind on loose parts.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Shape keys for animation
-- Shape key panel and mirroring
-- Texture face swap with a bone driver
-- Blinks on a floating eye mesh
-- Eye and mouth swaps in 2D
-- Lip sync
-- Procedural wiggle and wind
-- Mechanical and prop animation
-- Squash and stretch on props
+- [Acting, faces, shape keys and procedural motion](#acting-faces-shape-keys-and-procedural-motion)
+- [Shape keys for animation](#shape-keys-for-animation)
+- [Shape key panel and mirroring](#shape-key-panel-and-mirroring)
+- [Texture face swap with a bone driver](#texture-face-swap-with-a-bone-driver)
+- [Blinks on a floating eye mesh](#blinks-on-a-floating-eye-mesh)
+- [Eye and mouth swaps in 2D](#eye-and-mouth-swaps-in-2d)
+- [Lip sync](#lip-sync)
+- [Procedural wiggle and wind](#procedural-wiggle-and-wind)
+- [Mechanical and prop animation](#mechanical-and-prop-animation)
+- [Squash and stretch on props](#squash-and-stretch-on-props)
+<!-- skill-navigation:end -->
 
 ## Shape keys for animation
 

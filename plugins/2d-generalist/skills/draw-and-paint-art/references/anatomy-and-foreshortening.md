@@ -2,18 +2,21 @@
 
 The notes give no numeric proportions (no heads-tall counts). Use a reference for numbers. Learn surface anatomy only: what is visible and understandable, not medical detail.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Proportion checks
-- Torso
-- Arm
-- Leg
-- Hands and fingers
-- Foot
-- Head and portrait planes
-- Foreshortening
-- Shadow pass to check volume
-- Review checklist for a figure
+- [Anatomy and foreshortening](#anatomy-and-foreshortening)
+- [Proportion checks](#proportion-checks)
+- [Torso](#torso)
+- [Arm](#arm)
+- [Leg](#leg)
+- [Hands and fingers](#hands-and-fingers)
+- [Foot](#foot)
+- [Head and portrait planes](#head-and-portrait-planes)
+- [Foreshortening](#foreshortening)
+- [Shadow pass to check volume](#shadow-pass-to-check-volume)
+- [Review checklist for a figure](#review-checklist-for-a-figure)
+<!-- skill-navigation:end -->
 
 ## Proportion checks
 

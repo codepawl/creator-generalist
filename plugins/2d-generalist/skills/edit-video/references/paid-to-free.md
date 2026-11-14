@@ -10,7 +10,7 @@ Read the quick map first, then open the one technique section you need and read 
 - [Film and screen emulation](#film-and-screen-emulation)
 - [Line and markup animation](#line-and-markup-animation)
 - [Camera, depth and transitions](#camera-depth-and-transitions)
-- [3D in After Effects: cinematic documentary pop-up scene](#3d-in-after-effects-bilto-cinematic-documentary-pop-up-scene)
+- [3D in After Effects: cinematic documentary pop-up scene](#3d-in-after-effects-cinematic-documentary-pop-up-scene)
 - [Sound design](#sound-design)
 - [Workflow and presets](#workflow-and-presets)
 - [Add-ons, assets and tools named](#add-ons-assets-and-tools-named)

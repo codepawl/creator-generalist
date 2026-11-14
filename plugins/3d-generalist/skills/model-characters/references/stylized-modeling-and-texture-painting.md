@@ -10,18 +10,21 @@ Renames that apply to every entry below:
 - Principled BSDF v2 (4.0+): Specular became Specular IOR Level, Transmission became Transmission Weight; Mix RGB is now Mix.
 - Sculpt brushes are brush assets since 4.3 (search the brush by name in the asset shelf).
 
-## Reading map
+<!-- skill-navigation:start -->
+## Reading Map
 
-1. Blockout and starting shapes: Reference images; Subdivided cube start; Round Cube and Quadsphere; Half model and Mirror; Blockout big, medium, small
-2. Shaping tricks: Crease; Bevel then harden normals; Inset detail; Panel lines; Clothes as a body shell; Boolean mouth; Cylinder not cone; Curve-bevel tubes; Array and Curve; Metaball hair; Face disc and visor; Eyes on a sphere; Bevel node for seams; Checker deselect tendrils
-3. Splitting for rigs: Pivot-ready parts
-4. Hand-worn and sculpt: Lattice and Clay Strips; Scrape wear; Carver rock; VDM brushes; Human Base Meshes
-5. Pixel and blocky: Cuboid grid mob; Pixel-perfect UVs and noise
-6. Topology: Topology rules; Trace-over wireframe; Reduce to low poly
-7. Texture painting: Paint setup; Brush defaults; Face mask and fill; Stencil; Alpha layers; Painted layer on tileable material; Alpha brushes; 4-colour painting; Tint without repainting; Photo to PBR; Slime
-8. UV notes
-9. Round chibi characters and carved faces: Cube to sphere; Chibi body; Face as loose edges; Mascot pole fix; Carved Boolean face
-10. Add-ons
+- [Stylized Modeling and Texture Painting](#stylized-modeling-and-texture-painting)
+1. [1. Blockout and starting shapes](#1-blockout-and-starting-shapes): Reference images; Subdivided cube start; Round Cube and Quadsphere; Half model and Mirror; Blockout big, medium, small
+2. [2. Shaping tricks](#2-shaping-tricks): Crease; Bevel then harden normals; Inset detail; Panel lines; Clothes as a body shell; Boolean mouth; Cylinder not cone; Curve-bevel tubes; Array and Curve; Metaball hair; Face disc and visor; Eyes on a sphere; Bevel node for seams; Checker deselect tendrils
+3. [3. Splitting for rigs](#3-splitting-for-rigs): Pivot-ready parts
+4. [4. Hand-worn and sculpt](#4-hand-worn-and-sculpt): Lattice and Clay Strips; Scrape wear; Carver rock; VDM brushes; Human Base Meshes
+5. [5. Pixel and blocky](#5-pixel-and-blocky): Cuboid grid mob; Pixel-perfect UVs and noise
+6. [6. Topology](#6-topology): Topology rules; Trace-over wireframe; Reduce to low poly
+7. [7. Texture painting](#7-texture-painting): Paint setup; Brush defaults; Face mask and fill; Stencil; Alpha layers; Painted layer on tileable material; Alpha brushes; 4-colour painting; Tint without repainting; Photo to PBR; Slime
+8. [8. UV notes](#8-uv-notes)
+9. [9. Round chibi characters and carved faces](#9-round-chibi-characters-and-carved-faces): Cube to sphere; Chibi body; Face as loose edges; Mascot pole fix; Carved Boolean face
+10. [Add-ons](#add-ons)
+<!-- skill-navigation:end -->
 
 ## 1. Blockout and starting shapes
 

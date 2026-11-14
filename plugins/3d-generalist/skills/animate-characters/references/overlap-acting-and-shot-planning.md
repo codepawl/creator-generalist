@@ -4,16 +4,19 @@ Hair, tail and wind motion, reference-driven acting, and the order of work for a
 Blender tutorials. Rig set-up for tails, wind bones and Damped Track chains is in
 `rig-characters` `references/creature-and-stylized-rigs.md`. The principle itself is in [principles.md](principles.md).
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Overlap on hair and tails by hand
-- Overlap with shape keys on hair
-- Tail and wind on bones
-- Wind without the paid add-on
-- Acting from reference
-- Plan a shot, then block and polish
-- Cinematic shot lessons
-- Test small before a series
+- [Overlap, acting and shot planning](#overlap-acting-and-shot-planning)
+- [Overlap on hair and tails by hand](#overlap-on-hair-and-tails-by-hand)
+- [Overlap with shape keys on hair](#overlap-with-shape-keys-on-hair)
+- [Tail and wind on bones](#tail-and-wind-on-bones)
+- [Wind without the paid add-on](#wind-without-the-paid-add-on)
+- [Acting from reference](#acting-from-reference)
+- [Plan a shot, then block and polish](#plan-a-shot-then-block-and-polish)
+- [Cinematic shot lessons](#cinematic-shot-lessons)
+- [Test small before a series](#test-small-before-a-series)
+<!-- skill-navigation:end -->
 
 ## Overlap on hair and tails by hand
 

@@ -2,6 +2,17 @@
 
 Get a transcript with word times, then measure the voice. Both write into `$S`.
 
+<!-- skill-navigation:start -->
+## Reading map
+
+- [Speech and tone of voice](#speech-and-tone-of-voice)
+- [Transcript](#transcript)
+- [Check the words: two transcripts](#check-the-words-two-transcripts)
+- [Who speaks when](#who-speaks-when)
+- [Subtitles and translation](#subtitles-and-translation)
+- [Tone of voice](#tone-of-voice)
+<!-- skill-navigation:end -->
+
 ## Transcript
 
 A link with captions:

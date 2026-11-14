@@ -8,12 +8,14 @@ For the 12 principles read [principles.md](principles.md). For Blender curve wor
 [timing-and-graph-editor.md](timing-and-graph-editor.md). Hand-drawn frame work is in
 [2d-frame-by-frame-and-cutout.md](2d-frame-by-frame-and-cutout.md). Face swaps are in [acting-and-faces.md](acting-and-faces.md).
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Workflow and blocking
+- [2D motion-design animation](#2d-motion-design-animation)
+- [Workflow and blocking](#workflow-and-blocking)
   1. Block with holds, ease later, then secondary
   2. Uneven spacing to sell an impact
-- Easing and the graph editor
+- [Easing and the graph editor](#easing-and-the-graph-editor)
   3. Easy Ease, value graph and speed graph
   4. Steep ease recipes (cubic-bezier table)
   5. Anticipation and overshoot on a move
@@ -24,21 +26,21 @@ For the 12 principles read [principles.md](principles.md). For Blender curve wor
   10. Hold keyframes, flashes and stepped blinks
   11. Ease Copy, graph helpers and paid tools
   12. Deliberate linear, and match cuts
-- Secondary action and overlap
+- [Secondary action and overlap](#secondary-action-and-overlap)
   13. Secondary action from momentum
   14. Wave principle for cloth, hair and tails
   15. Keep a still character alive
   16. Parallax and loops from copied keys
   17. Show the result of an action: splash and drip
   18. Smears and blob transitions
-- Hand-drawn feel
+- [Hand-drawn feel](#hand-drawn-feel)
   19. On twos: Posterize Time and stepped time
   20. Wiggle Paths boil and flame on twos
   21. Frame-by-frame cycles and bounces
   22. Run and walk cycle mistakes
   23. Shape-layer cleanup over roughs
   24. Frame-by-frame assembly: Sequence Layers, PSD import, stop motion
-- Shape layers and morphs
+- [Shape layers and morphs](#shape-layers-and-morphs)
   25. Path morph: first vertex and in-between shape
   26. Hide the swap in the fastest frame
   27. Shape parameters that already span two shapes
@@ -50,14 +52,15 @@ For the 12 principles read [principles.md](principles.md). For Blender curve wor
   33. Mattes: shine sweep, shadow, clip to a base shape
   34. Gradients: beam and animated gradient bubble
   35. Echo trail, radio waves and shards
-- Character and rigging
+- [Character and rigging](#character-and-rigging)
   36. Layer-per-part rig with parents and a null controller
   37. Simple eye rig with nulls
   38. Blinks: open slow, close fast
   39. Fake turn, mouth swaps and counter-rotation
   40. Puppet Pin, rigging plugins and Duik-free routes
-- Currency: renamed and removed features
-- Sources and licences
+- [Currency: renamed and removed features](#currency-renamed-and-removed-features)
+- [Sources and licences](#sources-and-licences)
+<!-- skill-navigation:end -->
 
 ## Currency: renamed and removed features
 

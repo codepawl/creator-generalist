@@ -4,12 +4,16 @@ Steps for the two free open-source editors that run on Windows, macOS and Linux.
 (docs.kdenlive.org) and Shotcut's documentation (shotcut.org). Menu names change between releases, so check each
 path in the installed version. For effects beyond what they offer, use DaVinci Resolve or FFmpeg.
 
-Reading map
-- Kdenlive
-- Kdenlive: styled titles, shape transitions, green-screen stingers
-- A whole video in open source tools
-- Shotcut
-- Which one
+<!-- skill-navigation:start -->
+## Reading map
+
+- [Kdenlive and Shotcut](#kdenlive-and-shotcut)
+- [Kdenlive](#kdenlive)
+- [Kdenlive: styled titles, shape transitions, green-screen stingers](#kdenlive-styled-titles-shape-transitions-green-screen-stingers)
+- [A whole video in open source tools](#a-whole-video-in-open-source-tools)
+- [Shotcut](#shotcut)
+- [Which one](#which-one)
+<!-- skill-navigation:end -->
 
 ## Kdenlive
 

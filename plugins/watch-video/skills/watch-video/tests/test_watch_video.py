@@ -581,7 +581,7 @@ class ScreenReading(unittest.TestCase):
         self.reader = load_script_module("read_screen")
 
     def test_letter_vote_beats_every_single_reading(self):
-        # Real slips from the Ducky fog tutorial: no single reading is right, the per-letter vote is.
+        # Real slips from a fog tutorial: no single reading is right, the per-letter vote is.
         readings = [("irina-iriser-2Y4dE8sdhic-unsplash", 1), ("irina-iriser-2Y4dE8sdnlc-unsplash", 2),
                     ("irina-iriser-2Y4dE8sdhkc-unsplash", 2), ("irina-iriser-ZY4dE8sdhlc-unsplash", 2),
                     ("irina-iriser-2Y4dE8sdhlc-ursplash", 2)]
@@ -624,13 +624,13 @@ class ScreenReading(unittest.TestCase):
         self.assertGreaterEqual(self.reader.changed_blocks(still, edited), 1)
 
     def test_a_dropped_decimal_point_is_not_a_value_change(self):
-        # Ducky 3D run, 2026-11-07: "W 1.320 -> 1320" and "Pos 0.000 -> 0000" were OCR slips, not edits.
+        # Tutorial run, 2026-11-07: "W 1.320 -> 1320" and "Pos 0.000 -> 0000" were OCR slips, not edits.
         self.assertTrue(self.reader.same_digits("1.320", "1320"))
         self.assertTrue(self.reader.same_digits("0.000", "0000"))
         self.assertFalse(self.reader.same_digits("0.567", "0.484"))
 
     def test_source_names_are_recognised_through_ocr_slips(self):
-        # Strings as RapidOCR read them from a Ducky 3D Outliner (2026-11-07), letter slips included.
+        # Strings as RapidOCR read them from a tutorial Outliner (2026-11-07), letter slips included.
         meanings = [meaning for _, meaning in self.reader.find_sources("uploads_fles_909440_Bendy_Beect")]
         self.assertTrue(any("CGTrader" in meaning for meaning in meanings), meanings)
         self.assertTrue(self.reader.find_sources("rina-riser-2Y4dE8sdhic-unsplash"))

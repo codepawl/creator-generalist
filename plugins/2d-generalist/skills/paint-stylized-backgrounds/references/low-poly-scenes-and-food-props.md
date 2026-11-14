@@ -5,21 +5,24 @@ The look comes from the render, not the topology: plan shape, texture and light 
 
 Names for Blender 4.2+ and 5.x: "Shade Auto Smooth" is now Object > Shade Auto Smooth (a modifier node group in 4.1+). Loop Tools is a free extension from extensions.blender.org (right-click a vertex ring > Circle). Link Object Data is Object > Link/Transfer Data > Link Object Data.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Judge the render
-- Low-poly rocks and cracks
-- Tree stump with roots
-- Mushrooms, leaves and floor discs
-- Paint fake 3D
-- UV and texture painting for a set
-- Four-part low-poly process
-- Set dressing rules
-- Fried egg, pan and eggs
-- Waffle, syrup and toppings
-- Pancake, berries and plate
-- Ramen, noodles and burger
-- Prop patterns
+- [Low-poly stylized scenes and Ghibli-style food props](#low-poly-stylized-scenes-and-ghibli-style-food-props)
+- [Judge the render](#judge-the-render)
+- [Low-poly rocks and cracks](#low-poly-rocks-and-cracks)
+- [Tree stump with roots](#tree-stump-with-roots)
+- [Mushrooms, leaves and floor discs](#mushrooms-leaves-and-floor-discs)
+- [Paint fake 3D](#paint-fake-3d)
+- [UV and texture painting for a set](#uv-and-texture-painting-for-a-set)
+- [Four-part low-poly process](#four-part-low-poly-process)
+- [Set dressing rules](#set-dressing-rules)
+- [Fried egg, pan and eggs](#fried-egg-pan-and-eggs)
+- [Waffle, syrup and toppings](#waffle-syrup-and-toppings)
+- [Pancake, berries and plate](#pancake-berries-and-plate)
+- [Ramen, noodles and burger](#ramen-noodles-and-burger)
+- [Prop patterns](#prop-patterns)
+<!-- skill-navigation:end -->
 
 ## Judge the render
 

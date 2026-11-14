@@ -1,6 +1,20 @@
 # Foley generated from the picture (HunyuanVideo-Foley)
 
-Reading map: When, Command (local, the default), Prompts and shot lists, Hosted on fal (when the GPU stays busy), Install, Resources, Limits, Licence, Why this model, ElevenLabs instead.
+<!-- skill-navigation:start -->
+## Reading map
+
+- [Foley generated from the picture (HunyuanVideo-Foley)](#foley-generated-from-the-picture-hunyuanvideo-foley)
+- [When](#when)
+- [Command (local, the default)](#command-local-the-default)
+- [Prompts and shot lists](#prompts-and-shot-lists)
+- [Hosted on fal](#hosted-on-fal)
+- [Install](#install)
+- [Resources](#resources)
+- [Limits](#limits)
+- [Licence](#licence)
+- [Why this model (checked 2026-11-07)](#why-this-model-checked-2026-11-07)
+- [ElevenLabs instead (checked 2026-11-07)](#elevenlabs-instead-checked-2026-11-07)
+<!-- skill-navigation:end -->
 
 ## When
 

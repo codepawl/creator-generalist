@@ -1,20 +1,23 @@
 # Krita 5.x tools
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Document and dockers
-- Navigation and shortcuts
-- Selection tools
-- Transform tool
-- Fill and gradient
-- Assistants
-- Canvas size
-- Brushes
-- Colour picking
-- Layers, Alpha Lock, Inherit Alpha
-- Blending modes
-- Layer styles and filters
-- Tools named
+- [Krita 5.x tools](#krita-5x-tools)
+- [Document and dockers](#document-and-dockers)
+- [Navigation and shortcuts](#navigation-and-shortcuts)
+- [Selection tools](#selection-tools)
+- [Transform tool](#transform-tool)
+- [Fill and gradient](#fill-and-gradient)
+- [Assistants](#assistants)
+- [Canvas size](#canvas-size)
+- [Brushes](#brushes)
+- [Colour picking](#colour-picking)
+- [Layers, Alpha Lock, Inherit Alpha](#layers-alpha-lock-inherit-alpha)
+- [Blending modes](#blending-modes)
+- [Layer styles and filters](#layer-styles-and-filters)
+- [Tools named](#tools-named)
+<!-- skill-navigation:end -->
 
 ## Document and dockers
 

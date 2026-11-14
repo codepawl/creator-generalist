@@ -2,18 +2,21 @@
 
 Shader nodes, world shaders, palette colouring, baking, toon looks and lighting.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- 5.x names: read first
-- Palette and UV colouring
-- Procedural textures and distortion
+- [Shading and textures](#shading-and-textures)
+- [5.x names](#5x-names): read first
+- [Palette and UV colouring](#palette-and-uv-colouring)
+- [Procedural textures and distortion](#procedural-textures-and-distortion)
 - Character and prop materials
-- World and sky shaders
-- Toon and stylised looks
-- Baking, painting, decals
-- Lighting
-- Quick material and viewport tricks
-- Compositor and post
+- [World and sky shaders](#world-and-sky-shaders)
+- [Toon and stylised looks](#toon-and-stylised-looks)
+- [Baking, painting, decals](#baking-painting-decals)
+- [Lighting](#lighting)
+- [Compositor and post](#compositor-and-post)
+- [Quick material and viewport tricks (Blender 4.2+)](#quick-material-and-viewport-tricks-blender-42)
+<!-- skill-navigation:end -->
 
 ## 5.x names
 
@@ -89,7 +92,7 @@ Shader nodes, world shaders, palette colouring, baking, toon looks and lighting.
 - **Worm loop shading**: Mix Principled and Emission by Wave -> Greater Than, normal-based coordinates + Multiply -0.02 so waves follow the worm. Ground: Voronoi Chebychev Randomness 0, Smooth F1 for bump (0.001, invert).
 - **Milky rings material**: White metallic roughness 0, Musgrave (now Noise type) scale 300 for roughness and Bump 0.03, look High Contrast, ground subsurface 1, point lights on camera (1000, green and blue saturation 0.5).
 
-## Quick material and viewport tricks
+## Quick material and viewport tricks (Blender 4.2+)
 
 - **Link materials**: select the objects that need the material, then Shift+click the one that has it (active, last). Ctrl+L > Link Materials.
 - **Viewport colours for modeling**: Viewport Shading dropdown, Color > Random, tick Cavity (Type Both), World Space Ridge about 1.295, Valley 1.27 to 1.39 (Valley `unverified`). Viewport only, renders do not change.

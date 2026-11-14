@@ -44,7 +44,7 @@ Stylized low-poly characters rely on **painted lighting** inside the texture atl
    - If the texture uses alpha cutouts (e.g., the 3D eye sockets in the eyes video), use a `Principled BSDF` with `Base Color = Black`, `Roughness = 1.0`, `Specular = 0.0`, plug `Image Texture (Color)` into `Emission Color` (`Emission Strength = 1.0`), and plug `Image Texture (Alpha)` into `Alpha`.
 2. **Texture Filtering:** Set the `Image Texture` interpolation to:
    - **`Closest`** for crisp PS1 / pixel-art textures (`256x256` or `512x512`).
-   - **`Linear`** for smooth hand-painted anime/Crashsune gradients (`1024x512` or `1024x1024`).
+   - **`Linear`** for smooth hand-painted anime gradients (`1024x512` or `1024x1024`).
 3. **Color Management:** Under `Render Properties -> Color Management`, set **`View Transform = Standard`** and **`Look = None`**.
 
 ### 2.2 Three.js (`MeshBasicMaterial` + `SRGBColorSpace`)

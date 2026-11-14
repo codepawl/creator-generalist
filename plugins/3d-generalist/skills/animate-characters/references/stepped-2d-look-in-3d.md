@@ -6,18 +6,21 @@ For the look itself (toon shader, outlines, painted textures) read
 `model-characters` `references/npr-shading-and-painted-look.md`. Do not copy it here.
 Smears and effect planes are in [smears-and-vfx-planes.md](smears-and-vfx-planes.md).
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Pick the step size
-- Pose workflow on twos
-- Fours, then twos, then threes
-- Turn threes into twos
-- Stepped shader time with floor
-- Line boil and Sketchify
-- Jitter with Displace and an Empty
-- Linear loops that run forever
-- Work in a clean file
-- WIP clips: pipeline, frame counts and beats
+- [2D-style timing in 3D](#2d-style-timing-in-3d)
+- [Pick the step size](#pick-the-step-size)
+- [Pose workflow on twos](#pose-workflow-on-twos)
+- [Fours, then twos, then threes](#fours-then-twos-then-threes)
+- [Turn threes into twos](#turn-threes-into-twos)
+- [Stepped shader time with floor](#stepped-shader-time-with-floor)
+- [Line boil and Sketchify](#line-boil-and-sketchify)
+- [Jitter with Displace and an Empty](#jitter-with-displace-and-an-empty)
+- [Linear loops that run forever](#linear-loops-that-run-forever)
+- [Work in a clean file](#work-in-a-clean-file)
+- [WIP clips: pipeline, frame counts and beats (seen from silent clips)](#wip-clips-pipeline-frame-counts-and-beats-seen-from-silent-clips): pipeline, frame counts and beats
+<!-- skill-navigation:end -->
 
 ## Pick the step size
 
@@ -120,7 +123,7 @@ Animated shader values move smoothly by default. Step them so water, rain and sm
 - A heavy scene lags. Copy the rig into a new .blend, animate there, and name the action in the Action Editor.
   In the main file use File > Append > Action, then assign it to the rig by typing its name in the Action Editor.
 
-## WIP clips: pipeline, frame counts and beats
+## WIP clips: pipeline, frame counts and beats (seen from silent clips)
 
 - **Pipeline**: model, rig, animate in Blender (grey 3D pass with keys), then draw over every frame in Clip Studio Paint, with separate named face drawings (`face13 Copy`, `face14 Copy` ...) per frame. His voice-over says the same four steps.
 - **Frame counts (guessed)**: the CSP ruler labels step by 3 (28, 31, 34 ... 64) while thumbnails are named frame6, frame7 ... one drawing each. The threes reading was dropped (see the frame-rate note below).

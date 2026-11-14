@@ -4,15 +4,19 @@ Blender recipes for two-bone IK with a pole, the foot rig with roll and limits, 
 Auto IK are in `use-3d-software/references/rigging-and-weights.md`. This file holds the method, the choice rules and the
 Rigify and ready-rig controls.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- IK limb recipe (short)
-- Control bones and the master bone
-- IK or FK per shot
-- Rigify controls: switch, snap, foot roll
-- Bone collections
-- Ready rigs
-- Pose tools
+- [IK, FK and controls](#ik-fk-and-controls)
+- [IK limb recipe (short)](#ik-limb-recipe-short)
+- [Control bones and the master bone](#control-bones-and-the-master-bone)
+- [IK or FK per shot](#ik-or-fk-per-shot)
+- [Rigify controls: switch, snap, foot roll](#rigify-controls-switch-snap-foot-roll)
+- [Bone collections](#bone-collections)
+- [Ready rigs](#ready-rigs)
+- [Pose tools](#pose-tools)
+- [Measured in the creator's rig files](#measured-in-the-creators-rig-files)
+<!-- skill-navigation:end -->
 
 ## IK limb recipe (short)
 

@@ -4,19 +4,22 @@ How a character holds, picks up, carries, hands over and puts down a prop in any
 were heard in a tutorial but not confirmed on screen or in docs: use them as hints, test before relying on them.
 Names are current; the name the tutorial showed is in brackets.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-1. Core idea (any software)
-2. Blender
-3. Maya
-4. Unreal Engine
-5. Unity
-6. Godot
-7. Spine 2D
-8. Cascadeur
-9. Craft: weight, the C-to-S lift, finger posing, grip tension
-10. Checklist for a grip shot
-11. Sources
+- [Props, grip and contact (`props-grip-and-contact.md`)](#props-grip-and-contact-props-grip-and-contactmd)
+1. [1. Core idea (any software)](#1-core-idea-any-software)
+2. [2. Blender (5.x)](#2-blender-5x)
+3. [3. Maya](#3-maya)
+4. [4. Unreal Engine (5.x)](#4-unreal-engine-5x)
+5. [5. Unity](#5-unity)
+6. [6. Godot (4.x)](#6-godot-4x)
+7. [7. Spine 2D (Pro 4.x: IK and transform constraints are not in Essential)](#7-spine-2d-pro-4x-ik-and-transform-constraints-are-not-in-essential)
+8. [8. Cascadeur](#8-cascadeur)
+9. [9. Craft](#9-craft): weight, the C-to-S lift, finger posing, grip tension
+10. [10. Checklist for a grip shot](#10-checklist-for-a-grip-shot)
+11. [11. Sources](#11-sources)
+<!-- skill-navigation:end -->
 
 ## 1. Core idea (any software)
 

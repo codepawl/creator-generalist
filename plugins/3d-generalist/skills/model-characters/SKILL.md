@@ -7,7 +7,7 @@ license: MIT
 # Model 3D Characters
 Paths use `{{WORK_DIR}}` for the project folder and `{{SKILL_DIR}}` for this skill's folder.
 
-If `references/local.md` exists, read it first for local paths and machine rules.
+If `local.md` or `references/local.md` exists, read it first for local paths and machine rules.
 
 A craft skill. It turns a reference (drawing, turnaround, photo, text idea) into a 3D character in the style the user
 wants. Low poly is one route, not the default. The generalist skills (`3d-generalist`, `2d-generalist`) decide the

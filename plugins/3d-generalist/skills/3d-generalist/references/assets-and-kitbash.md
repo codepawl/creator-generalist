@@ -1,5 +1,16 @@
 # Assets and Kitbashing (`assets-and-kitbash.md`)
 
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Assets and Kitbashing (`assets-and-kitbash.md`)](#assets-and-kitbashing-assets-and-kitbashmd)
+- [1. Source priority and licensing](#1-source-priority-and-licensing)
+- [2. Fitting and scaling rules (zero float, real bounds)](#2-fitting-and-scaling-rules-zero-float-real-bounds)
+- [3. Kitbashing and adapting in Blender](#3-kitbashing-and-adapting-in-blender)
+- [Detail ladder: the cheapest method that looks best](#detail-ladder-the-cheapest-method-that-looks-best)
+- [Variation and imperfection: nothing boxy, nothing repeated](#variation-and-imperfection-nothing-boxy-nothing-repeated)
+<!-- skill-navigation:end -->
+
 A 3D generalist for content creation builds from real, scanned 3D assets and PBR materials first. Models built from
 primitives by code read as toys and trigger "AI slop" reactions. Only model custom parts when no free scan or model fits,
 and texture custom geometry with scanned PBR sets at real texel density.

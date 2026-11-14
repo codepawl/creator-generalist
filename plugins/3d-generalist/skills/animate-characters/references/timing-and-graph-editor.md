@@ -3,20 +3,23 @@
 Keys, holds, retiming, curves and procedural modifiers for character work. Blender 4.x to 5.x names. Hotkeys are
 Blender defaults.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Keyframe basics and Auto Keying
-- Timeline, frame range and playback
-- Dope Sheet
-- Graph Editor: value versus timing
-- Handle types and slow in, slow out
-- Interpolation modes
-- Stepped modifier: on twos and threes
-- Noise modifier
-- Cycles modifier
-- Motion paths and arc checks
-- Timing charts for 2D
-- Frame rate and motion blur
+- [Timing, Dope Sheet and Graph Editor](#timing-dope-sheet-and-graph-editor)
+- [Keyframe basics and Auto Keying](#keyframe-basics-and-auto-keying)
+- [Timeline, frame range and playback](#timeline-frame-range-and-playback)
+- [Dope Sheet](#dope-sheet)
+- [Graph Editor: value versus timing](#graph-editor-value-versus-timing)
+- [Handle types and slow in, slow out](#handle-types-and-slow-in-slow-out)
+- [Interpolation modes](#interpolation-modes)
+- [Stepped modifier: on twos and threes](#stepped-modifier-on-twos-and-threes)
+- [Noise modifier](#noise-modifier)
+- [Cycles modifier](#cycles-modifier)
+- [Motion paths and arc checks](#motion-paths-and-arc-checks)
+- [Timing charts for 2D](#timing-charts-for-2d)
+- [Frame rate and motion blur](#frame-rate-and-motion-blur)
+<!-- skill-navigation:end -->
 
 ## Keyframe basics and Auto Keying
 

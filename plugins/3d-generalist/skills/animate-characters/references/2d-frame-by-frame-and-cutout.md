@@ -6,19 +6,22 @@ Rough Animator, Toon Boom, Spine and TVPaint are paid alternatives. Build the cu
 Version mapping: the Grease Pencil notes come from Blender 2.82 (legacy, "GPv2"). Blender 4.3 and later use Grease
 Pencil v3. The names marked "v3" below are mapped from general knowledge, not shown in the videos, so check the UI.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Choose a tool
-- Krita frame by frame
-- Krita FX, shadows and export
-- Grease Pencil setup (v3)
-- Grease Pencil walk cycle
-- Grease Pencil layers, materials and fill
-- Grease Pencil modifiers and looping
-- Moving a drawing in 3D
-- Animatic with scenes and the Sequencer
-- Cut-out animation with sprites
-- Preview playblast and checks
+- [2D: frame by frame, Grease Pencil, Krita and cut-out](#2d-frame-by-frame-grease-pencil-krita-and-cut-out)
+- [Choose a tool](#choose-a-tool)
+- [Krita frame by frame](#krita-frame-by-frame)
+- [Krita FX, shadows and export](#krita-fx-shadows-and-export)
+- [Grease Pencil setup (v3)](#grease-pencil-setup-v3)
+- [Grease Pencil walk cycle](#grease-pencil-walk-cycle)
+- [Grease Pencil layers, materials and fill](#grease-pencil-layers-materials-and-fill)
+- [Grease Pencil modifiers and looping](#grease-pencil-modifiers-and-looping)
+- [Moving a drawing in 3D](#moving-a-drawing-in-3d)
+- [Animatic with scenes and the Sequencer](#animatic-with-scenes-and-the-sequencer)
+- [Cut-out animation with sprites](#cut-out-animation-with-sprites)
+- [Preview playblast and checks](#preview-playblast-and-checks)
+<!-- skill-navigation:end -->
 
 ## Choose a tool
 

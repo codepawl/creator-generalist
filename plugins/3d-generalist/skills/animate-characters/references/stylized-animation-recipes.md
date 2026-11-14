@@ -6,35 +6,37 @@ Blender 5.2 where a route moved; values marked `verified` were read from a frame
 tagged `(heard)` has no value seen on a frame. Generic stepped modifier, Make Cyclic, Copy and Paste Flipped, and basic NLA
 are not repeated: see the end of the file.
 
+<!-- skill-navigation:start -->
 ## Reading Map
 
-- Stop-motion and stepped looks
+- [Stylized animation, physics and jiggle recipes](#stylized-animation-physics-and-jiggle-recipes)
+- [Stop-motion and stepped looks](#stop-motion-and-stepped-looks)
   - Clay fingerprint and boil jitter
   - Block in Constant, then splines, then Bezier
-  - Stop-Mo: one-click stepped animation
-- Keys and the Graph Editor
+  - [Stop-motion and stepped looks](#stop-motion-and-stepped-looks): one-click stepped animation
+- [Keys and the Graph Editor](#keys-and-the-graph-editor)
   - Keying sets and Only Active Keying Set
   - Handle shaping: ease, overshoot, rest
   - Ball bounce with squash and stretch
-- Cycles and loops
+- [Cycles and loops](#cycles-and-loops)
   - Walk cycle polish
   - 16-frame box-character walk
   - Pivot flipper animation without a rig
   - Mograph Array twirl loop
   - Looping balls on curves
-- Secondary motion and acting
+- [Secondary motion and acting](#secondary-motion-and-acting)
   - Offset keys for follow-through
   - Constant shape-key blink
   - Coffee wobble without a sim
   - Anime tear on a path
-- Actions, NLA and mocap
+- [Actions, NLA and mocap](#actions-nla-and-mocap)
   - Slotted actions
   - NLA mixing: Hold Forward, influence, Combine
   - Mocap retarget with Rokoko
-- Audio and procedural motion
+- [Audio and procedural motion](#audio-and-procedural-motion)
   - Shape key driven by audio
   - Procedural wind on instances
-- Physics and particles
+- [Physics and particles](#physics-and-particles)
   - Rigid-body spring jiggle
   - Box-proxy ragdoll
   - Jelly soft body with Cloth pressure
@@ -46,8 +48,9 @@ are not repeated: see the end of the file.
   - Hair dynamics trick
   - Floating dust particles
   - Particle explosion with random colours
-- Add-ons
-- Already covered elsewhere
+- [Add-ons](#add-ons)
+- [Already covered elsewhere](#already-covered-elsewhere)
+<!-- skill-navigation:end -->
 
 ## Stop-motion and stepped looks
 
@@ -287,13 +290,13 @@ are not repeated: see the end of the file.
 - Steps:
   1. Model the egg and chick, join with the egg second (active). Mesh data > Shape Keys: Basis plus "Open"; in edit mode lift the shell and chick parts so the chick shows. Shell: Solidify Thickness 0.01 m, Offset -1, Fill Rim on.
   2. Armature with one bone "Driver". Right-click the Open key's Value > Add Driver: Scripted Expression `var`, variable type Single Property or Transform Channel on the Armature, Bone Driver, Z Location (World Space).
-  3. Pose mode `I` for location, delete the other channels so only the driven axis stays. Graph Editor: Key > Bake Sound to F-Curves, Lowest 20, Highest 200, Attack 0.005, Release 0.200, Threshold 0 (verified), pick the music file.
+  3. Pose mode `I` for location, delete the other channels so only the driven axis stays. Graph Editor: Channel > Sound to Samples (Key > Bake Sound to F-Curves before 4.1), Lowest 20, Highest 200, Attack 0.005, Release 0.200, Threshold 0 (verified), pick the music file.
   4. Pose Context > Bake Action (`F3` "bake action"): Only Selected Bones off, Bake Data Pose, Start 1 to the end of the song. Delete every channel except the driver location and scale the curve in Y until it peaks at 1 (the baked curve peaked near 0.5).
   5. Audio only plays if added in the Video Sequencer (Add > Sound, same file, start 1).
   6. Wave: each ring is a parented Empty (Row.000 to Row.004), keys offset 2 to 4 frames per row; duplicate the driver bone per row and offset its keys.
 - Principle: the bone location is the single driver value; baked sound is an editable curve and the driver maps it to 0 to 1.
 - Other tools: three.js `morphTargetInfluences` from an AnalyserNode band, Godot spectrum analyzer into a blend shape, Unity `GetSpectrumData` into a blend shape weight. Untested.
-- Pitfall: the 2.80 frames use Auto Smooth, removed in 4.1 (use Shade Auto Smooth or Smooth by Angle). Bake Sound to F-Curves still exists in the Graph Editor Key menu.
+- Pitfall: the 2.80 frames use Auto Smooth, removed in 4.1 (use Shade Auto Smooth or Smooth by Angle). Bake Sound to F-Curves is now Channel > Sound to Samples in the Graph Editor (`graph.sound_to_samples`, seen in 5.3).
 
 ### Procedural wind on instances
 
