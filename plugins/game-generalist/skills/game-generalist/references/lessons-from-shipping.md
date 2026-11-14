@@ -5,6 +5,8 @@ hand, not the whole file.
 
 ## Reading Map
 
+- [Scope churn kills the entry](#scope-churn-kills-the-entry)
+- [Onboarding and the first minute](#onboarding-and-the-first-minute)
 - [Screens the bot skips](#screens-the-bot-skips)
 - [Composed pictures: generator and preview](#composed-pictures-generator-and-preview)
 - [Figures and icons at low resolution](#figures-and-icons-at-low-resolution)
@@ -14,6 +16,32 @@ hand, not the whole file.
 - [Mechanics and depth](#mechanics-and-depth)
 - [Parallel workers on one codebase](#parallel-workers-on-one-codebase)
 - [Text, splash art and rebuilds](#text-splash-art-and-rebuilds)
+
+## Scope churn kills the entry
+
+A jam entry was dropped 36 h before its deadline after its core loop changed four times in three days (scan, ball
+decoy, parkour, a blind sound-hunting monster) and its name five times.
+
+- After the step 4 freeze, a new core idea is a restart at step 4, not a feature. Say so with the cost in hours
+  against the deadline, and build it as a separate greybox while the frozen build stays shippable. Swap only after
+  the owner plays the new greybox and says yes.
+- A new movement mechanic (jump, parkour, climb) is a greybox room first; wire it into the level only after a yes.
+- Pick the title once, from a short list at step 1. Lock the story and the voice line list before recording.
+- When a mechanic is removed, grep every trigger that depends on it (voice lines, hints, counters, achievements) and
+  replay a full run to count silent stretches: removing a scan once muted the whole narrator.
+
+## Onboarding and the first minute
+
+- The first route is linear. An open map before the player knows the rules left the owner unable to say how to play.
+- Teach one mechanic at a time. A control that is not taught yet is disabled, and a physical gate (door, grate)
+  stops the player from skipping a lesson.
+- Every interactable shows a prompt at range with the real key or mouse-button icon for the current input device.
+- A player choice is not automated away: no auto-pickup when picking up is a decision.
+- Every system changes a player decision or it is cut. A charge or wake meter nobody plans around is noise.
+- Check the first 10 s of a real capture: the core visual must read at once, not after a few seconds of staring.
+- Every pressure curve (heart rate, noise, stress) starts slow for a new player and falls again when the player
+  stops. Run the first room with a new-player bot (no optimal inputs) and check that the curve has a floor.
+- Text the player must read uses a legible font; ASCII or glyph styling is decoration only.
 
 ## Screens the bot skips
 
@@ -86,3 +114,5 @@ picture (cutscene tableau, logo, HUD icon, title art):
   dark against bright pixels): a transparent source turned into a white box.
 - Tell the owner before closing their running game to rebuild, batch fixes into one rebuild, and reopen it afterwards
   without being asked.
+- Launch the game with no console window (no `cmd /K` launcher), and confirm the game window is on screen before
+  saying the build is open.
