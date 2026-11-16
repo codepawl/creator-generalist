@@ -70,15 +70,20 @@ def uv_python(*arguments, packages=()):
 def get_link(url, out_folder, language, log):
     info_path = out_folder / "info.json"
     result = log.run("info", ["yt-dlp", "--js-runtimes", "node", "--encoding", "utf-8", "--skip-download", "--dump-json",
-                              "--write-comments", "--extractor-args", "youtube:max_comments=5,all,all,all", url], timeout=300)
+                              "--write-comments", "--extractor-args",
+                              # Top-level threads only (no replies), sorted by top: "5,all,all,all" returned one
+                              # thread of replies with no like counts (2026-11-16).
+                              "youtube:max_comments=60,60,0,0;comment_sort=top", url], timeout=300)
     info = {}
     if result:
         info = json.loads(result.stdout.splitlines()[-1])
         keep = ["id", "title", "channel", "uploader", "upload_date", "duration", "description", "chapters", "heatmap",
                 "language", "view_count", "like_count", "categories", "tags", "webpage_url"]
         slim = {key: info.get(key) for key in keep}
+        comments_by_likes = sorted(info.get("comments") or [], key=lambda comment: -(comment.get("like_count") or 0))
         slim["comments"] = [{"author": comment.get("author"), "text": comment.get("text"), "likes": comment.get("like_count"),
-                             "pinned": comment.get("is_pinned")} for comment in (info.get("comments") or [])[:5]]
+                             "pinned": comment.get("is_pinned"), "by_uploader": comment.get("author_is_uploader")}
+                            for comment in comments_by_likes[:20]]
         info_path.write_text(json.dumps(slim, ensure_ascii=False, indent=1), encoding="utf-8")
         info = slim
     caption_language = language or info.get("language") or "en"
