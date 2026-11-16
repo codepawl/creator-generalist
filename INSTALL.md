@@ -57,6 +57,7 @@ Otherwise:
    - `plugins/3d-generalist/skills/build-minecraft-model-from-image`
    - `plugins/2d-generalist/skills/draw-and-paint-art`
    - `plugins/2d-generalist/skills/paint-stylized-backgrounds`
+   - `plugins/2d-generalist/skills/paint-with-code`
    - `plugins/watch-video/skills/watch-video`
    - `plugins/design-sound/skills/design-sound`
 3. Gemini CLI: copy `harness/gemini/3dg.toml`, `harness/gemini/2dg.toml` and `harness/gemini/gameg.toml` to the commands folder.
@@ -92,7 +93,7 @@ yes. Optional tools are listed, not installed.
 
 1. Ask your agent to list its skills, or check the folders. `3d-generalist`, `2d-generalist`, `game-generalist`,
    `model-characters`, `use-3d-software`, `edit-video`, `animate-characters`,
-   `rig-characters`, `sculpt-models`, `visualize-in-3d`, `make-pixel-splats`, `build-house-from-plan`, `build-minecraft-model-from-image`, `draw-and-paint-art`, `paint-stylized-backgrounds`, `watch-video` and `design-sound` must be there.
+   `rig-characters`, `sculpt-models`, `visualize-in-3d`, `make-pixel-splats`, `build-house-from-plan`, `build-minecraft-model-from-image`, `draw-and-paint-art`, `paint-stylized-backgrounds`, `paint-with-code`, `watch-video` and `design-sound` must be there.
 2. Run `/2dg audit` (Claude Code: `/2d-generalist:2dg audit`) if your agent has commands.
 3. If Blender is installed, run `blender --version`.
 
