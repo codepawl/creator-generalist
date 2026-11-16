@@ -3,10 +3,10 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-E9F5F0?style=flat-square&labelColor=0A1D1A"></a>
-  <img alt="2D and 3D" src="https://img.shields.io/badge/skills-2D%20%2B%203D-F7C948?style=flat-square&labelColor=0A1D1A">
-  <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-4DB6FF?style=flat-square&labelColor=0A1D1A">
-  <img alt="Works with Codex, Cursor, Gemini CLI and OpenCode" src="https://img.shields.io/badge/also-Codex%20%C2%B7%20Cursor%20%C2%B7%20Gemini%20%C2%B7%20OpenCode-12302B?style=flat-square&labelColor=0A1D1A">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-4f4e5a?style=flat-square&labelColor=2a282d"></a>
+  <img alt="2D and 3D" src="https://img.shields.io/badge/skills-2D%20%2B%203D-4f4e5a?style=flat-square&labelColor=2a282d">
+  <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-4f4e5a?style=flat-square&labelColor=2a282d">
+  <img alt="Works with Codex, Cursor, Gemini CLI and OpenCode" src="https://img.shields.io/badge/also-Codex%20%C2%B7%20Cursor%20%C2%B7%20Gemini%20%C2%B7%20OpenCode-4f4e5a?style=flat-square&labelColor=2a282d">
 </p>
 
 Install the pack one time. After that, your agent can work like a 2D and 3D generalist and a small game studio.
@@ -236,3 +236,25 @@ ChatGPT. The wordmark uses [Sora](https://fonts.google.com/specimen/Sora) (SIL O
 ## License
 
 [MIT](LICENSE) © CodePawl
+
+<br>
+
+<p align="center">
+  <a href="https://codepawl.com">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/codepawl/.github/main/brand/codepawl-lockup-dark.png">
+      <img alt="CodePawl" src="https://raw.githubusercontent.com/codepawl/.github/main/brand/codepawl-lockup.png" width="160">
+    </picture>
+  </a>
+  <br>
+  <sub>Made by CodePawl, an independent 3D studio in Vietnam.</sub>
+  <br>
+  <sub>
+    <a href="https://codepawl.com">Website</a> ·
+    <a href="https://x.com/codepawl">X</a> ·
+    <a href="https://github.com/codepawl">GitHub</a> ·
+    <a href="https://huggingface.co/codepawl">Hugging Face</a> ·
+    <a href="https://www.youtube.com/@codepawlhq">YouTube</a> ·
+    <a href="https://www.threads.com/@codepawl">Threads</a>
+  </sub>
+</p>
