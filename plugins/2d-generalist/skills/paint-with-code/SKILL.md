@@ -23,7 +23,11 @@ uv tool install git+https://github.com/codepawl/paintkit   # or: pip install git
 ```bash
 paintkit paint picture.jpg -o painting.png --size 2048          # long side in px
 paintkit film picture.jpg -o painting.mp4 --size 1024 --still painting.png
+paintkit paint picture.jpg -o painting.png --size 2048 --painter glazing   # closer to the picture, deeper darks
 ```
+
+`--painter glazing` (paintkit 0.2.0) glazes until the paper matches the picture: 40 washes, reserved lights, darker
+darks. It is slower than the default `classic` painter: about 5 minutes for a 2048 px picture on one core.
 
 Time on one CPU core: 1400 px about 30 s, 4096 px 8 to 12 min. Run several pictures as parallel processes at low
 priority, not one big job.
