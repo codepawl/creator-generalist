@@ -73,6 +73,7 @@ those on its own too.
 | **[rig-characters](plugins/3d-generalist/skills/rig-characters/SKILL.md)** | a rig for a character, face, prop or puppet | Bone naming, Rigify, weights, IK with poles, IK/FK snapping, face rigs, mechanical rigs, 2D cut-out rigs and export to Unity, Godot and glTF |
 | **[draw-and-paint-art](plugins/2d-generalist/skills/draw-and-paint-art/SKILL.md)** | drawing, painting or a figure check | Gesture and construction, anatomy and foreshortening, light and form, colouring grayscale, Krita and Grease Pencil, turnaround sheets for 3D |
 | **[paint-stylized-backgrounds](plugins/2d-generalist/skills/paint-stylized-backgrounds/SKILL.md)** | a background in any style | Blender render settings, 3D blockout and paint-over, brushes, time-of-day variants, parallax, wind, water and particle effects |
+| **[paint-with-code](plugins/2d-generalist/skills/paint-with-code/SKILL.md)** | a watercolour painting from any picture, filmed stroke by stroke | paintkit code brushes, crops that keep the subject, seamless carousel strips, process videos |
 
 **Tool skills**
 
@@ -93,7 +94,7 @@ those on its own too.
 |---|---|---|
 | **[design-sound](plugins/design-sound/skills/design-sound/SKILL.md)** | SFX, foley, music or a mix for a video, game or reel | A sound library searched by meaning (CLAP) with sheets to look at before choosing, web and ElevenLabs fetching, foley generated from a silent film with a local video-to-audio model (HunyuanVideo-Foley), an effects stem placed from an event list, music fitted to the cut, and a mix to platform loudness checked for sync, masking and phone audibility |
 
-`model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters`, `rig-characters`, `visualize-in-3d`, `make-pixel-splats`, `build-house-from-plan` and `build-minecraft-model-from-image` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art` and `paint-stylized-backgrounds` come with the 2d-generalist plugin. `watch-video`, `design-sound` and `game-generalist` are their own plugins.
+`model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters`, `rig-characters`, `visualize-in-3d`, `make-pixel-splats`, `build-house-from-plan` and `build-minecraft-model-from-image` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art`, `paint-stylized-backgrounds` and `paint-with-code` come with the 2d-generalist plugin. `watch-video`, `design-sound` and `game-generalist` are their own plugins.
 Install all five plugins to get every skill. `2d-generalist` ships its own copy of the production spine and of
 `compare_look.py`, so each of the two plugins also works installed alone.
 
@@ -157,6 +158,7 @@ npx skills add codepawl/creator-generalist
    - `plugins/3d-generalist/skills/build-minecraft-model-from-image`
    - `plugins/2d-generalist/skills/draw-and-paint-art`
    - `plugins/2d-generalist/skills/paint-stylized-backgrounds`
+   - `plugins/2d-generalist/skills/paint-with-code`
    - `plugins/watch-video/skills/watch-video`
    - `plugins/design-sound/skills/design-sound`
 2. Use the folder of your agent: `~/.claude/skills/`, `~/.agents/skills/`, `~/.cursor/skills/`, `~/.gemini/skills/`

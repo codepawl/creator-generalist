@@ -19,7 +19,7 @@ editorial motion graphics) and `game-generalist` (playable games on web, Godot, 
 - `use-3d-software` lives in the `3d-generalist` plugin and `edit-video` in the `2d-generalist` plugin.
   They are tool skills the generalists call. Do not add a separate plugin for them.
 - The craft skills `animate-characters` and `rig-characters` live in the `3d-generalist` plugin, `draw-and-paint-art`
-  and `paint-stylized-backgrounds` in the `2d-generalist` plugin. They own one craft across tools and link to the
+  `paint-stylized-backgrounds` and `paint-with-code` (watercolour by the paintkit code brushes) in the `2d-generalist` plugin. They own one craft across tools and link to the
   tool skills for software recipes.
 - `watch-video` is its own plugin: the learning skill (watch a video, remake recipe, tutorial channel into a verified
   skill). It ships `scripts/transcribe.py` and `data/blender-names.json`; regenerate the JSON with
