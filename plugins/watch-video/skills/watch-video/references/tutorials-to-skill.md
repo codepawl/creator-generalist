@@ -33,7 +33,7 @@ Mark each entry `verified` (with how) or fix it. Order, cheapest first:
    names against its current manual (DaVinci Resolve reference manual, Krita docs, Godot docs).
 2. **Values on screen.** Every `[frame mm:ss]` and every number that decides the look (voxel size, strength, count,
    colour) is read from one full-size frame at that time:
-   `yt-dlp --download-sections "*<s>-<s+2>" -f "bv*[height<=1080]" -o "$S/clip.%(ext)s" <url>`, then
+   `yt-dlp --download-sections "*<s>-<s+2>" -f "bv*" -S "res:1080" -o "$S/clip.%(ext)s" <url>`, then
    `ffmpeg -i clip -frames:v 1 frame.png`. More than 5 frames: a subagent reads them. Fix the note to what
    the frame shows.
 3. **Meaning.** For each technique, the frame at the end of its segment shows the result. If "what it makes" in the

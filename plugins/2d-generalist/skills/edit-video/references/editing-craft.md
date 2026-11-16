@@ -55,6 +55,20 @@ the buttons. Platform numbers change often, so check the platform's help page be
 1. Use a hard cut by default. Use a styled transition only when it carries meaning or energy (a whip pan on a beat).
 2. Keep one transition family per piece.
 
+**Joins in explainer Shorts (measured)**
+Three popular explainer Shorts were measured frame by frame (a 3D render explainer with 17 cuts, a game-dev tutorial with 38, a stock-footage science Short with 11). None had a crossfade at any cut. What they did instead:
+1. Hard cut on an event: a sentence start, a key noun, a click, an impact. In a tutorial every UI step gets its own cut, at the click.
+2. Cut while something is already moving (objects falling, a cursor travelling, facets turning). Never cut from a still to a still.
+3. Change scale or angle at the cut and keep one anchor fixed on screen: the subject's position, a HUD counter, the cursor. A wide shot cut to a macro of the same pile reads as a punch-in, not a jump.
+4. Swap in place: same framing, and the state changes (a menu opens, a render setting flips, a card swaps for the 3D view behind it). This was about as common as a crop change.
+5. At most one special join per beat, used for a reason: one whip with motion blur on a change of subject, a dip to dark or an exposure flash to mark a new scene, a foreground object that wipes the frame. Everything else stays hard.
+6. Overlays (outlines, labels, "?" marks, cards) pop in a few frames after the cut lands, never on the cut frame. The old caption leaves on the old shot; the new one arrives on the new shot.
+7. A reference card enters blurred or pixelated and sharpens over about 0.7 s while the background defocuses. It holds 2 to 3 s once sharp, then shrinks or slides out over 0.3 to 0.5 s.
+8. Keep something moving inside every shot: a slow drift or push, a live counter ticking every 0.25 to 0.5 s, a gizmo that rotates. A visible change every 1 to 3 s.
+9. Alternate background type and brightness between neighbouring shots so a hard cut reads as intended.
+- Use when / pitfalls: crossfades, slides, zooms and spins between shots are the slideshow look viewers call cheap ("PowerPoint"). The stock-footage Short with text fading on gradient cards looked weakest of the three. Two joins that are really one camera move (the same camera continuing, the same object from the same angle) play as one seamless shot, with no transition.
+- Check: `uv run --no-project --with numpy python <skill>/scripts/check_blended_cuts.py <video>` lists every crossfade or dissolve (frames that mix the shot before and after; dips to black and flashes are allowed) and exits 1 if any is found. Run it on each preview before it goes out.
+
 ## Beat sync
 
 **Cut on the beat**

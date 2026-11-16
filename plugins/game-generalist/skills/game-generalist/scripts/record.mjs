@@ -327,7 +327,7 @@ function muxAligned({ videoPath, audioPath, videoStart, audioStart }) {
 }
 
 function findMarkerFlash({ videoPath, expectedFlashSeconds }) {
-  const flashSeconds = findFlashSeconds(videoPath, { flashMs: MARKER_FLASH_MS });
+  const flashSeconds = findFlashSeconds(videoPath, { flashMs: MARKER_FLASH_MS, allowLeadingPartial: true, checkPulseLength: true });
   if (flashSeconds === null) return null;
   return Math.abs(flashSeconds - expectedFlashSeconds) <= MARKER_POSITION_TOLERANCE_SECONDS ? flashSeconds : null;
 }
@@ -342,13 +342,15 @@ async function captureFiles(chromium, workFolder, botAct) {
     recordVideo: { dir: workFolder, size: { width: videoWidth, height: videoHeight } },
   });
   await context.addInitScript({ content: buildRecorderInitScript() });
-  const pageCreatedAt = Date.now();
   const page = await context.newPage();
   const builtUrl = buildTargetUrl(positionals[0]);
   await page.goto(values.autostart ? addAutostartParameter(builtUrl) : builtUrl, { waitUntil: "load" });
+  const pageLoadedAt = Date.now();
   await page.evaluate(() => window.__recorderApi.start());
   await sleep(SETTLE_BEFORE_MARKER_MS);
-  const expectedFlashSeconds = (Date.now() - pageCreatedAt) / 1000;
+  // The video clock starts around the end of loading, not at page creation (a 2.5 s load under contention put the
+  // marker 2.5 s off a creation-based guess and it was rejected), so the position is counted from the load event.
+  const expectedFlashSeconds = (Date.now() - pageLoadedAt) / 1000;
   await page.evaluate(([flashMs, beepMs]) => window.__recorderApi.marker(flashMs, beepMs), [MARKER_FLASH_MS, MARKER_BEEP_MS]);
   await playForSeconds(page, botAct);
   await sleep(TAIL_PAD_MS);
@@ -392,5 +394,7 @@ try {
   console.log(`audio-video offset used: ${offsetMs} ms (flash at ${flashSeconds.toFixed(3)} s in the video, beep at ${beepSeconds.toFixed(3)} s in the audio)`);
   console.log(`wrote ${outputPath}`);
 } finally {
-  rmSync(workFolder, { recursive: true, force: true });
+  // RECORD_KEEP_WORK=1 keeps the raw video and audio of every attempt, for finding why a marker was missed.
+  if (process.env.RECORD_KEEP_WORK) console.error(`raw captures kept in ${workFolder}`);
+  else rmSync(workFolder, { recursive: true, force: true });
 }

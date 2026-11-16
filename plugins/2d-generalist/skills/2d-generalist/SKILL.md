@@ -41,7 +41,7 @@ answer picks the next round: fix, continue in a direction, or "you decide" free 
 | 2. Reference | `refs/`, `refs/NOTES.md` | real photos, scans, documents and footage via `scripts/fetch_images.py` (`references/real-images.md`); real data for maps and charts; a Vox look starts from `references/vox-modern-measured.md` |
 | 3. Script and beats | `script.md`, `beats.md`, scratch voice, cue list | `references/explainer-script.md` |
 | 4. Prep and look gate | `plan.md` (sketch, tools checked, photos and data downloaded), style frames A/B/C, animatic of the beats, then `LOOK.md`, `recipe.json` | the user picks; one anchor with asymmetric scale and the Look-Away / Look-Back Test (`references/vox-psychology-and-design.md`); default flat paper and print borders, grain, ink bleed, torn edges and halftone only when the pick is a stylised option (`references/textures-retro-and-shading.md`); then `scripts/validate_vox_recipe.py --recipe recipe.json` (the recipe's `look` is `flat` by default, `stylised` only when `LOOK.md` picks it) |
-| 5. Assets and check | `assets/`, `CREDITS.md` | `scripts/rework_image.py` for cut-outs, `scripts/generate_vox_assets.py` for the filters and ruler timelines the recipe uses; every picture sourced or the search named |
+| 5. Assets and check | `assets/`, `CREDITS.md` | `scripts/rework_image.py` for cut-outs, `scripts/generate_vox_assets.py` for a dot grid, cross grid, diagonal hatch and paper grain SVG plus the palettes JSON (rulers and torn or ink-bleed edges are built in the scene or with `rework_image.py --torn`); every picture sourced or the search named |
 | 6. Build and animate | scenes, WIP demo after the first | Remotion + SVG filters + Three.js, Fusion (`ImagePlane3D`, `Camera3D`) or Blender Grease Pencil per `references/2d-3d-toolchain-matrix.md`; mode references above; posterize graphics at 8 to 12 fps only when `LOOK.md` picks a stylised look (flat and `vox-now`: no posterize), camera never posterized; finish with 35mm DoF, vignette and a light unsharp, grain and chromatic aberration only if `LOOK.md` says |
 | 7. Sound | final voice, SFX, music, mix | `design-sound`: every visible stroke, pop and wipe gets its own sound at its frame |
 | 8. QA, preview, final | gate report, 540p preview with sound | `scripts/check_render.py` and the contact sheet per `references/qa-and-gates.md`, look match with `scripts/compare_look.py`; the user approves the preview before the full render |
@@ -67,6 +67,6 @@ Craft skills for single steps: `draw-and-paint-art` (drawing, figures, painting 
 ## Scripts & References
 
 - Toolchain audit: [`scripts/check_vox_toolchain.py`](scripts/check_vox_toolchain.py)
-- Asset & SVG filter generator: [`scripts/generate_vox_assets.py`](scripts/generate_vox_assets.py)
+- Texture SVG and palette generator (dot grid, cross grid, diagonal hatch, paper grain, palettes JSON): [`scripts/generate_vox_assets.py`](scripts/generate_vox_assets.py)
 - Recipe validator: [`scripts/validate_vox_recipe.py`](scripts/validate_vox_recipe.py)
 - Unit tests: [`scripts/test_vox_skill.py`](scripts/test_vox_skill.py)

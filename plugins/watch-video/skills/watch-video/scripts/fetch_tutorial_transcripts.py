@@ -27,6 +27,8 @@ import tempfile
 import time
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import ytdlp_runner  # noqa: E402  (after the path line: python -I drops the script folder from the path)
 
 SCRIPT_FOLDER = pathlib.Path(__file__).resolve().parent
 BUNDLED_TRANSCRIBE = pathlib.Path(__file__).resolve().parent / "transcribe.py"  # the public pack ships a copy here
@@ -43,8 +45,7 @@ def load_captions_module():
 
 
 def run_yt_dlp(arguments):
-    command = ["yt-dlp", "--js-runtimes", "node", "--encoding", "utf-8", "--ignore-errors", *arguments]
-    return subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return ytdlp_runner.run_yt_dlp(["--ignore-errors", *arguments])
 
 
 def number_or_zero(text):
@@ -59,6 +60,8 @@ def list_videos(urls):
     template = "%(id)s\t%(title)s\t%(duration)s\t%(view_count)s\t%(upload_date)s"
     for url in urls:
         result = run_yt_dlp(["--flat-playlist", "--print", template, url])
+        if result.returncode != 0 and not result.stdout.strip():
+            sys.exit(f"yt-dlp listed no videos for {url} (exit code {result.returncode}): {ytdlp_runner.explain_failure(result)}")
         for line in result.stdout.splitlines():
             parts = line.split("\t")
             if len(parts) != 5 or not parts[0]:
@@ -119,7 +122,11 @@ def fetch_captions(video, caption_folder, language, captions_module):
     ])
     caption_file = choose_caption_file(caption_folder, video["id"])
     if caption_file is None:
-        return "limited" if RATE_LIMITED.search(result.stderr) else "none"
+        if RATE_LIMITED.search(result.stderr):
+            return "limited"
+        if result.returncode != 0 and ytdlp_runner.CERTIFICATE_ERROR.search(result.stderr):
+            sys.exit(f"yt-dlp failed on a certificate error even after the truststore retry: {ytdlp_runner.explain_failure(result)}")
+        return "none"
     _, lines = captions_module.words_and_lines(caption_file.read_text(encoding="utf-8"))
     return lines
 

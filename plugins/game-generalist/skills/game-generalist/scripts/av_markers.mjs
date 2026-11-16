@@ -7,6 +7,9 @@ import { spawnSync } from "node:child_process";
 // falling edge) and a page that is merely bright.
 const MIN_EDGE_LUMA_STEP = 25;
 const MAX_PULSE_SECONDS = 2;
+// With checkPulseLength, a pulse whose measured length is further than this from the length the page drew is
+// rejected: a stalled screencast delays one edge and would skew the start time by half the stall.
+const MAX_PULSE_LENGTH_ERROR_SECONDS = 0.15;
 const BEEP_AMPLITUDE_THRESHOLD = 0.1;
 const PCM_SAMPLE_RATE = 16000;
 const MAX_OUTPUT_BYTES = 256 * 1024 * 1024;
@@ -43,6 +46,24 @@ function medianFrameInterval(frames) {
   return gaps[Math.floor(gaps.length / 2)];
 }
 
+// Playwright's video can begin after the flash has already started, so the capture opens on a bright frame and
+// the rising edge is missing. Such a pulse counts only when it stays bright for a few frames, which a one-frame
+// blank start does not.
+const MIN_LEADING_PULSE_SECONDS = 0.12;
+
+function findLeadingPartialPulse(frames) {
+  if (frames.length < 2) return null;
+  for (let fallIndex = 1; fallIndex < frames.length; fallIndex += 1) {
+    if (frames[fallIndex].time - frames[0].time > MAX_PULSE_SECONDS) return null;
+    const fellFromStart = frames[0].luma - frames[fallIndex].luma >= MIN_EDGE_LUMA_STEP;
+    if (fellFromStart && frames[fallIndex - 1].luma - frames[fallIndex].luma >= MIN_EDGE_LUMA_STEP) {
+      const brightSeconds = frames[fallIndex].time - frames[0].time;
+      return brightSeconds >= MIN_LEADING_PULSE_SECONDS ? { fallIndex } : null;
+    }
+  }
+  return null;
+}
+
 function findFirstPulse(frames) {
   for (let riseIndex = 1; riseIndex < frames.length; riseIndex += 1) {
     if (frames[riseIndex].luma - frames[riseIndex - 1].luma < MIN_EDGE_LUMA_STEP) continue;
@@ -58,13 +79,20 @@ function findFirstPulse(frames) {
 // seen up to one frame late. Both edges are seen late by a related amount, so their mean cancels most of it
 // when the flash lasts an odd number of half frames (180 ms at 25 fps); half a frame is what is left.
 // flashMs is the length the page drew the flash for.
-export function findFlashSeconds(videoPath, { flashMs } = {}) {
+// With allowLeadingPartial and a flashMs, a capture that opens inside the flash is dated from its falling edge alone.
+export function findFlashSeconds(videoPath, { flashMs, allowLeadingPartial = false, checkPulseLength = false } = {}) {
   const frames = readFrameBrightness(videoPath);
   const pulse = findFirstPulse(frames);
+  const leadingPulse = allowLeadingPartial && flashMs ? findLeadingPartialPulse(frames) : null;
+  const pulseStartsFirst = pulse && (!leadingPulse || frames[pulse.riseIndex].time < frames[leadingPulse.fallIndex].time);
+  if (leadingPulse && !pulseStartsFirst) {
+    return frames[leadingPulse.fallIndex].time - flashMs / 1000 - medianFrameInterval(frames) / 2;
+  }
   if (!pulse) return null;
   const riseTime = frames[pulse.riseIndex].time;
   if (!flashMs) return riseTime;
   const fallTime = frames[pulse.fallIndex].time;
+  if (checkPulseLength && Math.abs(fallTime - riseTime - flashMs / 1000) > MAX_PULSE_LENGTH_ERROR_SECONDS) return null;
   const halfFrame = medianFrameInterval(frames) / 2;
   return (riseTime + fallTime - flashMs / 1000) / 2 - halfFrame;
 }

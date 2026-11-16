@@ -9,7 +9,7 @@
     {
       "name": "3d-generalist",
       "source": "./plugins/3d-generalist",
-      "description": "Full-pipeline 3D generalist studio for content creators: kitbashed scans, rigged characters, character modeling in any style, Blender, three.js and game engine steps, perspective cutaways, expressive acting, camera/lighting and anti-slop QA gates"
+      "description": "Full-pipeline 3D generalist studio for content creators: kitbashed scans, rigged characters, character modeling in any style, Blender, three.js and game engine steps, perspective cutaways, expressive acting, camera/lighting and anti-slop QA gates, plus 3D visualizations, pixel splat art, houses from plans and Minecraft-style models"
     },
     {
       "name": "2d-generalist",

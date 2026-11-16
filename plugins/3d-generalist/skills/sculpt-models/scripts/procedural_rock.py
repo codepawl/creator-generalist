@@ -2,7 +2,7 @@
 
 Block (convex hull of scattered points, cut by three joint sets) -> chips (flattened spheres subtracted at corners)
 -> voxel remesh -> chamfer smooth -> displacement by scale, fine layers masked to edges and base -> remesh -> low copy by
-QuadriFlow (Decimate when it cancels). Fracture planes follow a bedding set plus two steep cross sets, so the rock breaks like
+QuadriFlow (Decimate when it cancels or leaves the mesh unreduced). Fracture planes follow a bedding set plus two steep cross sets, so the rock breaks like
 real stone instead of a noise blob.
 
 Run:
@@ -184,8 +184,16 @@ def main():
     print(f"high faces {len(rock.data.polygons)}, low faces {len(low.data.polygons)} by {method} -> {out_path}")
 
 
+def triangle_count(mesh):
+    return sum(len(polygon.vertices) - 2 for polygon in mesh.polygons)
+
+
 def make_low_poly(obj, target_faces):
-    """QuadriFlow needs a manifold mesh with consistent normals; clean first, fall back to Decimate if it cancels."""
+    """Low copy near target_faces. QuadriFlow needs a manifold mesh with consistent normals, so clean first.
+
+    QuadriFlow can return FINISHED without remeshing (Blender 4.4 warns "The mesh needs to be manifold" and leaves the
+    mesh as it was), so the face count after it decides, not its return value. When it did not reduce, Decimate runs.
+    """
     activate(obj)
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
@@ -196,13 +204,19 @@ def make_low_poly(obj, target_faces):
     bpy.ops.mesh.select_non_manifold()
     bpy.ops.object.mode_set(mode="OBJECT")
     non_manifold = sum(1 for vertex in obj.data.vertices if vertex.select)
+    faces_before = len(obj.data.polygons)
     result = bpy.ops.object.quadriflow_remesh(mode="FACES", target_faces=target_faces)
-    if "FINISHED" in result:
+    faces_after = len(obj.data.polygons)
+    quadriflow_reduced = "FINISHED" in result and faces_after < faces_before // 2
+    if quadriflow_reduced:
         return f"QuadriFlow ({non_manifold} non-manifold vertices before)"
+    # Decimate collapse counts triangles, and a collapsed mesh is all triangles, so the ratio is taken over the
+    # triangles of the current mesh; a ratio over quads landed the low copy about 4x over target.
     decimate = obj.modifiers.new("decimate", "DECIMATE")
-    decimate.ratio = min(1.0, target_faces * 2 / max(1, len(obj.data.polygons)))
+    decimate.ratio = min(1.0, target_faces / max(1, triangle_count(obj.data)))
     bpy.ops.object.modifier_apply(modifier=decimate.name)
-    return f"Decimate (QuadriFlow cancelled, {non_manifold} non-manifold vertices)"
+    reason = "QuadriFlow did not reduce the mesh" if "FINISHED" in result else "QuadriFlow cancelled"
+    return f"Decimate ({reason}, {non_manifold} non-manifold vertices)"
 
 
 if __name__ == "__main__":
