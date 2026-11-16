@@ -12,11 +12,39 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+
+def discover_blender_paths() -> list[str]:
+    """Every installed Blender executable, newest version first.
+
+    A fixed list of versions went stale (4.4 and 4.5 were missed), so the install folders are searched instead.
+    """
+    search_patterns: list[tuple[Path, str]] = []
+    for variable in ("ProgramFiles", "ProgramFiles(x86)", "LOCALAPPDATA"):
+        root = os.environ.get(variable)
+        if root:
+            search_patterns.append((Path(root) / "Blender Foundation", "Blender */blender.exe"))
+    search_patterns.append((Path("C:/Program Files/Blender Foundation"), "Blender */blender.exe"))
+    search_patterns.append((Path("/Applications"), "Blender*.app/Contents/MacOS/Blender"))
+    search_patterns.append((Path("/opt"), "blender*/blender"))
+    search_patterns.append((Path.home() / "Applications", "Blender*.app/Contents/MacOS/Blender"))
+
+    found: dict[str, tuple[int, ...]] = {}
+    for folder, pattern in search_patterns:
+        if not folder.is_dir():
+            continue
+        for executable in folder.glob(pattern):
+            is_mac_bundle = executable.name == "Blender"
+            version_folder_name = executable.parents[2].name if is_mac_bundle else executable.parent.name
+            version_numbers = re.findall(r"\d+", version_folder_name)
+            found[str(executable)] = tuple(int(number) for number in version_numbers)
+    return sorted(found, key=lambda path: found[path], reverse=True)
 
 
 TOOL_SPECS: list[dict[str, Any]] = [
@@ -26,14 +54,7 @@ TOOL_SPECS: list[dict[str, Any]] = [
         "category": "3d_and_25d",
         "required": True,
         "commands": ["blender"],
-        "candidate_paths": [
-            r"C:\Program Files\Blender Foundation\Blender 5.3\blender.exe",
-            r"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe",
-            r"C:\Program Files\Blender Foundation\Blender 5.1\blender.exe",
-            r"C:\Program Files\Blender Foundation\Blender 5.0\blender.exe",
-            r"C:\Program Files\Blender Foundation\Blender 4.3\blender.exe",
-            r"C:\Program Files\Blender Foundation\Blender 4.2\blender.exe",
-        ],
+        "candidate_paths": discover_blender_paths(),
         "version_args": ["--version"],
         "install_cmd": "winget install BlenderFoundation.Blender",
     },

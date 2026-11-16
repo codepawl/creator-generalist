@@ -2,11 +2,21 @@
   <img src="assets/banner.jpg" alt="creator-generalist: 2D and 3D skills for AI agents, with a water mill cutaway, a low-poly character and a Silk Road map made with them" width="100%">
 </p>
 
+<h3 align="center">2D, 3D and game skills that turn your agent into a generalist</h3>
+
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-4f4e5a?style=flat-square&labelColor=2a282d"></a>
   <img alt="2D and 3D" src="https://img.shields.io/badge/skills-2D%20%2B%203D-4f4e5a?style=flat-square&labelColor=2a282d">
   <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-4f4e5a?style=flat-square&labelColor=2a282d">
   <img alt="Works with Codex, Cursor, Gemini CLI and OpenCode" src="https://img.shields.io/badge/also-Codex%20%C2%B7%20Cursor%20%C2%B7%20Gemini%20%C2%B7%20OpenCode-4f4e5a?style=flat-square&labelColor=2a282d">
+</p>
+
+<p align="center">
+  <a href="#install">Install</a> ·
+  <a href="#the-skills">Skills</a> ·
+  <a href="#one-prompt-one-result">Examples</a> ·
+  <a href="https://crucible.codepawl.com">Crucible</a> ·
+  <a href="https://github.com/codepawl/creator-generalist/issues">Issues</a>
 </p>
 
 Install the pack one time. After that, your agent can work like a 2D and 3D generalist and a small game studio.
@@ -44,6 +54,15 @@ those on its own too.
 | **[2d-generalist](plugins/2d-generalist/skills/2d-generalist/SKILL.md)** | a Vox or Johnny Harris style explainer graphic | A footage-led Vox look with flat paper cards, print-bordered real photos, highlighters, maps, charts and true-scale timelines (torn paper, halftone and grain only as opt-in stylised looks), made with free tools |
 | **[game-generalist](plugins/game-generalist/skills/game-generalist/SKILL.md)** | a game prototype, a small original game, a game jam entry, a feel and QA pass on a playable | A playable greybox you try before any art, a locked look, an original game on web (three.js, Phaser, canvas), Godot, Unity or Unreal, and a playtest report from scripted bots (errors, win and lose paths, restart, determinism, frame time, softlocks) with a playable link and a 30 to 60 s capture |
 
+**More 3D skills**
+
+| Skill | Ask for | You get |
+|---|---|---|
+| **[visualize-in-3d](plugins/3d-generalist/skills/visualize-in-3d/SKILL.md)** | a place, a working system, an event on real land or how a thing works, shown in 3D | A live three.js app, film, lesson, documentary, action short or web game built from sourced models, each checked by its own frame review |
+| **[make-pixel-splats](plugins/3d-generalist/skills/make-pixel-splats/SKILL.md)** | pixel art dioramas from gaussian splats, or a video of how they are made | Scenes written as code (distance functions, baked light) rendered in [Crucible](https://crucible.codepawl.com), a crisp ink look with palette and contours, film plans and a "how it's made" explainer compositor |
+| **[build-house-from-plan](plugins/3d-generalist/skills/build-house-from-plan/SKILL.md)** | a floor plan or blueprint turned into a real-looking house | A Blender Cycles house checked by overlaying the build on the drawing, stills, a film of the walls rising, streets, and shop or kitchen fit-outs with clearance checks |
+| **[build-minecraft-model-from-image](plugins/3d-generalist/skills/build-minecraft-model-from-image/SKILL.md)** | a photo of an object turned into a Minecraft-style model | A few clean cuboids with pixel textures, exported to GLB with a viewer and renders |
+
 **Craft skills**
 
 | Skill | Ask for | You get |
@@ -74,7 +93,7 @@ those on its own too.
 |---|---|---|
 | **[design-sound](plugins/design-sound/skills/design-sound/SKILL.md)** | SFX, foley, music or a mix for a video, game or reel | A sound library searched by meaning (CLAP) with sheets to look at before choosing, web and ElevenLabs fetching, foley generated from a silent film with a local video-to-audio model (HunyuanVideo-Foley), an effects stem placed from an event list, music fitted to the cut, and a mix to platform loudness checked for sync, masking and phone audibility |
 
-`model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters` and `rig-characters` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art` and `paint-stylized-backgrounds` come with the 2d-generalist plugin. `watch-video`, `design-sound` and `game-generalist` are their own plugins.
+`model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters`, `rig-characters`, `visualize-in-3d`, `make-pixel-splats`, `build-house-from-plan` and `build-minecraft-model-from-image` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art` and `paint-stylized-backgrounds` come with the 2d-generalist plugin. `watch-video`, `design-sound` and `game-generalist` are their own plugins.
 Install all five plugins to get every skill. `2d-generalist` ships its own copy of the production spine and of
 `compare_look.py`, so each of the two plugins also works installed alone.
 
@@ -132,6 +151,10 @@ npx skills add codepawl/creator-generalist
    - `plugins/3d-generalist/skills/animate-characters`
    - `plugins/3d-generalist/skills/rig-characters`
    - `plugins/3d-generalist/skills/sculpt-models`
+   - `plugins/3d-generalist/skills/visualize-in-3d`
+   - `plugins/3d-generalist/skills/make-pixel-splats`
+   - `plugins/3d-generalist/skills/build-house-from-plan`
+   - `plugins/3d-generalist/skills/build-minecraft-model-from-image`
    - `plugins/2d-generalist/skills/draw-and-paint-art`
    - `plugins/2d-generalist/skills/paint-stylized-backgrounds`
    - `plugins/watch-video/skills/watch-video`

@@ -27,7 +27,7 @@ user already pays for them. Ask before suggesting a paid tool.
 
 | The task is | Read |
 | --- | --- |
-| Cutting craft in any editor: hook, pacing, J and L cuts, beat sync, captions, safe zones, platform export | `references/editing-craft.md` |
+| Cutting craft in any editor: hook, pacing, J and L cuts, which joins Shorts really use (hard cuts, no crossfades), beat sync, captions, safe zones, platform export | `references/editing-craft.md` |
 | Any Resolve step: free vs Studio, rules, scripting, checks | `references/resolve-basics.md` first |
 | Resolve Anim Curves, splines, beat sync, markers, scene cut detection | `references/edit-page-and-keyframes.md` |
 | Resolve transitions, stingers, zooms, wipes on adjustment clips | `references/transitions.md` |
@@ -64,6 +64,8 @@ Long references open with a reading map. Find the exact entry, then read the who
 - No eyebrow or helper text: no small muted line under or above a title (taglines, "humans: X / agents: Y",
   "paste into ..."), and no corner caption naming the shot, step or tool. The voice carries it; text on screen is
   only what the viewer must read (the title itself, code, a command).
+- Run `scripts/check_blended_cuts.py` on the export: it lists crossfades and dissolves between shots, which read as a
+  slideshow; replace each with a hard cut or one of the joins in `references/editing-craft.md`.
 - Measure the loudness of the export (`references/ffmpeg.md`, "Measure loudness") against the platform target.
 - Check duration, resolution, frame rate and codec with `ffprobe` against the platform limits.
 - Say which paid or Studio-only features were used and which free fallback replaced them.

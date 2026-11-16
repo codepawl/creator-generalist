@@ -13,10 +13,11 @@ import argparse
 import collections
 import pathlib
 import re
-import subprocess
 import sys
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import ytdlp_runner  # noqa: E402  (after the path line: python -I drops the script folder from the path)
 
 URL_PATTERN = re.compile(r"https?://[^\s)\]>\"']+")
 KIND_RULES = [
@@ -29,23 +30,28 @@ SKIPPED_HOSTS = re.compile(r"youtube\.com/(playlist|@|channel)|instagram\.com|ti
 
 
 def run_yt_dlp(arguments):
-    command = ["yt-dlp", "--js-runtimes", "node", "--encoding", "utf-8", "--ignore-errors", *arguments]
-    result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
-    return result.stdout
+    return ytdlp_runner.run_yt_dlp(["--ignore-errors", *arguments])
 
 
 def list_videos(url):
-    output = run_yt_dlp(["--flat-playlist", "--print", "%(id)s\t%(title)s", url])
+    result = run_yt_dlp(["--flat-playlist", "--print", "%(id)s\t%(title)s", url])
     videos = []
-    for line in output.splitlines():
+    for line in result.stdout.splitlines():
         video_id, _, title = line.partition("\t")
         if video_id:
             videos.append((video_id, title))
+    if not videos:
+        sys.exit(f"yt-dlp listed no videos for {url} (exit code {result.returncode}): {ytdlp_runner.explain_failure(result)}")
     return videos
 
 
 def read_description(video_id):
-    return run_yt_dlp(["--skip-download", "--print", "%(description)s", f"https://www.youtube.com/watch?v={video_id}"])
+    """The description text, or None when yt-dlp failed for this video (the reason goes to stderr)."""
+    result = run_yt_dlp(["--skip-download", "--print", "%(description)s", f"https://www.youtube.com/watch?v={video_id}"])
+    if result.returncode != 0 and not result.stdout.strip():
+        print(f"description of {video_id} failed (exit code {result.returncode}): {ytdlp_runner.explain_failure(result)}", file=sys.stderr)
+        return None
+    return result.stdout
 
 
 def classify(link, context_line):
@@ -67,9 +73,13 @@ def main():
 
     rows = collections.OrderedDict()
     raw_text = []
+    failed_descriptions = 0
     for url in arguments.urls:
         for video_id, title in list_videos(url):
             description = read_description(video_id)
+            if description is None:
+                failed_descriptions += 1
+                continue
             raw_text.append(f"=== {video_id} | {title}\n{description}")
             for line in description.splitlines():
                 for link in URL_PATTERN.findall(line):
@@ -83,6 +93,8 @@ def main():
                         rows[key] = {"kind": kind, "label": label[:90], "videos": []}
                     rows[key]["videos"].append(video_id)
 
+    if not raw_text:
+        sys.exit(f"no description could be read ({failed_descriptions} failed); nothing written. Details are above.")
     (out_folder / "descriptions.txt").write_text("\n\n".join(raw_text), encoding="utf-8")
     lines = ["# Resources from video descriptions", "", "Check each download row: price, licence, gate (email, sign-in, CAPTCHA).", ""]
     for kind in ["download", "membership", "reference", "shop", "other"]:
@@ -98,6 +110,8 @@ def main():
     (out_folder / "resources.md").write_text("\n".join(lines), encoding="utf-8")
     counts = collections.Counter(row["kind"] for row in rows.values())
     print(f"{len(raw_text)} descriptions, {len(rows)} links:", dict(counts), "->", out_folder / "resources.md")
+    if failed_descriptions:
+        sys.exit(f"{failed_descriptions} of {len(raw_text) + failed_descriptions} descriptions failed; resources.md is partial.")
 
 
 if __name__ == "__main__":

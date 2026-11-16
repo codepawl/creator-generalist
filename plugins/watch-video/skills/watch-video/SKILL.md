@@ -22,7 +22,8 @@ Read every item in that order before the first conclusion (sound, tone, screen t
 ## 1. Get the file and its context
 
 - Manual: `yt-dlp --js-runtimes node --encoding utf-8 --skip-download --dump-json --write-comments "<url>"` for info,
-  chapters, most replayed and comments; `-f "bv*[height<=720]+ba/b[height<=720]"` for the video.
+  chapters, most replayed and comments; `-f "bv*+ba/b" -S "res:720"` for the video (`res` is the short side, so
+  vertical reels work). Behind TLS-inspecting antivirus use `scripts/ytdlp_runner.py <yt-dlp args>` (truststore retry).
 - A playlist or a channel: run `scripts/harvest_resources.py "<url>" --out <folder>` first and read `resources.md`.
 - Get every free download in `resources.md` (textures, .blend, presets, fonts, music; licence risk: ask once) into a
   folder of its own, read-only, never run its scripts; say which were left and why. A CAPTCHA, a block on bots or AI

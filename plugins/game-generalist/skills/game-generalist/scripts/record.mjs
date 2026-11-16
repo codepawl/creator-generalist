@@ -3,7 +3,7 @@
  * Records a capture of real play with the game's own sound.
  * Video: Playwright recordVideo. Sound: every connection to an AudioContext destination is redirected
  * into a MediaStreamDestination feeding a MediaRecorder, so nothing reaches the machine's speakers.
- * A white flash plus a beep at t=0 mark the start; their offset between the two tracks is measured and
+ * A magenta flash plus a beep at t=0 mark the start; their offset between the two tracks is measured and
  * both tracks are trimmed to start just after the marker.
  */
 
@@ -13,7 +13,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
-import { findBeepSeconds, findFlashSeconds } from "./av_markers.mjs";
+import { findBeepSeconds, findFlashMarker } from "./av_markers.mjs";
 
 const USAGE = `Usage: node record.mjs <url-or-file> --seconds N --out capture.mp4 [options]
   --seconds N           length of the capture after the sync marker (default 10)
@@ -29,8 +29,6 @@ Sound never reaches the speakers: it goes only to the recorder.`;
 // of the 25 fps recording: long enough to be caught, and an odd number of half frames so the flash's two edges
 // together give a start time good to about half a frame (av_markers.mjs).
 const MARKER_FLASH_MS = 500;
-// A flash found this far from where the page drew the marker is the game's own flash, not the marker.
-const MARKER_POSITION_TOLERANCE_SECONDS = 1;
 const MARKER_BEEP_MS = 100;
 const SECONDS_TRIMMED_AFTER_MARKER_END = 0.1;
 const SETTLE_BEFORE_MARKER_MS = 400;
@@ -216,7 +214,7 @@ function buildRecorderInitScript() {
     },
     async marker(flashMs, beepMs) {
       const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:2147483647;pointer-events:none';
+      overlay.style.cssText = 'position:fixed;inset:0;background:#ff00ff;z-index:2147483647;pointer-events:none';
       document.documentElement.appendChild(overlay);
       await nextFrame();
       const oscillator = markerContext.createOscillator();
@@ -326,10 +324,11 @@ function muxAligned({ videoPath, audioPath, videoStart, audioStart }) {
   if (result.status !== 0) fail(`ffmpeg mux failed: ${result.stderr}`, 1);
 }
 
-function findMarkerFlash({ videoPath, expectedFlashSeconds }) {
-  const flashSeconds = findFlashSeconds(videoPath, { flashMs: MARKER_FLASH_MS });
-  if (flashSeconds === null) return null;
-  return Math.abs(flashSeconds - expectedFlashSeconds) <= MARKER_POSITION_TOLERANCE_SECONDS ? flashSeconds : null;
+// The marker is magenta and found on the chroma channel, so the page's own flashes and Playwright's white blank first
+// frame can never be mistaken for it, however slow the machine is.
+function findMarkerFlash({ videoPath }) {
+  const marker = findFlashMarker(videoPath, { flashMs: MARKER_FLASH_MS, allowLeadingPartial: true, checkPulseLength: true, signal: "chroma" });
+  return marker === null ? null : marker.seconds;
 }
 
 async function captureFiles(chromium, workFolder, botAct) {
@@ -342,13 +341,11 @@ async function captureFiles(chromium, workFolder, botAct) {
     recordVideo: { dir: workFolder, size: { width: videoWidth, height: videoHeight } },
   });
   await context.addInitScript({ content: buildRecorderInitScript() });
-  const pageCreatedAt = Date.now();
   const page = await context.newPage();
   const builtUrl = buildTargetUrl(positionals[0]);
   await page.goto(values.autostart ? addAutostartParameter(builtUrl) : builtUrl, { waitUntil: "load" });
   await page.evaluate(() => window.__recorderApi.start());
   await sleep(SETTLE_BEFORE_MARKER_MS);
-  const expectedFlashSeconds = (Date.now() - pageCreatedAt) / 1000;
   await page.evaluate(([flashMs, beepMs]) => window.__recorderApi.marker(flashMs, beepMs), [MARKER_FLASH_MS, MARKER_BEEP_MS]);
   await playForSeconds(page, botAct);
   await sleep(TAIL_PAD_MS);
@@ -358,7 +355,7 @@ async function captureFiles(chromium, workFolder, botAct) {
   await browser.close();
   const audioPath = join(workFolder, "audio.webm");
   writeFileSync(audioPath, Buffer.from(audioBase64, "base64"));
-  return { videoPath, audioPath, expectedFlashSeconds };
+  return { videoPath, audioPath };
 }
 
 const chromium = await loadChromium();
@@ -392,5 +389,7 @@ try {
   console.log(`audio-video offset used: ${offsetMs} ms (flash at ${flashSeconds.toFixed(3)} s in the video, beep at ${beepSeconds.toFixed(3)} s in the audio)`);
   console.log(`wrote ${outputPath}`);
 } finally {
-  rmSync(workFolder, { recursive: true, force: true });
+  // RECORD_KEEP_WORK=1 keeps the raw video and audio of every attempt, for finding why a marker was missed.
+  if (process.env.RECORD_KEEP_WORK) console.error(`raw captures kept in ${workFolder}`);
+  else rmSync(workFolder, { recursive: true, force: true });
 }

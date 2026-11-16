@@ -7,7 +7,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { findBeepSeconds, findFlashSeconds } from "../scripts/av_markers.mjs";
 
-const MAX_OFFSET_SECONDS = 0.05;
+// Two frames of the 25 fps recording: a flash is only seen on whole frames (40 ms apart), so a correct alignment
+// still measured 49 ms in 1 run in 40 against a 50 ms limit. The faults this guards against are 200 ms and more.
+const MAX_OFFSET_SECONDS = 0.08;
 const MIN_MAX_VOLUME_DB = -40;
 const MAX_DURATION_GAP_SECONDS = 0.25;
 const REQUESTED_SECONDS = 3;
@@ -68,7 +70,7 @@ if (existsSync(outputPath)) {
   if (flashSeconds !== null && beepSeconds !== null) {
     const offsetSeconds = Math.abs(flashSeconds - beepSeconds);
     console.log(`flash at ${flashSeconds.toFixed(3)} s, beep at ${beepSeconds.toFixed(3)} s, offset ${(offsetSeconds * 1000).toFixed(0)} ms`);
-    check(offsetSeconds < MAX_OFFSET_SECONDS, `audio-video offset ${(offsetSeconds * 1000).toFixed(0)} ms is not under 50 ms`);
+    check(offsetSeconds < MAX_OFFSET_SECONDS, `audio-video offset ${(offsetSeconds * 1000).toFixed(0)} ms is not under ${MAX_OFFSET_SECONDS * 1000} ms`);
   }
 }
 
@@ -92,4 +94,4 @@ if (failures.length > 0) {
   console.error(`FAIL\n${failures.join("\n")}`);
   process.exit(1);
 }
-console.log("OK: capture has a non-silent audio track and flash and beep line up under 50 ms");
+console.log(`OK: capture has a non-silent audio track and flash and beep line up under ${MAX_OFFSET_SECONDS * 1000} ms`);

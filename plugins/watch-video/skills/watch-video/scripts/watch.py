@@ -67,13 +67,18 @@ def uv_python(*arguments, packages=()):
     return ["uv", "run", "--no-project", *packages, "python", "-I", *map(str, arguments)]
 
 
+def yt_dlp_step(*arguments):
+    # ytdlp_runner.py adds --js-runtimes and --encoding, falls back to the truststore library on a certificate error.
+    return uv_python(SCRIPTS / "ytdlp_runner.py", *arguments)
+
+
 def get_link(url, out_folder, language, log):
     info_path = out_folder / "info.json"
-    result = log.run("info", ["yt-dlp", "--js-runtimes", "node", "--encoding", "utf-8", "--skip-download", "--dump-json",
+    result = log.run("info", yt_dlp_step("--skip-download", "--dump-json",
                               "--write-comments", "--extractor-args",
                               # Top-level threads only (no replies), sorted by top: "5,all,all,all" returned one
                               # thread of replies with no like counts (2026-11-16).
-                              "youtube:max_comments=60,60,0,0;comment_sort=top", url], timeout=300)
+                              "youtube:max_comments=60,60,0,0;comment_sort=top", url), timeout=300)
     info = {}
     if result:
         info = json.loads(result.stdout.splitlines()[-1])
@@ -87,11 +92,13 @@ def get_link(url, out_folder, language, log):
         info_path.write_text(json.dumps(slim, ensure_ascii=False, indent=1), encoding="utf-8")
         info = slim
     caption_language = language or info.get("language") or "en"
-    log.run("captions", ["yt-dlp", "--js-runtimes", "node", "--encoding", "utf-8", "--skip-download", "--write-auto-subs",
-                         "--write-subs", "--sub-langs", f"{caption_language}.*,{caption_language}", "--sub-format", "vtt",
-                         "-o", str(out_folder / "captions.%(ext)s"), url], timeout=300)
-    log.run("download", ["yt-dlp", "--js-runtimes", "node", "-f", "bv*[height<=720]+ba/b[height<=720]",
-                         "-o", str(out_folder / "video.%(ext)s"), url], timeout=3600)
+    log.run("captions", yt_dlp_step("--skip-download", "--write-auto-subs",
+                                    "--write-subs", "--sub-langs", f"{caption_language}.*,{caption_language}", "--sub-format", "vtt",
+                                    "-o", str(out_folder / "captions.%(ext)s"), url), timeout=300)
+    # -S res:720 sorts on the short side, so a 540x960 reel and a 1280x720 landscape video both fit; a
+    # height<=720 filter left vertical reels with no format at all.
+    log.run("download", yt_dlp_step("-f", "bv*+ba/b", "-S", "res:720",
+                                    "-o", str(out_folder / "video.%(ext)s"), url), timeout=3600)
     log.run("resources", uv_python(SCRIPTS / "harvest_resources.py", url, "--out", out_folder), timeout=300)
     videos = [path for path in out_folder.glob("video.*") if path.suffix not in (".part", ".ytdl", ".json")]
     return (videos[0] if videos else None), info
