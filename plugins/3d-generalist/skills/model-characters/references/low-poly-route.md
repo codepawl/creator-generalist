@@ -55,3 +55,15 @@ For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NL
 - **Pre-bent IK limbs:** Never rig dead-straight $180^\circ$ knees or elbows when using IK (`motion.ik` or Rigify).
 - **Stepped 2D face keys:** Always use `Constant` / `STEP` interpolation on UV-offset face controllers so expressions never slide across intermediate sprites.
 - Run `uv run --no-project {{SKILL_DIR}}/scripts/test_character_skill.py` after modifying any script in `scripts/`.
+
+## Garments and soft props (shirts, jackets, bags)
+
+From a low-poly polo that looked odd until rebuilt this way (2026-11-17).
+
+- **Loft through measured sections.** Take widths, depths and lengths from a real size chart checked against photos, as cross-sections from hem to neck. Shoulder and neckline sections are not planar: the shoulder slopes down from the neck and the front neckline sits lower than the back. Write the numbers in a plain math file the build script imports, so they can be checked without Blender.
+- **v along height.** Set the body's v to height over garment length, so a painted row is a line of constant height: seams, hems and logos land where you expect.
+- **Weld the strips.** A loft built strip by strip shows a shading seam at each join under smooth shading. Merge by distance (`bmesh.ops.remove_doubles`) per smooth part. Keep double-sided flaps (collars, lapels) as separate flat-shaded vertices.
+- **Measure flap clearance.** A collar or lapel lying on the body must sit in front of the body surface along its whole edge (1 to 2 cm at this scale). Check the numbers or a close crop. An edge 5 mm behind the chest vanished in the render.
+- **Fine detail only on near-rectangular faces.** PS1-style affine mapping smears texture on large trapezoid faces, such as neck-to-chest triangles. Put plackets, buttons and logos below the trapezoid, on faces close to rectangles.
+- **No 1-texel stripes.** Ribs or stripes alternating every texel shimmer (moire) on a turntable. Use bands at least 2 texels wide, for example 2 dark columns in every 4.
+- **Dark side shading only where the side faces away.** Painting side darkening or seam lines up over the shoulder shows as a streak from the top.
