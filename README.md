@@ -119,6 +119,17 @@ https://raw.githubusercontent.com/codepawl/creator-generalist/main/INSTALL.md an
 /plugin install design-sound@creator-generalist
 ```
 
+**Crucible, for 3D renders.** The 3D skills render in [Crucible](https://crucible.codepawl.com), an engine your agent
+drives through MCP. Its plugin adds the MCP server and the `build-crucible-scene` and `render-crucible-media` skills:
+
+```text
+/plugin marketplace add codepawl/crucible
+/plugin install crucible@crucible
+```
+
+Other agents: copy `skills/build-crucible-scene` and `skills/render-crucible-media` from
+[codepawl/crucible](https://github.com/codepawl/crucible) and add the MCP server `npx -y -p @codepawlhq/crucible crucible-mcp`.
+
 **From a shell**
 
 ```bash
