@@ -62,6 +62,10 @@ PHONE_CUTOFF_HZ = 200              # phone speakers roll off between about 100 a
 PHONE_WEAK_SHARE = 0.3             # a cue with under 30% of its energy above 200 Hz is barely there on a phone
 MONO_BASS_HZ = 100
 MONO_LOSS_FLAG_DB = 3.0
+# A bed whose A-weighted level moves less than this between its quiet (10th percentile) and loud (95th) frames is a
+# flat wall of noise, the hiss viewers hear as "noisy". Measured 2026-11-18: an arctic wind bed moved 3.7 dB and read as
+# hiss; a surf bed with real swells moved 14 dB.
+FLAT_BED_RANGE_DB = 6.0
 VOICE_HIGHPASS_HZ = 80             # tutorial consensus 80-100 Hz; above 120 Hz thins the voice
 AUTO_LEVEL_MARGIN_LU = 1.0         # when lowering the music to meet the voice rule, land this far past it
 # De-essing threshold from the owner's approved narrations (four documentary Shorts;
@@ -424,6 +428,17 @@ def print_master_checks(final, processed, roles):
     loss = mono_loss_db(final)
     flags += int(loss > MONO_LOSS_FLAG_DB)
     print(f"mono fold-down {loss:+.1f} dB" + ("  FLAG wide or out-of-phase content" if loss > MONO_LOSS_FLAG_DB else ""))
+    for name, audio in processed.items():
+        if roles[name] != "bed":
+            continue
+        levels = a_weighted_levels_db(audio.mean(axis=1))
+        sounding = levels[levels > levels.max() - 60]
+        level_range = float(numpy.percentile(sounding, 95) - numpy.percentile(sounding, 10))
+        flat = level_range < FLAT_BED_RANGE_DB
+        flags += int(flat)
+        print(f"bed {name} moves {level_range:.1f} dB between quiet and loud moments"
+              + (f"  FLAG flat wall of noise (under {FLAT_BED_RANGE_DB:.0f} dB): pick a recording with swells or gusts,"
+                 " or automate it, or drop it" if flat else ""))
     voices = [audio for name, audio in processed.items() if roles[name] == "voice"]
     music = [audio for name, audio in processed.items() if roles[name] in ("duck", "bed")]
     if voices and music:

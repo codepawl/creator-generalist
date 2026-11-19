@@ -88,7 +88,9 @@ The order a re-recording mixer works in, with the numbers this script uses:
    a few dB when the voice is on rather than ducking the whole track further.
 3. Effects per cue: each event its own sound (foley.md), 2 to 3 layers at most, bused. A long loud effect (engine,
    crowd, rain) fades up to make its point and is ducked back under speech.
-4. Beds and ambience: 15 LU under the voice, sparse and peaky rather than a flat wall of noise.
+4. Beds and ambience: 15 LU under the voice, sparse and peaky rather than a flat wall of noise. `mix.py` flags a bed
+   that moves under 6 dB between quiet and loud moments. With no voice or music, one bed leads (the sea, the street)
+   and the others sit 6 LU or more under it. A hiss bed such as steady wind goes in as gusts, not a constant layer.
 5. Master: -14 LUFS integrated, -1.5 dBTP, short-term within +5 LU, bass under 100 Hz mono. Do not compress the master
    harder for loudness: micro-dynamics correlated with listener preference, and YouTube's Stable volume evens playback.
 6. Check on a phone speaker's terms: anything that only lives under 200 Hz is gone there.

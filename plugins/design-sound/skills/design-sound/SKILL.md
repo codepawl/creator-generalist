@@ -17,7 +17,8 @@ Read `local.md` next to this file when it exists: the owner, machine paths and p
 ## When to use
 
 Any video, reel, episode, game or demo that needs a sound made, chosen, placed, or a mix built or checked; pipelines
-that cut and place sounds (Remotion reels, `watch-video` remakes, 2D and 3D films) call these scripts.
+that cut and place sounds (Remotion reels, `watch-video` remakes, 2D and 3D films) call these scripts. A trailer,
+action film or re-score of an existing cut also reads `references/cinematic-trailer.md`.
 
 ## The loop
 
@@ -58,6 +59,8 @@ Scripts live in `scripts/` next to this file; run them with absolute paths and n
 - `<model venv python> video_foley.py film.mp4 --prompt "<material, object, action>" | --shots s.json --out f.wav` reads
   video + prompt, 9 GB VRAM (machine rules in local.md; prompts: references/video-foley.md); `fal_foley.py` on fal.
 - `PY listen.py <wav> [--expect "label@seconds"]... [--window 1.0]`; `PY eval.py` the 30-query search benchmark.
+- `PY reference_gap.py ours.wav reference.wav --hits t1,t2` band shares and each hit's peak, jump and pre-hit
+  dip against a reference mix.
 - `PY foley.py events.json --out foley.wav [--report r.csv]` the effects stem (prints licence warnings).
 - `PY fit_music.py <track> --duration S [--cues cues.json] --out music.wav` a real track edited to the cut.
 - `PY mix.py mix.json --out final.wav [--sheet sheet.png] [--no-listen | --quick]` the mix and every check.
@@ -92,3 +95,5 @@ Scripts live in `scripts/` next to this file; run them with absolute paths and n
 - `references/music.md` the music library, mood search, `fit_music.py`, credits, the `score.json` sketch.
 - `references/mix.md` mix.json, carving, ducking, phone bass, the whole-mix checks, mixing practice and Evidence.
 - `references/video-foley.md` foley generated from a silent film: install, resources, when it hears nothing, licence.
+- `references/cinematic-trailer.md` trailers and re-scores: heavy explosions, tails through cuts, punch,
+  reference match, trailer music.

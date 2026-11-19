@@ -19,6 +19,8 @@
 Not for finished music (2026-10-29, on the pass 2 demo: the effects were fine, the music was weak). A score built
 from repitched one-shots sounds like a MIDI sketch. Use it only as a timing sketch or a placeholder. Finished music
 comes from a produced recording, either a track the owner names or one picked from the library by mood, then edited to the cut.
+Confirmed again on 2026-11-19 (Godzilla re-score): a full sampled orchestra re-chorded to the original still read as
+"boring"; trailer music notes are in `references/cinematic-trailer.md`.
 
 ## Real tracks
 
