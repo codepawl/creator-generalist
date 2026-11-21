@@ -11,6 +11,7 @@ from pathlib import Path
 
 import librosa
 import numpy
+import scipy.signal
 
 sys.path.insert(0, str(Path(__file__).parent))
 import sound_library as library
@@ -70,12 +71,33 @@ def masking_margins(levels, sample_rate, cue_time, window_seconds):
     return margins, dominant
 
 
+def low_band_onsets(clip, sample_rate, cutoff_hz=200.0, window_seconds=0.01, jump_db=10.0, history_seconds=0.05):
+    """Times where the level under cutoff_hz jumps jump_db over the quietest of the previous history_seconds."""
+    sos = scipy.signal.butter(4, cutoff_hz, "lowpass", fs=sample_rate, output="sos")
+    low = scipy.signal.sosfilt(sos, clip)
+    size = int(window_seconds * sample_rate)
+    count = len(low) // size
+    if count < 2:
+        return numpy.array([])
+    levels = 10 * numpy.log10(numpy.mean(low[:count * size].reshape(count, size) ** 2, axis=1) + 1e-12)
+    history = max(1, int(history_seconds / window_seconds))
+    found = []
+    for index in range(1, count):
+        before = levels[max(0, index - history):index].min()
+        loud_enough = levels[index] > levels.max() - 30
+        if levels[index] - before >= jump_db and loud_enough and (not found or index * window_seconds - found[-1] > 0.1):
+            found.append(index * window_seconds)
+    return numpy.array(found)
+
+
 def find_onset_error_ms(samples, sample_rate, cue_time):
     window_start = max(0.0, cue_time - 0.5)
     clip = samples[int(window_start * sample_rate): int((cue_time + 0.5) * sample_rate)]
     if len(clip) < 2048:
         return None
     onsets = librosa.onset.onset_detect(y=clip, sr=sample_rate, hop_length=128, units="time", backtrack=True) + window_start
+    # Spectral flux misses a hit that lives only under 200 Hz (a kick under a whoosh read 150 ms late, 2026-11-21).
+    onsets = numpy.concatenate([onsets, low_band_onsets(clip, sample_rate) + window_start])
     if not len(onsets):
         return None
     nearest = onsets[numpy.argmin(numpy.abs(onsets - cue_time))]

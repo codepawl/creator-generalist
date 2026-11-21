@@ -7,9 +7,11 @@ Reading map: Order, Licence policy, ElevenLabs (generate_elevenlabs.py), Web (fe
 1. `search.py` the library first (it is free and already measured).
 2. A real recording on the web (`fetch_web.py`): Openverse for real foley and ambiences, myinstants for memes,
    YouTube for a named track, a game or film sound, or anything else that exists.
-3. ElevenLabs (`generate_elevenlabs.py`) when nothing real fits, when the cue must match a picture exactly, or when the
-   project says so (`local.md` lists project rules).
+3. Make it by code (`make.md`): learn the closest recording into a model and render takes with controls, or write a
+   design for a gesture.
 4. Index what you got (`index.py --add <folder>`), then pick with `search.py --sheet` like any library sound.
+
+ElevenLabs runs only when the owner names it, or a project rule in `local.md` says so. The same holds for picture foley (`video-foley.md`).
 
 A track the owner names is downloaded with yt-dlp and used.
 

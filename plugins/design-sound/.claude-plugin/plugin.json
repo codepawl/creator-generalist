@@ -1,7 +1,7 @@
 {
   "name": "design-sound",
-  "version": "0.4.0",
-  "description": "Make, find, choose and mix SFX and music for a video, game or reel: CLAP library search with sheets, web and ElevenLabs fetching, foley from the picture with HunyuanVideo-Foley (local, fits a 12 GB GPU), an effects stem from an event list, music fitted to the cut, and a mix to platform loudness with sync, masking and phone checks.",
+  "version": "0.5.0",
+  "description": "Make, find, choose and mix SFX and music for a video, game or reel: sounds made by code (recordings learned into models with knobs, designed gestures, layered hits, Doppler passes), a check that everything on screen has its own sound on its own frame, library search, music fitted to the cut, and a mix to platform loudness with sync, masking and phone checks.",
   "author": {
     "name": "CodePawl",
     "url": "https://codepawl.com"
@@ -12,6 +12,7 @@
   "keywords": [
     "sound-design",
     "sfx",
+    "procedural-audio",
     "foley",
     "video-to-audio",
     "music",
