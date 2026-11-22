@@ -42,6 +42,8 @@ TEXTURED_MATERIALS = {
     "fabric_rug": ("dirty_carpet", 1.0, (1.5, 1.15, 0.9), 0.2, 0.7, 1.0),
     "corrugated_metal": ("corrugated_iron", 1.6, (0.78, 0.80, 0.82), 0.6, 0.9, 0.9),
     "concrete_slab": ("concrete_floor_02", 4.0, (0.86, 0.84, 0.80), 0.5, 0.15, 0.85),
+    # Waxed concrete slab coloured Cherokee red, as in Wright's Usonian houses.
+    "concrete_cherokee": ("concrete_floor_painted", 2.5, (0.78, 0.30, 0.22), 1.0, 0.12, 0.55),
 }
 
 # name: (base colour, roughness, metallic)

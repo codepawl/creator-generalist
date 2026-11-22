@@ -69,6 +69,15 @@ Each entry was seen on a real render from this pipeline. Read the group you are 
 - **Empty rooms.** A room with one object reads as a game level. Add curtains, a rug, a lamp and what the room is used for.
 - **Beds floating, models the wrong size.** A linked model's matrix is stale until `view_layer.update()`, so its bounding box
   lies. Update before measuring.
+- **Lawn showing in strips along wall bases and under doors.** Room floors stop at the wall faces, so a walk camera sees
+  the ground through every threshold. `build_floors` now lays a subfloor grown 16 cm under the walls.
+- **Blown ceiling lamps at eye level on a walk page.** Low Usonian ceilings put the lamp in the view. Halve the intensity,
+  widen the radius and raise the bloom threshold.
+- **Rug floating at sofa-back height.** A rug in a sunken room was laid at `levels.floor`. Give it the room's `z`.
+- **Every closet door standing open into a corridor.** A walk or tour sees leaves, hinges and knobs where a wall should be.
+  Open only the doors people walk through; leave closets and wardrobes at `open: 0`.
+- **A saturated period appliance stealing the frame.** A teal retro fridge read as a placeholder box. Prefer the plain
+  finish of the period unless the photos show the colour.
 - **Black or blank slab filling part of the frame.** The camera stands inside a wall or behind a door leaf. Check every shot
   in a preview before a final render.
 - **Upper floor hiding the room in a cutaway, or one cut ignored.** Cuts must slice `floors` as well as walls. Shots run

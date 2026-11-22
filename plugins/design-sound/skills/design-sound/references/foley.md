@@ -93,6 +93,14 @@ One CSV row per event: `index, t, what, material, layers` (per layer: file, pitc
 - Knocks, taps, clicks, glass or bell hits on UI and diagram cues in explainers (2026-11-07, agent-memory film:
   they sounded like tapping a glass): cues there are soft air, paper, pen or footstep sounds, and
   an element appearing needs no sound of its own.
+- UI cues that are dense, all in one tone, or hissy (2026-11-22, a release reel: the owner found the SFX too noisy
+  and all in one tone). Dense means a tick per typed letter or a counter ticking every 2 frames; hissy means recorded clicks and noisy
+  whooshes. Keep cues sparse and under the music, rotate takes at different pitches, and let a run of cues (switches,
+  a counter) climb the track's scale.
+- UI takes that double, thump or drag (2026-11-22, a UI listening reel). A clock tick learned with its second strike
+  sounded like 4 sounds in a run. A dark tilt on a bright key press moved 83 % of its energy under 300 Hz, so it
+  sounded like a gunshot. A 443 ms swish was too long for an arrow. Check each take has one onset, high-pass dark
+  takes of bright sources at about 220 Hz, and keep UI transitions under about 100 ms, or use short OS-style ones.
 
 ## Memes
 

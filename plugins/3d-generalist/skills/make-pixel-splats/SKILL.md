@@ -1,6 +1,6 @@
 ---
 name: make-pixel-splats
-description: "Make pixel art scenes from gaussian splats written by code, with no 3D model, rendered in Crucible: shapes from signed distance functions, light baked into each splat, then glow, haze, a small palette and dither, or the crisp ink look with body-coloured contours. Ships example scenes, motion helpers, a headless frame renderer, film plans and a 'how it's made' explainer compositor. Use for pixel art splats, voxel splat dioramas, code-built gaussian splat scenes."
+description: "Make pixel art scenes from gaussian splats written by code, with no 3D model, rendered in Crucible: shapes from signed distance functions, light baked into each splat, then glow, haze, a small palette and dither, or the crisp ink look with body-coloured contours. Ships example scenes, motion helpers, a headless frame renderer, film plans and a 'how it's made' explainer compositor. Use for pixel art splats, voxel splat dioramas, code-built gaussian splat scenes. Also sprite stacking: pixel-art slices of a GLB that turn to any angle (\"sprite stack\")."
 license: MIT
 ---
 
@@ -66,6 +66,7 @@ light. Crucible draws them at a low internal size, then the page turns the frame
 - Reveal: raise `internalSize` to 1080 and set `style.palette` to `'none'` to show the single round splats.
 - Ink: `style.ink` with ramp-shaded materials, the crisp look of the trending X dioramas. Showcase, "how it's made"
   film and posting flow in [references/ink-look.md](references/ink-look.md).
+- Sprite stack: a GLB cut into pixel slices that turn to any angle. Read [references/sprite-stacking.md](references/sprite-stacking.md).
 
 ## Matching a crisp reference
 

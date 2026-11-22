@@ -63,6 +63,36 @@ def new_collection(name):
     return collection
 
 
+SUBFLOOR_REACH_METRES = 0.16
+SUBFLOOR_DROP_METRES = 0.004
+
+
+def plan_scale(plan):
+    """Metres per plan unit."""
+    return {"m": 1.0, "ft": 0.3048}.get(plan.get("units", "m"), 1.0)
+
+
+def grown_outline(polygon, distance):
+    """The polygon pushed outward by distance, each corner moved along the mitre of its two edges."""
+    corner_count = len(polygon)
+    signed_area = sum(polygon[index][0] * polygon[(index + 1) % corner_count][1] - polygon[(index + 1) % corner_count][0] * polygon[index][1]
+                      for index in range(corner_count))
+    # For a counter-clockwise outline the outward normal of an edge (dx, dy) is (dy, -dx).
+    outward = 1 if signed_area > 0 else -1
+    grown = []
+    for index, point in enumerate(polygon):
+        normals = []
+        for start, end in ((polygon[index - 1], point), (point, polygon[(index + 1) % corner_count])):
+            length = math.hypot(end[0] - start[0], end[1] - start[1]) or 1e-9
+            normals.append(((end[1] - start[1]) / length * outward, -(end[0] - start[0]) / length * outward))
+        mitre = (normals[0][0] + normals[1][0], normals[0][1] + normals[1][1])
+        mitre_length_squared = mitre[0] ** 2 + mitre[1] ** 2 or 1e-9
+        # Distance from both edges; sharp corners are capped at three times the distance.
+        scale = min(2 * distance / mitre_length_squared, 3 * distance / math.sqrt(mitre_length_squared))
+        grown.append((point[0] + mitre[0] * scale, point[1] + mitre[1] * scale))
+    return grown
+
+
 def build_floors(plan, collection):
     batch = MeshBatch("floors", 11)
     levels = plan["levels"]
@@ -75,6 +105,14 @@ def build_floors(plan, collection):
         batch.uv_offset = (batch.random.uniform(0, 9), batch.random.uniform(0, 9))
         batch.add_face(points, material, uvs=[(point[0], point[1]) for point in outline])
     batch.uv_offset = (0, 0)
+    # A subfloor a few millimetres down, grown out under the walls and door thresholds, so no gap between a room's
+    # floor and its walls shows the ground (or grass) beneath the house.
+    for room in plan["rooms"]:
+        material = room.get("floor", style.get("floor", "oak_floor"))
+        outline = grown_outline(room["poly"], SUBFLOOR_REACH_METRES / plan_scale(plan))
+        subfloor_z = floor_z + room.get("floor_z", 0.0) - SUBFLOOR_DROP_METRES / plan_scale(plan)
+        batch.add_face([Vector((point[0], point[1], subfloor_z)) for point in outline], material,
+                       uvs=[(point[0], point[1]) for point in outline])
     for slab in plan.get("slabs", []):
         batch.add_prism(slab["poly"], slab["z"] - slab.get("t", 0.1), slab["z"], slab.get("side_material", slab["material"]), material_top=slab["material"])
     batch.finish(collection)
@@ -174,7 +212,8 @@ def build_structure(plan, structure, collections):
     for rug in plan.get("rugs", []):
         x0, y0 = rug["a"]
         x1, y1 = rug["b"]
-        z = plan["levels"].get("floor", 0.0)
+        # A rug lies on its own room's floor: sunken living rooms sit below levels.floor.
+        z = rug.get("z", plan["levels"].get("floor", 0.0))
         outline = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
         fabric.add_prism(outline, z, z + 0.012, rug.get("material", "fabric_rug"))
     fabric_object = fabric.finish(collections["fitted"], smooth=True)

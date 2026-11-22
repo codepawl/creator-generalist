@@ -40,6 +40,13 @@ built floor plan lands on its ink.
 7. **Final.** 1920x1080 at about 512 samples, each still at full size beside a real photo. Look at each one.
 8. **Films.** `--film <name>`. A `build_up` film rises the walls off the sheet itself. Streets: "Streets" in
    `references/plan-format.md`.
+9. **Services, whole house.** When the house must work, not only look right (power, water, drains, gas, heat, air), add a
+   `systems` section and run `uv run --no-project python scripts/systems_check.py plan.json`. It routes every trade,
+   checks the residential code rules, reroutes clashes and exits 1 on anything left. Keys, rules and its limits:
+   `references/systems.md`.
+10. **Live walk page.** A house people walk through on the web, rendered live in Crucible, with a plan minimap:
+   `scripts/export_web.py`, then `scripts/walk_data.py`, then the page. Read `references/walk-page.md`, including its
+   tour check: every planned spot runs through the page's own collision before a frame is rendered.
 
 ## Hard rules
 

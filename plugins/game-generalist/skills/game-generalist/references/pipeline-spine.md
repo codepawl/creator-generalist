@@ -104,6 +104,23 @@ Execution only: no new design decisions. A decision that changes the look or the
 Each finished shot gets three stills (first, middle, last) compared with its style frame and board before the next
 shot starts.
 
+Build in sub-phases, never in one pass. Each ends with its gate in `qa-and-gates.md`; a failed gate is fixed and run
+again before the next sub-phase. Save the hero still and the recipe or scene file after each one, and write each gate
+result in `checks.md` (phase, check, result, what changed). The split holds in every engine (Crucible, three.js,
+Blender); the Crucible how-to for 6d to 6g is in the Crucible skill's `materials.md` and `particles-and-vfx.md`.
+
+| Sub-phase | Makes | Gate |
+|---|---|---|
+| 6a Layout | grey blockout on the locked hero camera, real sizes | bounds match `plan.md`; hero subject on its third; shot list varies angles and frames the subject |
+| 6b Modeling | hero and secondary meshes | silhouette from the hero camera and two side views; gate 15 contact and base review |
+| 6c Set dressing | secondary props, scatter, surface breakup, numbered build list on the hero frame | gate 14 bare-surface rule (any engine); each part says what holds it up; density against the reference photo |
+| 6d Texturing | base colour, pattern and real-world repeat size per material | gate 16 value and tiling |
+| 6e Shading | roughness, metal, emission, wetness, layers | gate 17 turn test |
+| 6f Lighting | key, fill, fog, exposure | gate 18 every visible part reads; gate 12 phone check |
+| 6g FX | particles, volumes, beams, foam, each with its cause | gate 19 four-sample FX check, hero plus one side view |
+| 6h Animation | motion tracks | gates 1 to 7; gate 15 again at four times for anything on a moving support |
+| 6i Finish and grade | bloom, glare, grade, grain, depth of field from `LOOK.md` | effects off and on side by side; gate 11 look match with the clip and contrast limits |
+
 The first finished shot (or the first finished part of a still, model or app) goes to the user as a WIP demo: a short
 low-resolution clip or still with one line on what comes next. Keep building while waiting; nothing is thrown away
 before an answer. Notes on the WIP start a fix round at once. When the user asked to approve the WIP first, wait.

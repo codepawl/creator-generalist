@@ -1,0 +1,46 @@
+{
+ "name": "Systems fixture",
+ "units": "m",
+ "levels": {"ceiling": 2.6},
+ "walls": [
+  {"id": "south", "a": [0, 0], "b": [10, 0], "t": 0.2, "kind": "ext"},
+  {"id": "east", "a": [10, 0], "b": [10, 7], "t": 0.2, "kind": "ext"},
+  {"id": "north", "a": [10, 7], "b": [0, 7], "t": 0.2, "kind": "ext"},
+  {"id": "west", "a": [0, 7], "b": [0, 0], "t": 0.2, "kind": "ext"},
+  {"id": "split", "a": [5, 0], "b": [5, 7], "t": 0.1, "kind": "int"},
+  {"id": "bed_bath", "a": [5, 3.5], "b": [10, 3.5], "t": 0.1, "kind": "int"},
+  {"id": "bath_kitchen", "a": [8, 3.5], "b": [8, 7], "t": 0.1, "kind": "int"}
+ ],
+ "openings": [
+  {"id": "front_door", "wall": "south", "kind": "door", "at": 2.5, "width": 0.9, "head": 2.1},
+  {"id": "living_glass", "wall": "west", "kind": "window", "at": 3.5, "width": 3.0, "sill": 0.05, "head": 2.4, "operation": "fixed"},
+  {"id": "bed_door", "wall": "split", "kind": "door", "at": 1.5, "width": 0.8, "head": 2.1},
+  {"id": "kitchen_opening", "wall": "split", "kind": "cased", "at": 5.2, "width": 1.6, "head": 2.1},
+  {"id": "bath_door", "wall": "bath_kitchen", "kind": "door", "at": 0.8, "width": 0.7, "head": 2.1},
+  {"id": "bed_window", "wall": "south", "kind": "window", "at": 7.5, "width": 1.5, "sill": 0.9, "head": 2.1, "operation": "casement"},
+  {"id": "kitchen_window", "wall": "north", "kind": "window", "at": 3.5, "width": 1.2, "sill": 1.1, "head": 2.1, "operation": "casement"}
+ ],
+ "rooms": [
+  {"name": "Living", "kind": "living", "poly": [[0, 0], [5, 0], [5, 7], [0, 7]]},
+  {"name": "Bedroom", "kind": "bedroom", "poly": [[5, 0], [10, 0], [10, 3.5], [5, 3.5]]},
+  {"name": "Kitchen", "kind": "kitchen", "poly": [[5, 3.5], [8, 3.5], [8, 7], [5, 7]]},
+  {"name": "Bath", "kind": "bath", "poly": [[8, 3.5], [10, 3.5], [10, 7], [8, 7]]}
+ ],
+ "casework": [
+  {"kind": "base", "a": [5.2, 6.9], "b": [7.8, 6.9], "depth": 0.6, "z0": 0, "z1": 0.9, "side": 1}
+ ],
+ "systems": {
+  "heating": "radiant",
+  "service": {"panel": [7.9, 3.7], "manifold": [7.6, 3.7], "gas_in": [7.0, 6.9], "sewer": [10.5, 5.0]},
+  "fixtures": [
+   {"id": "lav", "kind": "lavatory", "room": "Bath", "at": [9.6, 4.2]},
+   {"id": "wc", "kind": "toilet", "room": "Bath", "at": [9.6, 5.4]},
+   {"id": "shower", "kind": "shower", "room": "Bath", "at": [9.4, 6.5]},
+   {"id": "sink", "kind": "sink", "room": "Kitchen", "at": [6.5, 6.6]}
+  ],
+  "appliances": [
+   {"id": "range", "kind": "range", "fuel": "gas", "room": "Kitchen", "at": [5.6, 6.6]}
+  ],
+  "drain_depth_m": 0.6
+ }
+}

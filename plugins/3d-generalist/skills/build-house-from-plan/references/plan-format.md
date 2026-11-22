@@ -76,7 +76,7 @@ Poly Haven or ambientCG folder and real tile size for a new finish.
 `casework[]`: `{kind: "base"|"wall", a, b, depth, z0, z1, doors, side, counter, material, hardware}`. Doors face the
 left of a-to-b when `side` is 1. `stairs[]`: `{start, heading, width, run, rise, steps, z0, material, riser_material}`.
 `panelling[]`: `{a, b, z0, z1, cols, rows, side, material, stile, offset}`. `curtains[]`: `{a, b, z0, z1, folds, material}`.
-`rugs[]`: `{a, b, material}`. `boxes[]`: `{origin, x, y, z, material}` for shelves and anything plain.
+`rugs[]`: `{a, b, material, z}`; `z` is the floor it lies on (default `levels.floor`), so set it in a sunken room. `boxes[]`: `{origin, x, y, z, material}` for shelves and anything plain.
 `furnish[]`: `{asset, at, rot, z, scale, fit_w, fit_h, fit_max, fit_size: [x, y, z], hang, part, paint, name}`. `paint` puts every part of a model in one named material, for models with missing textures. `fit_size` stretches
 to a measured size, `hang` is the gap below the ceiling for a pendant, `part` keeps one model from a file that holds a
 row of variants (Poly Haven plants). At `rot: 0` a model's front faces -y, so it faces `(sin rot, -cos rot)`. `asset` is `ph:<Poly Haven id>` (from

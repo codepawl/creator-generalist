@@ -114,6 +114,25 @@ first build comes out as flat boxes, because nobody listed what the frame holds.
 Keep each line to what must be built (material, count, size, colour), never a mood word. At most about 12 boxes a
 frame; split a busier frame into two crops.
 
+### Rebuilding one still in 3D
+
+The owner's note on a game-still rebuild, 2026-11-21: "look at where each object sits, in front or behind". The list
+must hold the 3D layout behind the picture, not only boxes on it. Read the still with `read-reference-still.md`
+first: measured camera and depth, zoom tiles per region, then a staged build.
+
+- Depth for every part: what sits in front of what, and roughly how far from the camera it is. A tree right in
+  front of the lens is a few metres away, not one more thing on the hill. Write the distance in the list.
+- Place parts by frame position and distance (a ray from the camera), so each part lands on its measured spot.
+  Fixed objects (poles, a car, a fence, a pier) go exactly where the picture has them, never moved for convenience.
+- Hidden support: when a part's base is hidden (poles behind a rock, a car past a crest), infer what holds it, such
+  as the road or a verge, and build that too. Nothing floats, and nothing grows where it cannot. A tree "on the sea"
+  stands on a rock or a strip of land.
+- Small details count, and each gets its own line: which way the tree leans (toward the sea, for example), the bush
+  beside it, bushes around the rocks, how the road bends, the car, pebbles, rock shape and surface texture, birds,
+  aircraft contrails, the colour and clarity of the water.
+- Check depth and placement on the render with the side-by-side and a 50/50 blend. Measure colours (sky, sun ring,
+  water) in numbers, because readers judge them badly by eye.
+
 ## 6. Verify the remake
 
 1. `perceive.py` on the finished video, then `recipe.py check brief.json <final>/perception.json rebuild`.
