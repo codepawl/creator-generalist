@@ -11,6 +11,7 @@
 - [Alignment](#alignment)
 - [Report](#report)
 - [What the owner rejected (carry into every render)](#what-the-owner-rejected-carry-into-every-render)
+- [Memes](#memes)
 - [Limits](#limits)
 <!-- skill-navigation:end -->
 
@@ -92,6 +93,36 @@ One CSV row per event: `index, t, what, material, layers` (per layer: file, pitc
 - Knocks, taps, clicks, glass or bell hits on UI and diagram cues in explainers (2026-11-07, agent-memory film:
   they sounded like tapping a glass): cues there are soft air, paper, pen or footstep sounds, and
   an element appearing needs no sound of its own.
+
+## Memes
+
+A meme sound is a quote, so it is used as the original file. Change only its pitch or speed when placing it, and
+never learn it into a model or render a new take of it.
+
+The hard part is knowing when a meme fits. `memes.py` covers that in two steps:
+
+- `build <folders> [--audit audit.json]` writes `<library>/memes.json`. Each entry holds the file, its audible length,
+  the time of its peak and the moments it fits. The moments come from whole words in the file name (`TAG_RULES`).
+  `memes-overrides.json` in the library replaces the tags of one file. Duplicates are skipped when they share a name,
+  and also when an audit marks them.
+- `detect words.json [--events events.json] --out cues.json` reads a word-timed transcript (the watch-video
+  `words.json`) and an optional event list (`t`, `kind`: hit, fall, fail, win, reveal, throw, start, end). It finds:
+  - trigger words, such as "broke" for fail, "worked" for win, "why" for confused, "cost" for money and "hours later"
+    for later;
+  - a pause of 1.6 s or more after a line (awkward);
+  - an exclamation followed by a pause (punchline);
+  - events.
+
+  It picks one meme per moment and never uses the same file twice. A meme goes at the end of the phrase, in the
+  pause. When the next word starts first, the cue fades at that word (`fade_at`). A hit puts its peak on the event,
+  14 dB down if someone is speaking. A drum roll ends on the reveal, and a censor beep covers the word. When one
+  phrase has two triggers, the later one wins, so "actually worked" is a win and not a shock. The defaults are 6 s
+  between memes and 4 a minute.
+
+Every cue gives its reason (`why`), and the cut decides whether to keep it. A project rule against memes always wins.
+On a scripted test of 10 known moments, detect placed 8. The other 2 were dropped by the
+gap rule. A 1,500-word tech talk got 1 cue, which is the right density for talk without jokes. Meme files have no
+licence (`unknown`), so give the licence warning once.
 
 ## Limits
 

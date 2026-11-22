@@ -58,15 +58,15 @@ Scripts live in `scripts/` next to this file; run them with absolute paths and n
 - `PY make.py learn <recording> --name family/id [--from S --to S] | render <family/id> --out x.wav [--seed N] [--n N]
   [--size --pitch --length --bright --hard --ring --weight --energy --vary] | design <riser|subdrop|whoosh|blip|tick> | list`
 - Only when named: `generate_elevenlabs.py` (`references/sources.md`), `video_foley.py` (`references/video-foley.md`).
-- `PY listen.py <wav> [--expect "label@seconds"]... [--window 1.0]`; `PY eval.py` the 30-query search benchmark.
-- `PY reference_gap.py ours.wav reference.wav --hits t1,t2` band shares and each hit's peak, jump and pre-hit
-  dip against a reference mix.
+- `PY listen.py <wav> [--expect "label@seconds"]...`; `eval.py` search benchmark; `reference_gap.py ours.wav ref.wav
+  --hits t1,t2` band shares, peaks, jumps and pre-hit dips against a reference mix.
 - `PY foley.py events.json --out foley.wav [--report r.csv]` the effects stem (prints licence warnings).
-- `PY fit_music.py <track> --duration S [--cues cues.json] --out music.wav` a real track edited to the cut.
+- `PY fit_music.py <track> --duration S [--cues cues.json] --out music.wav` a real track fit to the cut.
 - `PY mix.py mix.json --out final.wav [--sheet sheet.png] [--no-listen | --quick]` the mix and every check.
 - `PY ab_test.py make mix.json --param hold|cue|unmask --out-dir DIR` blind A/B; `ab_test.py pick DIR <A|B|same>
   --note "<the owner's words>"` writes the pick into `house-defaults.json`.
-- `score.py score.json --out music.wav` (numpy scipy soundfile psutil only) a MIDI-style sketch only.
+- `PY memes.py build <folders> | detect words.json [--events e.json] --out cues.json` memes stay originals (pitch
+  and speed only); detect finds the moment each fits and places it in a pause (`references/foley.md`, "Memes").
 
 ## House rules
 
