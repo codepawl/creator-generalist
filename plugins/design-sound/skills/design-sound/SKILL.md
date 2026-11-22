@@ -60,8 +60,8 @@ Scripts live in `scripts/` next to this file; run them with absolute paths and n
 - Only when named: `generate_elevenlabs.py` (`references/sources.md`), `video_foley.py` (`references/video-foley.md`).
 - `PY listen.py <wav> [--expect "label@seconds"]...`; `eval.py` search benchmark; `reference_gap.py ours.wav ref.wav
   --hits t1,t2` band shares, peaks, jumps and pre-hit dips against a reference mix.
-- `PY foley.py events.json --out foley.wav [--report r.csv]` the effects stem (prints licence warnings).
-- `PY fit_music.py <track> --duration S [--cues cues.json] --out music.wav` a real track fit to the cut.
+- `PY foley.py events.json --out foley.wav` effects stem; `fit_music.py <track> --duration S --out m.wav` music fit.
+- `PY ui_kit.py build --style faithful|soft|crisp|warm|toy --out kit/ | check kit/` UI sounds + web player (foley.md).
 - `PY mix.py mix.json --out final.wav [--sheet sheet.png] [--no-listen | --quick]` the mix and every check.
 - `PY ab_test.py make mix.json --param hold|cue|unmask --out-dir DIR` blind A/B; `ab_test.py pick DIR <A|B|same>
   --note "<the owner's words>"` writes the pick into `house-defaults.json`.

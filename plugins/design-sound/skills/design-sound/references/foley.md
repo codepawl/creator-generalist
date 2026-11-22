@@ -12,6 +12,7 @@
 - [Report](#report)
 - [What the owner rejected (carry into every render)](#what-the-owner-rejected-carry-into-every-render)
 - [Memes](#memes)
+- [UI kits (ui_kit.py)](#ui-kits-ui_kitpy)
 - [Limits](#limits)
 <!-- skill-navigation:end -->
 
@@ -131,6 +132,39 @@ Every cue gives its reason (`why`), and the cut decides whether to keep it. A pr
 On a scripted test of 10 known moments, detect placed 8. The other 2 were dropped by the
 gap rule. A 1,500-word tech talk got 1 cue, which is the right density for talk without jokes. Meme files have no
 licence (`unknown`), so give the licence warning once.
+
+## UI kits (ui_kit.py)
+
+A UI kit is one set of interface sounds in one style, for a web page, an app or a motion graphics timeline. The roles
+are key, select, switch, tick, arrow, notify, success and error.
+
+1. Pick one source per role. Use a short OS-style sound for arrows and transitions (Windows XP, Windows 11, macOS,
+   Kenney CC0), not a long swish. Learn each with `make.py learn <file> --name <folder>/<role> --around-peak <s>`,
+   about 0.05 s for clicks and ticks and 0.6 s for chimes. Cut the source so a click or tick strikes once.
+2. `ui_kit.py build --models <folder> --style <style> --out kit/` renders the takes. Keys, selects, switches and arrows
+   get several varied takes, so repeats differ. Ticks step up 2 semitones each, for counters. Every take is high-passed
+   at 300 Hz, cut 4 dB around 350 Hz and faded to its role's length (arrow 120 ms, select 100 ms, tick 80 ms), because
+   the owner heard the first kit as heavy. The command ends with `check`.
+   Keys are the exception: learn them from real key press recordings (letter soft, medium and firm, space, Return;
+   the Wyzowl SFX Kit, CC0, has all of them), mix the press weights, move level about 2 dB and pitch under half a
+   semitone, and high-pass at 120 Hz only. Designed noise ticks, the musical pitch cycle and the 300 Hz cut made keys
+   sound childish (owner, 2026-11-22). Modern kits: XP, Kenney and macOS alert sounds read as 1990s; the owner picked
+   sine blips and short chimes made by `designs.py blip` (`audits/ui-packs-2026-11-22/build_coded_kits.py`).
+3. `kit.json` lists files and levels. `ui-sounds.js` is a Web Audio player: `uiSound("select")`, `uiSound("tick", n)`,
+   `setMuted(true)`. Sound starts after the first user gesture. Each repeat of a role moves to the next pitch step
+   (0, +2, -1, +3, +1, -2 semitones), because the owner found one sound repeating boring. On a Remotion or editor
+   timeline, place the WAVs at each event's frame with the same pitch steps for repeats. A run that builds (a row of
+   presses, a count) climbs instead. UI sounds sit about 12 dB under the content.
+4. On a motion graphics timeline, build the picture and the cue list from one plan file (Remotion: `plan.ts` writes
+   `cues.json`), so the two cannot drift. Cue only elements that are on screen at that frame. An element must be
+   visible 2 frames before its sound, with an appear of 6 frames or less: a card that faded in over 12 frames, and
+   ticks for cards still off screen, read as "SFX slightly off" to the owner although every cue sat on its frame
+   (2026-11-22).
+
+The styles are faithful, soft (softer strike, top cut at 5 kHz), crisp (smaller and brighter), warm (2
+semitones down) and toy (small, high, ringing). The owner approved soft, crisp and the originals on 2026-11-22.
+Ready kits from the 2026-11-22 models are in `<library>/kits/ui-<style>`. Brand sounds (iPhone, Apple Pay, Windows)
+carry their owners' rights, so give the licence warning once.
 
 ## Limits
 

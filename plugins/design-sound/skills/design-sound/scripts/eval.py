@@ -108,7 +108,7 @@ def main():
         run("hybrid kw 3.0 + impact prior 0.5", ensemble, 3.0, 0.5),
         run("CLAP 4-phrasing + impact prior 0.5", ensemble, 0, 0.5),
     ]
-    print(f"{len(records)} files indexed, {len(QUERIES)} queries ({sum(1 for q in QUERIES if q[2])} impact)\n")
+    print(f"{len(records)} files indexed, {len(QUERIES)} queries ({sum(1 for query in QUERIES if query[2])} impact)\n")
     print(f"{'configuration':40} {'top-1':>7} {'top-5':>7} | {'impact top-1':>12} {'impact top-5':>12}")
     for label, ranks in configurations:
         (top1, top5, total), (impact1, impact5, impact_total) = summarize(ranks)
