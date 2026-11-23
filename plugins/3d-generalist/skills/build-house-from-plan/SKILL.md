@@ -65,7 +65,7 @@ built floor plan lands on its ink.
 ## Speed
 
 A glTF import is the slow step, so `build_house.py` caches each model as a linked `.blend` in the asset library
-(`HOUSE_ASSET_LIBRARY`, default `~/house-assets`). Avoid scanned pines and firs: their importer takes many minutes. Grass and trees take long to
+(`HOUSE_ASSET_LIBRARY`, default set in `scripts/house_core.py`). Avoid scanned pines and firs: their importer takes many minutes. Grass and trees take long to
 sync, so renders keep persistent data between shots. Any step over 5 minutes gets profiled and fixed.
 
 ## Done means

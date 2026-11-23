@@ -56,7 +56,8 @@ human from nothing. Credit it.
 6. **Rig and animate.** Hand off to `rig-characters` and `animate-characters`. The short low-poly rig notes are in
    `references/rigging-and-animation.md`.
 7. **Check.** Run `uv run --no-project {{SKILL_DIR}}/scripts/check_character.py character.glb --max-tris <budget>`
-   on the export, then render a turnaround still and compare it with the reference side by side.
+   on the export, then render a turnaround still and compare it with the reference side by side. A static mesh
+   that was repaired, remeshed or decimated also passes `use-3d-software` `scripts/mesh_prep.py compare` against its source.
 
 ## More references
 

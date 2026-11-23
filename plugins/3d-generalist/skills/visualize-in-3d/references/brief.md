@@ -38,7 +38,7 @@ blender process runs). Use the full path to the Blender executable if `blender` 
 to a log file you read afterwards. Keep scratch files inside {{FOLDER}}, never in a folder another job shares.
 Blender gotchas: --factory-startup still loads the default cube, camera and light, so start each script with
 bpy.ops.wm.read_factory_settings(use_empty=True). Model each vehicle facing Blender -Y; the glTF exporter turns that
-into +Z, so lookAt works in three.js. Write the facing into ASSETS.md. glTF export of clips needs
+into +Z, the forward axis glTF and Crucible use. Write the facing into ASSETS.md. glTF export of clips needs
 export_animation_mode="NLA_TRACKS" with each clip pushed to an NLA strip. The exporter takes the rest pose from the last NLA
 track at its first frame, so push a clip that starts at rest last. bmesh.ops.bevel gives new faces material
 index 0, so set the materials of the bevel faces again on multi-material meshes. An exact boolean can silently drop a concave prism; build
@@ -52,8 +52,8 @@ UVs, PBR materials (small procedurally baked textures are fine), emissive where 
 material per state, so the app can toggle it. Two to four variants of anything that repeats more than about five
 times (vehicles, people, trees, buildings); one model is fine for unique structures. Moving parts are separate named objects or bones with their pivot at the
 origin (wheels, doors, fans, lifts, booms, bridges, character limbs); characters and animals get an armature with
-named clips (the app plays clips per figure, or for crowds uses a few baked pose meshes per clip, since three.js
-instancing does not skin) (vertex groups per bone, an Armature modifier, clips on NLA strips); render one posed frame of each clip
+named clips (the app plays clips per figure with Crucible skeleton-pose, or for crowds uses Crucible crowd skinning, which bakes clips so many copies stay cheap)
+(vertex groups per bone, an Armature modifier, clips on NLA strips); render one posed frame of each clip
 to check the bone axes. Build repeating structures (track, platforms, sheds) on one module length that fits the real
 thing, and write it into ASSETS.md. Keep the total under about 40 MB (10 MB is typical), one GLB per asset family so repeats can be instanced.
 Set single-sided materials (backface culling on), so the exported glTF is not doubleSided.
@@ -113,18 +113,18 @@ Themes. Ship three themes switched by one quiet button and remembered per viewer
 one and one more that suits the topic (blueprint, paper, night shift). A theme changes the scene's lights, ground and
 materials as well as the UI colours, and every theme keeps text contrast readable.
 
-Work only in {{FOLDER}}/app. Stack: Vite + React + React Three Fiber (+ drei, @react-three/postprocessing with N8AO for ambient occlusion), and
-Playwright as a dev dependency for checks and the film, all pinned to exact versions, serve on port
+Work only in {{FOLDER}}/app. Stack: Vite + React for the dashboard + Crucible (`@codepawlhq/crucible`, renderer with `depth: true` and
+`ambientOcclusion` on; see the skill's `references/crucible.md`, "A live app") for the 3D view, and Playwright as a dev dependency for checks and the film, all pinned to exact versions, serve on port
 {{PORT}}. A plain data model (sites, units, tasks, events) drives everything; the 3D view and the dashboard both read
 it, and a small seeded simulation advances it in real time so things move, statuses change and numbers tick. Load the
-GLBs with instancing for repeats, drive every moving part and clip from the simulation. A fixed-step simulation
-keeps the previous and current pose of everything that moves and renders the pose interpolated by the leftover
-time, so motion and the follow camera change every frame (no stutter). No two surfaces share a plane and no two
+GLBs with `loadGltf`, reuse one geometry for repeats (the renderer batches and culls them), drive every moving part and
+clip from the simulation. A fixed-step simulation (Crucible `createRuntime` in `mode: 'both'`) keeps the previous and
+current pose of everything that moves and renders the pose interpolated by `context.alpha`, so motion and the follow camera change every frame (no stutter). No two surfaces share a plane and no two
 modules overlap: lay repeats end to end, build curves (track, viaduct deck) as continuous swept geometry, lift
 stacked floors a few centimetres apart, and set the camera near plane to about 0.5 m. Ground layers each get
 their own height: grass -0.2 m, pads -0.06, road and floor modules 0, paint and decals +0.04. Walls and vehicles follow the same rule: a sign, lamp or poster stands 4 cm proud of the glass or panel behind it, never at the same depth. Where a pad or plaza
-replaces a road, leave the road modules out there instead of laying both. Run {{SKILL_DIR}}/scripts/coplanar-check.js
-on the built scene and fix every pair it lists before any screenshot. Anything that must meet a vehicle (platform screen doors, jet bridges, loading docks, lock
+replaces a road, leave the road modules out there instead of laying both. Run `findCoplanarPairs(parts)` from
+{{SKILL_DIR}}/scripts/coplanar-check.js on the built parts and fix every pair it lists before any screenshot. Anything that must meet a vehicle (platform screen doors, jet bridges, loading docks, lock
 gates) is placed from the vehicle's own door or hatch positions where it stops, not from a repeating module, and the
 vehicle stops exactly on its mark; print the offset of every pair and keep each under 5 cm, and keep the side gap
 to the real one (about 0.1-0.2 m at a platform). Layered transparent surfaces
@@ -178,5 +178,5 @@ free camera moves when a beat shows one stage, and show a speed change (2x or 5x
 Before reporting, run the loop in {{SKILL_DIR}}/references/self-review.md (up to three rounds) on the app and the film. Record the film as {{SKILL_DIR}}/references/film.md "Live app films" says. Run the dev server as a background
 job and stop it when done. Write README.md, pass2_started_at.txt and pass2_finished_at.txt (UTC). Budget about 100 tool calls. Report: what was
 built, how to run it, screenshot and film paths, checks with numbers, honest gaps, and a one-line caption suggestion
-("Claude built a live <place>, every <main assets> modeled in Blender and running in three.js").
+("Claude built a live <place>, every <main assets> modeled in Blender and running in Crucible").
 ```

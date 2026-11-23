@@ -37,7 +37,7 @@ Write one file before building. It holds:
 
 ## Build
 
-Use three.js with no Blender. A lofted shell, boxes and a few extrusions read well under a watercolour pass.
+Use Crucible primitives and its modeling addon with no Blender. A lofted shell, boxes and a few extrusions read well under a watercolour pass.
 
 - **Shell.** Build the outer form from cross-sections along its length (a hull, a nave, a tower), so the plan, the
   keel or roof line and the cut all come from the same numbers. Use real dimensions and keep the aspect ratio. Never
@@ -66,7 +66,7 @@ Use three.js with no Blender. A lofted shell, boxes and a few extrusions read we
 
 A full-screen pass turns the render into a plate.
 
-- Paper: cream base with low-frequency blotches, so no area is flat. Colour uniforms in a shader are linear: convert each hex with `new THREE.Color(hex)` (which converts sRGB to linear) or the paper renders dark. Grain at the end, multiplied over everything.
+- Paper: cream base with low-frequency blotches, so no area is flat. Crucible colours and pass uniforms are linear RGB: convert each sRGB hex to linear first or the paper renders dark. Grain at the end, multiplied over everything.
 - Washes: band the lit colour to 3 or 4 tones per material. Darken the colour along band edges, where pigment pools.
 - Ink: outlines from depth and normal edges in dark brown, about 24, 15 and 9 percent red, green and blue
   (`#3d2615`). Black outlines read as a vector cartoon. Vary the width a little with noise.

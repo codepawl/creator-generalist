@@ -35,7 +35,7 @@ decide whether the whole world reads as real. Build each hero in Blender from re
 views. Give it the real silhouette and the parts that make it recognisable (for an aircraft: nose cone and cockpit
 windows, swept tapered wings with dihedral, nacelles on pylons, tail at true size, door panels). Check its
 proportions on a compare sheet and export its attach points as named empties. A hero made of a few boxes and cylinders is not done.
-Without Blender, spend the extra effort in three.js (lathe and extruded profiles from the drawings, not boxes) and
+Without Blender, spend the extra effort in Crucible's modeling addon (lathe and extruded profiles from the drawings, not boxes) and
 say in the report that the heroes are below Blender quality.
 
 ## Compare renders

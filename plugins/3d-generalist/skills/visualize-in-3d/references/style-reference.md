@@ -55,11 +55,9 @@ Turn every line into settings before the first render. That means camera values,
 and shadow settings, the material list, and the set dressing list that gives the density. Pick models that already have the card's
 shapes (`asset-sources.md`) instead of reshaping primitives toward them.
 
-- **Tone mapping.** A bright stylized or pastel reference uses Neutral (`ToneMappingMode.NEUTRAL`) or AgX. ACES
-  darkens mid tones and turns pink into mauve, so keep it for cinematic looks. With `@react-three/postprocessing`,
-  import `ToneMappingMode` from `postprocessing`. Never pass `THREE.ACESFilmicToneMapping`: it is 4, which that enum
-  reads as UNCHARTED2, a much darker curve. Ambient occlusion darkens every grass blade, so keep N8AO near 0.8 and
-  tint it with the ground's dark tone, not blue.
+- **Tone mapping.** A bright stylized or pastel reference uses Crucible `environment.viewTransform` `neutral`. The
+  default `aces` darkens mid tones and turns pink into mauve, so keep it for cinematic looks. Ambient occlusion darkens
+  every grass blade, so keep `ambientOcclusion` low and let the ground's dark tone, not blue, fill the shadow side.
 - **Hero props.** Build each one to its real silhouette first, then stylize it as the reference does. A cherry tree
   has a short dark trunk that forks low into spreading limbs, an umbrella crown wider than tall, blossoms in
   clusters with gaps that show the branches, white-pink on top and deeper pink inside, and petals on the ground. A

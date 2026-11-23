@@ -34,6 +34,7 @@ machined parts at exact dimensions (`model-parts-in-cad`), drawing anatomy in 2D
    `references/surfaces-environment-and-hard-surface.md`).
 5. **Break symmetry** for anything alive, then **Multires** for tertiary detail in distinct layers by scale.
 6. **Retopologise or decimate, then bake** normals (and displacement where detail changes the silhouette).
+   Scripted route and the before/after numbers: `use-3d-software` `scripts/mesh_prep.py` (`references/mesh-prep.md`).
 7. **Check again** (below) at the final camera distance, then hand the asset to `rig-characters` or the scene.
 
 ## Hard rules

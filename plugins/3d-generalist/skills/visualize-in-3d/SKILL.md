@@ -1,6 +1,6 @@
 ---
 name: visualize-in-3d
-description: "Visualize anything in 3D - a place, a working system (airport, port, factory, hospital), an object, a creature, an event on real land, or how a thing works. Builds a live three.js app with a film, a lesson, a quick prototype, a documentary, an action short, a showcase, a cutaway plate or a web game, in clean, cinematic, technical or stylized looks, and checks its own frames. Use for \"visualize X in 3D\", \"make a 3D film of X\", \"a live 3D dashboard of X\", \"show off this model\", \"pixel battle\", \"theme point cloud\"."
+description: "Visualize anything in 3D - a place, a working system (airport, port, factory, hospital), an object, a creature, an event on real land, or how a thing works. Builds a live Crucible app with a film, a lesson, a quick prototype, a documentary, an action short, a showcase, a cutaway plate or a web game, in clean, cinematic, technical or stylized looks, and checks its own frames. Use for \"visualize X in 3D\", \"make a 3D film of X\", \"a live 3D dashboard of X\", \"show off this model\", \"pixel battle\", \"theme point cloud\"."
 license: MIT
 ---
 
@@ -21,8 +21,8 @@ Paths use `{{WORK_DIR}}` for the folder where projects live (the current directo
    the usual install folder. If it is missing, say it gives much better models, is free at blender.org, and ask
    whether to wait or go on without it. Without it, follow `references/no-blender.md` and say in the report that
    model quality is lower.
-2. **Node 20+ and Playwright with Chromium** for recording; **ffmpeg** for encoding and checks. **Crucible** renders
-   films and stills: when one is the deliverable, read `references/67js.md` for setup and when to use it.
+2. **Node 20+ and Playwright with Chromium** for recording; **ffmpeg** for encoding and checks. **Crucible** draws
+   every output (apps, films, stills): read `references/crucible.md` for setup before the first build.
 3. **Subagents:** where the harness has them, give each pass to a fresh subagent with its brief and keep it inside
    about 80 tool calls. Where it does not, run the passes one after another in this session, finish and check one
    before starting the next, and re-read the plan file at the start of each.
@@ -39,10 +39,10 @@ Read what the user wants people to see, then pick one shape (or combine two) and
 | A place or system that runs (units, tasks, flows) | Live app with dashboard and a 30 s film | `references/brief.md`, `examples/`; a built world shown as render, then clay model, then render: `references/clay-reveal.md` |
 | How a thing works (aircraft, circuit board, engine) | Lesson app: 3 to 5 lessons, one control each, a "Build your own" sandbox | `references/brief.md` (parts, flow overlays, sandboxes) |
 | Something spreading over real land | Terrain app with a time scrubber | `references/looks.md` (photoreal terrain), `examples/wildfire-valley.md` |
-| A story, case or piece of history | Documentary film | `references/documentary.md`, `references/film.md`, `references/67js.md` |
-| Characters, creatures or machines doing something | Action short | `references/action.md`, `references/67js.md` |
-| One object, product, model or creature to show off | Showcase film or stills | `references/looks.md` (Dither + ASCII showcase, Gradient glow ASCII), `references/film.md`, `references/67js.md` |
-| One object cut open or exploded | Cutaway film, or an app with a section view | `references/film.md`, `references/looks.md`, `references/67js.md` |
+| A story, case or piece of history | Documentary film | `references/documentary.md`, `references/film.md`, `references/crucible.md` |
+| Characters, creatures or machines doing something | Action short | `references/action.md`, `references/crucible.md` |
+| One object, product, model or creature to show off | Showcase film or stills | `references/looks.md` (Dither + ASCII showcase, Gradient glow ASCII), `references/film.md`, `references/crucible.md` |
+| One object cut open or exploded | Cutaway film, or an app with a section view | `references/film.md`, `references/looks.md`, `references/crucible.md` |
 | One big object or building with many rooms, as a page or a book | Book: interactive illustrated cutaway plate, with quizzes | `references/book.md`, `references/looks.md` |
 | A game people play in the browser (steer a creature, survive, grow) | Playable web game, bot-balanced; any other game people play goes to the `game-generalist` skill | `references/game.md` (worked example) |
 | A demo for leaders in about an hour | Quick prototype from ready models, no Blender | `references/live-embed.md` |
@@ -97,4 +97,4 @@ Give fixes to one more pass ("everything else is approved, change nothing else")
 - Render and encode at low priority, one heavy job at a time, and stop every server you start.
 - Real people and real harm: facts from sources, victims named with respect, no gore (`references/documentary.md`).
 - The public copy of this skill is mirrored from this folder. Edit only this folder; never put personal paths, names
-  or tools outside `references/local.md`. A nightly sync script mirrors the rest.
+  or tools outside `references/local.md`. The sync script mirrors the rest.

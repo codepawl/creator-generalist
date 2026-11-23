@@ -42,6 +42,7 @@ mobile or cross-platform game with a big asset store; Unreal for a photoreal rea
 | Blender keyframes, walk cycles, NLA, camera rigs, loops | `references/animation-and-nla.md` |
 | Blender fire, explosions from VDB, lightning, liquid, cloth drapes, ocean, hair and fur, glitch | `references/effects-fx.md` |
 | Blender hotkeys, bpy recipes, add-ons, free vs paid | `references/workflow-and-addons.md` |
+| Fix a broken mesh, clean quads, UVs, LODs, meshopt or KTX2, and proof it still looks the same (`scripts/mesh_prep.py`) | `references/mesh-prep.md` |
 | A web page: GLB loading, compression, animation, lights, colour, export from Blender | `references/threejs.md` |
 | A photoreal room from code in three.js: baked per-vertex light, code textures, filmic grade, film; porting it to a path tracer | `references/threejs-baked-interior.md` |
 | Godot 4: import, materials, AnimationTree, controller, camera, build | `references/godot.md` |

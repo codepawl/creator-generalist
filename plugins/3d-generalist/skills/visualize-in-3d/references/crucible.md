@@ -1,22 +1,27 @@
-# Crucible for films and stills
+# Crucible, the engine for every output
 
-[Crucible](https://github.com/codepawl/crucible) is a WebGL2 engine that an agent drives through an MCP server. It takes a
-scene as a JSON recipe, returns PNG previews and review grids, and renders stills and MP4 video on the GPU or the CPU
-with bounded memory. It has addons for terrain, scanned vegetation and grass, baked liquid, vehicles on paths,
-skinned characters, HDRI light and baked room light. Reading map: When to use it, Setup, From the plan file to a
-film, Faults seen. Its own docs are at https://crucible.codepawl.com/docs.html and in plain text at
+[Crucible](https://github.com/codepawl/crucible) is a WebGL2 engine that draws every output of this skill: live apps,
+films and stills. In an app it is a library (`CrucibleRenderer` with parts and a camera frame); for films and stills
+an agent drives it through an MCP server that takes a scene as a JSON recipe, returns PNG previews and review grids,
+and renders stills and MP4 video on the GPU or the CPU with bounded memory. It has addons for terrain, scanned
+vegetation and grass, baked liquid, vehicles on paths, skinned characters with IK, HDRI light, baked room light, a
+live game loop, input and player controllers. Reading map: When to use what, Setup, A live app, From the plan file
+to a film, Faults seen. Its own docs are at https://crucible.codepawl.com/docs.html and in plain text at
 https://crucible.codepawl.com/llms.txt.
 
-## When to use it
+## When to use what
 
-| Output | Engine |
+| Output | How |
 |---|---|
-| Live app, lesson app, quick prototype, embed, game | three.js. People click, steer and read a dashboard. The app's 30 s film is recorded from the app itself. |
-| Documentary film, action short, cutaway film, showcase film, layer build film | Crucible when it is installed, else three.js with `references/film.md`. |
-| Stills, posters, thumbnails, a model turntable | Crucible. |
-| Real land, forests, grass, water or liquid, vehicles on roads | Crucible addons, also as the stage that a three.js app copies its look from. |
+| Live app, lesson app, quick prototype, embed, game | Crucible as a library in the app (see A live app). People click, steer and read a dashboard. The app's 30 s film is recorded from the app itself. |
+| Documentary film, action short, cutaway film, showcase film, layer build film | Crucible recipe through MCP, with `references/film.md`. |
+| Stills, posters, thumbnails, a model turntable | Crucible recipe through MCP. |
+| Real land, forests, grass, water or liquid, vehicles on roads | Crucible addons, in a recipe or imported into the app. |
 
-Ask once at the start whether Crucible may be installed when a film or a still is the deliverable. It is MIT and on npm.
+The helpers in `scripts/` (`frame-guard.js`, `coplanar-check.js`, `human-arm.js`, `pixel-pass.js`) take Crucible parts,
+camera frames and poses; read each file's header for its inputs. three.js may still help beside Crucible for plain
+math (curves, geometry), but nothing renders through a three.js renderer. A look or feature Crucible lacks is filed at
+https://github.com/codepawl/crucible/issues and built as a user pass or material hook meanwhile.
 
 ## Setup
 
@@ -25,12 +30,40 @@ Ask once at the start whether Crucible may be installed when a film or a still i
 2. Add the MCP server. In Claude Code:
    `claude mcp add crucible-scene -- npx --package @codepawlhq/crucible crucible-mcp --backend gpu --memory 256`.
    On Windows, MCP clients start npm launchers badly: point `command` at `node` and `args` at
-   `<project>/node_modules/67js/bin/crucible-mcp.mjs` with absolute paths. Other clients take the same `command` and
+   `<project>/node_modules/@codepawlhq/crucible/bin/crucible-mcp.mjs` with absolute paths. Other clients take the same `command` and
    `args`. Raise `--memory` (32 to 384 MiB) for textured scenes: a 1080p frame needs about 175 MiB on its own.
 3. Pass `--assets <absolute folder>` for GLB models (up to 64 files, 16 MiB each) and `--audio <absolute folder>`
    for the soundtrack. Restart the server after a GLB changes, because asset IDs bind the file contents.
 4. Install its two skills, which hold the recipe contract and the render presets:
    `npx skills add codepawl/crucible` (`build-crucible-scene` and `render-crucible-media`). Read them before the first recipe.
+
+## A live app
+
+The app imports Crucible like any library (Vite, pinned versions). Blender models from Pass 1 load as GLB:
+
+```js
+import { CrucibleRenderer } from '@codepawlhq/crucible';
+import { loadGltf } from '@codepawlhq/crucible/addons/gltf';
+import { createRuntime } from '@codepawlhq/crucible/addons/runtime';
+
+const world = await loadGltf('models/world.glb');
+const renderer = new CrucibleRenderer(canvas, world.parts, { depth: true, samples: 4 });
+const runtime = createRuntime(renderer, {
+  mode: 'both',
+  fixedRate: 60,
+  frame: (context) => ({ eye: [14, 9, 18], target: [0, 1, 0], time: context.elapsedSeconds }),
+  systems: [inputSystem, simulationSystem],
+});
+runtime.start();
+```
+
+- Move and recolour parts with `renderer.updateParts(parts)`; call `renderer.resize()` when the canvas changes size.
+- Input, rebinding and replay: the Crucible docs `input.md`. Walk, drive and fly controllers and camera rigs:
+  `player.md`. A playable scene from a recipe: `game.md`. Characters: `skeleton-pose.md` (clip layers and IK).
+- The film recorded from the app does not use the runtime: each frame is `renderer.render({ ...camera, time })` from
+  a pure function of time, so a frame at 12.5 s is the same in every take.
+- Looks the engine builds in: toon bands and outlines (`line-art.md`), user post passes for pixel, dither and custom
+  outlines (`user-passes.md`), material hooks for dissolves and cutouts.
 
 ## From the plan file to a film
 

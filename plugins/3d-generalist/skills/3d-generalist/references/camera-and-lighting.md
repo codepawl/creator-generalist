@@ -20,6 +20,7 @@ Field and shutter motion blur work together.
   - Keep influence around `0.4 to 0.7` during close emotional reactions or dialogue.
   - Ramp influence down to `0.0` over 8 to 15 frames when a wide physical event (a cabin tipping over, a bridge
     collapsing) needs the whole set in frame.
+- **No stiff camera:** a camera keyed in code is interpolated with a monotone cubic spline, never linear or linear mixed with an ease, and each channel turns back only at an extreme. Run `visualize-in-3d` `scripts/camera-smoothness.mjs` on the camera function before every preview; it fails on speed jumps and zigzags.
 - **Smooth camera spacing:** never place camera keyframes 2 or 3 frames apart. Space camera keys at least **5 to 8
   frames apart** (or use critically damped springs / smoothstep curves) so the frame never stutters.
 - **Frame named parts straight on:** when the voice names a technical part and pops up its 3D leader-line label, point

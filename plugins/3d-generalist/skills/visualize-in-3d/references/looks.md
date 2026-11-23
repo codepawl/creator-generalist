@@ -51,9 +51,9 @@ Reference: a strait-monitoring app drawn as white dots over terrain. Fits places
 - World: terrain as a dense grid of small white spheres raised by a real heightmap, so slopes shade and valleys sit
   in shadow. Water is a flat, matte plane a clear step darker than the dots (about `#87919b` under white `#f2f2f2` dots), with a sparse dot lattice; a light-grey plane hides white ships. Vehicles and buildings are matte white clay models (no
   textures, no colour) with real detail; wakes, trails and exhaust are particles of the same dots.
-- Rendering: under about 150k dots, `InstancedMesh` of low-poly spheres (8x6 segments). Above that, `THREE.Points`
-  with a sphere-impostor shader (round point sprite, normal from the sprite UV for lambert shading, depth written so
-  dots occlude). Jitter each dot slightly so the grid does not moire. SSAO is what makes it read as 3D; add a light
+- Rendering: under about 150k dots, parts that share one low-poly sphere geometry (8x6 segments), which Crucible
+  batches and culls as instances. Above that, Gaussian splats (Crucible `addons/gaussian-splats`) sized as round dots,
+  which occlude like geometry. Jitter each dot slightly so the grid does not moire. SSAO is what makes it read as 3D; add a light
   bokeh depth of field (tilt-shift) and a soft overcast key light with long, faint shadows. No bloom.
 - Heights: a real DEM of the place (see `real-objects.md`, Terrain), resampled to the dot grid; exaggerate height
   1.5-3x when the land is low.
@@ -120,28 +120,33 @@ frames, music or text: name the risk once and ask the user). Fits a case file or
 ## Pixel diorama
 
 Reference: the "small floating world" pixel style seen in short battle and port clips. Reuse
-`{{SKILL_DIR}}/scripts/pixel-pass.js` (copy to `src/pixel-pass.js`; it only imports `three`). Fits any place seen as
-a small floating world with many tiny units: ports, yards, farms, camps, fairs, battles. Needs no Blender: boxes,
-extrusions and a few icospheres read well at this resolution.
+`{{SKILL_DIR}}/scripts/pixel-pass.js` (copy to `src/pixel-pass.js`; it imports nothing, and its header lists the Crucible
+installs it needs). Fits any place seen as a small floating world with many tiny units: ports, yards, farms, camps,
+fairs, battles. Needs no Blender: boxes, extrusions and a few spheres read well at this resolution.
 
-- Rendering: a real 3D scene drawn at about 360 px across (use `pixelScale` 5 at 1920x1080, so 384x216) and
-  upscaled with nearest-neighbour; one directional sun with real cast shadows; flat toon shading, 3 to 4 tones per
-  material (`createToonMaterial`); dark 1 px outlines around objects from depth edges, light creases from normal
-  edges; a limited natural palette (greens, soil browns, concrete, teal water, muted colours); a plain
-  paper-coloured background; the world is a floating block of 0.5 u cells (a cap cell over a soil column) with
-  ragged edges (cells near the border drop out by noise) and a soil cliff below.
-- Camera: orthographic, azimuth -135 and elevation 30 for the iso views. `snapOrthographicCamera` snaps the camera to
-  whole low-res pixels along its right and up axes and returns the sub-pixel residual that `PixelPass.render` applies
-  while upscaling, so the camera drifts smoothly and nothing shimmers. Ease the focus, zoom, azimuth and elevation
-  yourself every frame; keep zoom changes slow (they re-sample every texel).
-- Smoke, dust and fade-ins: clusters of 4 or 5 icospheres sharing one material with `addDitherDissolve`, an ordered
-  Bayer discard in low-res pixels. Mark the group `userData.skipNormalPass = true`. Units fade in at the edge of the
-  world with the same helper, so nothing appears out of thin air.
-- Water: a flat toon slab, deeper-blue lane stripes, pale arcs (`RingGeometry` arcs that blink on for the middle of
+- Rendering: a Crucible renderer with `depth: true` and `pixelRatio: 1`, the user-pass, render-passes and line-art
+  installs, and `createPixelPass({ pixelScale: 5 })` (1920x1080 gives a 384x216 grid; the canvas size must be a
+  multiple of `pixelScale`). `pixelPass.render(renderer, frame)` replaces `renderer.render(frame)`; a recipe takes
+  `pixelPass.descriptor(frame)` in `postPasses`. One sun with real cast shadows; flat toon shading, 3 to 4 tones per
+  material (`toonMaterialFields(3)`); dark 1 px outlines from depth edges (the threshold is in world units along the
+  view, default 0.55 for about 0.2 units per low-res pixel), light creases from normal edges; a palette of at most 12
+  colours (greens, soil browns, concrete, teal water, muted colours); a plain paper-coloured background; the world is a
+  floating block of 0.5 u cells (a cap cell over a soil column) with ragged edges (cells near the border drop out by
+  noise) and a soil cliff below.
+- Camera: orthographic, azimuth -135 and elevation 30 for the iso views. `snapOrthographicFrame` returns a camera frame
+  snapped to whole low-res pixels along its right and up axes, so nothing shimmers. The pixel grid cannot slide by a
+  sub-pixel residual yet (codepawl/crucible#3161), so a slow pan steps one low-res pixel at a time: ease the focus so
+  the steps are even, and keep zoom changes slow (they re-sample every texel).
+- Smoke, dust and fade-ins: clusters of 4 or 5 spheres whose material carries `createDitherDissolve().snippet`, an
+  ordered Bayer discard in low-res pixels; `setAmount` fades them, and a second set that fades on its own clock needs
+  its own `group`. List those parts in `creaseExcludedParts` so they draw no crease lines. Units fade in at the edge of
+  the world with the same helper, so nothing appears out of thin air.
+- Water: a flat toon slab, deeper-blue lane stripes, pale arcs (thin `torus` arcs that blink on for the middle of
   their life) and sparkles (tiny cubes blinking in steps), plus arcs spawned behind moving boats.
-- Traps: pixel scale too high (units under 3 px vanish; keep boxes at least 4 px), too many shadow-casting instanced
-  meshes (cast shadows only from objects, not ground cells), a half-float render target needs
-  `EXT_color_buffer_half_float` (all WebGL2 desktop), clipping planes need `renderer.localClippingEnabled = true`.
+- Traps: pixel scale too high (units under 3 px vanish; keep boxes at least 4 px), too many shadow-casting repeats
+  (cast shadows only from objects, not ground cells), a renderer without `depth: true` (outlines and creases vanish),
+  a canvas size that is not a multiple of `pixelScale` (the blocks go uneven), and an over-bright sun that pushes every
+  lit face onto the lightest palette colour (light it so the toon tones land on distinct palette entries).
 - Views, each chosen for what it shows best: a wide iso overview, a close-up of the busiest spot, a map-style
   top-down (azimuth 0, elevation 76) for flows, a low side view for arrivals, and a side cutaway of one unit. A
   cutaway clips the camera-side half of that unit with a clipping plane (`material.clippingPlanes`,
@@ -276,8 +281,8 @@ reference app (a chip fab with a roof cut away, three.js with react-three-fiber)
   far wall as a thin backdrop with a teal top rail.
 - Light: one warm sun (`#fff6ea`, intensity about 2.1) from the front-left and high, soft shadow (radius 4, 2048 map,
   shadow box fitted to the site and refreshed every other frame), a hemisphere fill (`#eef4ff` over `#aab6c8`, 0.6),
-  a neutral room environment at 0.3, tone-mapping exposure about 0.74. Postprocessing: N8AO ambient occlusion
-  (radius about 1.6, intensity about 2.4, tint `#33415c`), light bloom only above luminance 1.0 for lamps and screens
+  a neutral room environment at 0.3, tone-mapping exposure about 0.74. Effects: Crucible `ambientOcclusion`
+  (radius about 1.6, strength near the top of its range; tint the shadow side toward `#33415c` with the fill light), light bloom only above luminance 1.0 for lamps and screens
   (intensity 0.7), SMAA. Fog hides the edge of the world.
 - Content: people, vehicles and goods run the real process on a seeded simulation (queue, move, process, move on,
   breakdowns with a ticket and a person who walks to fix it). Zone labels lie flat on the floor in teal pills.
@@ -321,9 +326,9 @@ one is a finished, cinematic frame. No labels and no narration: the picture alon
   made the viewer jump, a fade looked soft), masses rise from the ground, facade detail, roof props, a viewport look with a
   wire sweep and a wire-only beat, clay, materials wipe on building by building, traffic, turntables of two heroes,
   sun move, signs light, four pass panels (albedo, sky, normal, sun), atmosphere, a long push along the street on the final, ending in the shot with no text card.
-- Rendering in three.js: every output frame is an average of many renders (jittered sun passes, sky dome passes,
-  sub-pixel camera jitter, shutter time for motion blur) in half-float targets. Then ray-marched shafts through a sun
-  depth map, depth haze, a steam layer, bloom, a filmic grade, grain. 8 sun and 24 sky passes hold at 1080p.
+- Rendering in Crucible: the `final` render tier or the path tracer for soft sun and sky light, `motionBlur.shutter`
+  for camera smear, volumetric fog with a sun `beamRadius` for shafts, depth haze, a steam layer, bloom, a filmic
+  grade, grain. Check the render time of one 1080p frame before committing to the whole film.
 - Hero frame: camera about 42 degrees down, not 64, and a raking sun so tower shadows fall across the street. Depth
   comes from hard shadow with light haze only: a low sun along the street with thick haze reads as a milky toy. Most of
   the frame sits in open shade, median luminance about 0.2 with little clipped (0.1 and heavy grime read as dark and dirty). Start the shaft march well away from the
@@ -341,7 +346,7 @@ one is a finished, cinematic frame. No labels and no narration: the picture alon
 A technical figure for anything that moves under spacing rules: aircraft, ships, trains, robots on a floor. The floor
 is the map and time is the vertical axis, so each mover is a tube and two tubes touching is a real breach. It looks
 like a live research tool: thin lines, small solid nodes, live readouts and crop brackets. One gesture re-lays the
-same data every few seconds with no cut. It uses plain three.js lines and no models.
+same data every few seconds with no cut. It uses Crucible world-space lines (`environment.lines.polylines`) and no models.
 
 - Each mover is a 1 px centre line plus a ring every 20 s of its time. The ring radius is half the lateral minimum, so
   two rings touch exactly at the minimum. Rings take the alert colour only inside a conflict window.

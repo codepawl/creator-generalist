@@ -33,7 +33,7 @@ tiers, has a 3D viewer Space for search, and keeps the source's licence and cred
 
 To search across libraries by kind, size and tier, read [codepawl/asset-index](https://huggingface.co/datasets/codepawl/asset-index) (one table of assets from several libraries, with how to get each).
 
-Load them in the browser with three.js or [Crucible](https://github.com/codepawl/crucible) (`npm install @codepawlhq/crucible meshoptimizer`).
+Load them in the browser with [Crucible](https://github.com/codepawl/crucible) (`npm install @codepawlhq/crucible meshoptimizer`).
 In Blender, Godot, Unity or Unreal, import the `engine/` tier: it keeps PNG and JPEG textures, because Blender cannot read KTX2.
 
 Then the general sources, in this order:
@@ -52,7 +52,7 @@ Then the general sources, in this order:
    credit "Scenario"). It holds props, characters, creatures, mechs, vehicles and buildings made by image-to-3D and
    text-to-3D generators. Search it by hand and pick by eye from previews. Meshes are static with no skeleton. Use
    them for props and set dressing, or as a base to restyle.
-5. **Build it** in Blender (or three.js, see `no-blender.md`) from a reference sheet (`real-objects.md`).
+5. **Build it** in Blender (or Crucible primitives and modeling, see `no-blender.md`) from a reference sheet (`real-objects.md`).
 
 Ground cover counts as an asset too. Search for it like a prop: a ground texture (ambientCG `Grass005` is a bright
 lawn, `api/v2/full_json?type=Material&q=grass` lists more) and tuft models on Poly Pizza (search "grass"; each

@@ -12,7 +12,7 @@
 Two needs that the full live app does not cover. Read the section that matches the request.
 
 - **Quick prototype**: a 3D view to show leaders this week, on a machine with no Blender, in about an hour of agent
-  time. One pass, models from primitives in three.js, seeded or sample data.
+  time. One pass, models from Crucible primitives, seeded or sample data.
 - **Live embed**: the 3D view goes into a dashboard or product that already exists and runs on the company's real
   data. A data adapter, a field mapping, and a component that any page can drop in.
 
@@ -22,9 +22,10 @@ seeded data to a real feed is a config change.
 ## Quick prototype
 
 Skip Pass 1 and do not ask about Blender. Build everything in one pass in `{{WORK_DIR}}/<topic>/app` with the Pass 2 stack
-(Vite, React, React Three Fiber, drei, postprocessing with N8AO) and these cuts. A named look's own rules win over
-steps 2 and 3: a Space-time cube draws lines and a map, a Point-cloud survey draws dots, a cutaway plate draws its
-plate, and none of them needs props or a dressed ground. Plain three.js without React is fine for those.
+(Vite, React for the dashboard, Crucible for the 3D view with `ambientOcclusion` on; `references/crucible.md`, "A live
+app") and these cuts. A named look's own rules win over steps 2 and 3: a Space-time cube draws lines and a map, a
+Point-cloud survey draws dots, a cutaway plate draws its plate, and none of them needs props or a dressed ground. Plain
+Crucible without React is fine for those.
 
 1. **One site, one process.** The topic file lists one site, four KPIs and three to five stages. Leave out the site
    switcher and the film unless the user asks.
@@ -38,7 +39,7 @@ plate, and none of them needs props or a dressed ground. Plain three.js without 
    materials. A scene of plain boxes and capsules is a fail, not a prototype. Build every main asset from the kit against its reference sheet
    (`real-objects.md`): proportions and part count still matter.
 3. **The look carries the quality.** The look the user named, else the prototype default in `looks.md` (Choosing),
-   Clean ops world: soft shadows, N8AO, a warm key light, a ground
+   Clean ops world: soft shadows, ambient occlusion, a warm key light, a ground
    with real materials, flat colours from one palette. Clean primitives under good light read as a design choice.
 4. **A light UI and motion that explains**, as the Pass 2 brief says: few plain buttons, no default dashboard,
    flows and stages animated, and panels added only when the user asks for them. One theme, the look's own palette;
@@ -176,9 +177,9 @@ Measured on a real walk-through page:
 
 - Artifacts refuse `.glb`, `.gltf` and `.bin` files under any content type. Ship each model as glTF JSON, named
   `<name>.gltf.json`, with the buffer embedded as base64.
-- The page's CSP blocks `fetch()` of `data:` URIs. GLTFLoader cannot read that embedded buffer by itself, and the page
+- The page's CSP blocks `fetch()` of `data:` URIs, so a loader that follows the embedded buffer URI fails, and the page
   shows "could not load" with no console error you can see. In the page, fetch the JSON, decode the buffer, rebuild a
-  GLB in memory and call `gltfLoader.parseAsync`.
+  GLB in memory and pass the `ArrayBuffer` to Crucible's `parseGltf` (`addons/gltf`).
 - Each text file may be 16 MB at most after base64, which adds about a third. Split big scenes and load the rest on
   first use. Textures go as `.webp` files and audio as `.mp3`. Skip Draco and KTX2, because their decoders fetch wasm
   from other hosts.

@@ -44,8 +44,8 @@ production spine (`references/pipeline-spine.md`). It costs one short round of q
 ## Engine pick
 
 - The engine is a brief slot, not a mode.
-- Browser target: three.js, Phaser or plain canvas. Pick the lightest that fits (plain canvas for 2D arcade, Phaser for
-  2D with scenes and physics, three.js for 3D).
+- Browser target: Crucible, Phaser or plain canvas. Pick the lightest that fits (plain canvas for 2D arcade, Phaser for
+  2D with scenes and physics, Crucible for 3D with its runtime, input, player and game addons).
 - Light 2D or 3D game with a native build: Godot or Unity. When the slot is open and no earlier answer is on record,
   ask once with Godot as the recommended option, and record the answer in `brief.md`. Do not ask again in later games.
 - Photoreal, or a jam that requires it: Unreal.

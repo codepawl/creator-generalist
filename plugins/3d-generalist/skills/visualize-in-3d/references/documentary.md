@@ -44,7 +44,7 @@ Write them at the top of the fact file and treat them as binding for every pass:
 
 ## Project shape
 
-A Vite + React + React Three Fiber app with a `film.html` page that plays the film on a virtual clock:
+A Vite + React + Crucible app with a `film.html` page that plays the film on a virtual clock:
 
 - `script.js`: the shot list. Each shot has a scene name, a caption (and an optional title line for date and place),
   a camera for 16:9 and one for 9:16 (`from`/`to` position and target, optional depth-of-field pull), and sound cues

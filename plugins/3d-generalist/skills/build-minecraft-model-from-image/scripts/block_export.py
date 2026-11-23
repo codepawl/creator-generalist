@@ -1,4 +1,4 @@
-"""Packs a BlockModel's face textures into one atlas and writes a GLB with nearest-neighbour sampling, plus a three.js viewer."""
+"""Packs a BlockModel's face textures into one atlas and writes a GLB with nearest-neighbour sampling, plus a Crucible viewer."""
 
 import base64
 import io
@@ -18,83 +18,124 @@ VIEWER_TEMPLATE = """<!doctype html>
 <title>__TITLE__</title>
 <style>
   html, body { margin: 0; height: 100%; background: #e6e2d8; }
-  canvas { display: block; width: 100%; height: 100%; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 </style>
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  "@codepawlhq/crucible": "https://cdn.jsdelivr.net/npm/@codepawlhq/crucible@0.22.0/build/crucible.module.js",
+  "@codepawlhq/crucible/addons/gltf": "https://cdn.jsdelivr.net/npm/@codepawlhq/crucible@0.22.0/build/gltf.js"
 } }
 </script>
 </head>
 <body>
+<canvas id="viewer"></canvas>
 <script type="module">
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { CrucibleRenderer } from "@codepawlhq/crucible";
+import { parseGltf } from "@codepawlhq/crucible/addons/gltf";
 
 const modelBase64 = "__MODEL__";
+const BACKGROUND = [0xe6 / 255, 0xe2 / 255, 0xd8 / 255];
+const FIELD_OF_VIEW = 24;
+const AUTO_ROTATE_RADIANS_PER_SECOND = 0.15;
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xe6e2d8);
-const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-document.body.appendChild(renderer.domElement);
-
-scene.add(new THREE.HemisphereLight(0xffffff, 0xa89f90, 1.9));
-const sun = new THREE.DirectionalLight(0xfff1dc, 2.2);
-sun.position.set(-1.5, 3, 2.5);
-sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
-sun.shadow.normalBias = 0.02;
-scene.add(sun);
-
-const camera = new THREE.PerspectiveCamera(24, 1, 0.01, 200);
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.autoRotate = true;
-controls.autoRotateSpeed = 1.4;
-
+const canvas = document.getElementById("viewer");
 const modelBytes = Uint8Array.from(atob(modelBase64), (character) => character.charCodeAt(0));
-new GLTFLoader().parse(modelBytes.buffer, "", (gltf) => {
-  gltf.scene.traverse((node) => {
-    if (node.isMesh) {
-      node.castShadow = true;
-      node.receiveShadow = true;
+const asset = await parseGltf(modelBytes.buffer);
+
+function worldBounds(parts) {
+  const minimum = [Infinity, Infinity, Infinity];
+  const maximum = [-Infinity, -Infinity, -Infinity];
+  for (const { geometry, matrix } of parts) {
+    const positions = geometry.positions;
+    for (let index = 0; index < positions.length; index += 3) {
+      const x = positions[index];
+      const y = positions[index + 1];
+      const z = positions[index + 2];
+      for (let axis = 0; axis < 3; axis++) {
+        const value = matrix[axis] * x + matrix[4 + axis] * y + matrix[8 + axis] * z + matrix[12 + axis];
+        minimum[axis] = Math.min(minimum[axis], value);
+        maximum[axis] = Math.max(maximum[axis], value);
+      }
     }
-  });
-  scene.add(gltf.scene);
-  const bounds = new THREE.Box3().setFromObject(gltf.scene);
-  const center = bounds.getCenter(new THREE.Vector3());
-  const radius = bounds.getSize(new THREE.Vector3()).length() / 2;
-  controls.target.copy(center);
-  camera.position.set(center.x + radius * 2.2, center.y + radius * 1.6, center.z + radius * 4.2);
-  const ground = new THREE.Mesh(new THREE.CircleGeometry(radius * 12, 64), new THREE.ShadowMaterial({ opacity: 0.22 }));
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.y = bounds.min.y;
-  ground.receiveShadow = true;
-  scene.add(ground);
-  sun.shadow.camera.left = -radius * 2;
-  sun.shadow.camera.right = radius * 2;
-  sun.shadow.camera.top = radius * 2;
-  sun.shadow.camera.bottom = -radius * 2;
-  sun.position.multiplyScalar(radius * 1.5);
-  window.viewerReady = true;
+  }
+  return { minimum, maximum };
+}
+
+const { minimum, maximum } = worldBounds(asset.parts);
+const center = minimum.map((value, axis) => (value + maximum[axis]) / 2);
+const radius = Math.hypot(...maximum.map((value, axis) => value - minimum[axis])) / 2;
+
+// A matte floor under the model that is lit like the page background, so only the shadow stands out.
+const groundSize = radius * 40;
+const groundHeight = minimum[1];
+const groundPart = {
+  name: "ground",
+  geometry: {
+    positions: new Float32Array([-1, 0, -1, -1, 0, 1, 1, 0, 1, 1, 0, -1].map((value, index) => (index % 3 === 1 ? 0 : value * groundSize))),
+    normals: new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0]),
+    indices: new Uint32Array([0, 1, 2, 0, 2, 3]),
+  },
+  matrix: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, center[0], groundHeight - radius * 0.002, center[2], 1]),
+  material: { color: [0.74, 0.69, 0.6], metallic: 0, roughness: 1, emission: 0 },
+};
+
+const renderer = new CrucibleRenderer(canvas, [...asset.parts, groundPart], {
+  ground: false,
+  samples: 4,
+  pixelRatio: Math.min(window.devicePixelRatio, 2),
+  background: BACKGROUND,
+  environment: { lightDirection: [-1.5, 3, 2.5], keyIntensity: 1.1, fillIntensity: 1, ambientIntensity: 1.2 },
+  shadowBounds: { target: center, extent: radius * 4 },
 });
 
-function resize() {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-}
-window.addEventListener("resize", resize);
-resize();
-renderer.setAnimationLoop(() => {
-  controls.update();
-  renderer.render(scene, camera);
+// Orbit state: start at the same angle and distance as before.
+let azimuth = Math.atan2(2.2, 4.2);
+let elevation = Math.atan2(1.6, Math.hypot(2.2, 4.2));
+let distance = radius * Math.hypot(2.2, 1.6, 4.2);
+let autoRotate = true;
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+
+canvas.addEventListener("pointerdown", (event) => {
+  dragging = true;
+  autoRotate = false;
+  lastX = event.clientX;
+  lastY = event.clientY;
+  canvas.setPointerCapture(event.pointerId);
 });
+canvas.addEventListener("pointermove", (event) => {
+  if (!dragging) return;
+  azimuth -= (event.clientX - lastX) * 0.008;
+  elevation = Math.min(1.5, Math.max(-0.2, elevation + (event.clientY - lastY) * 0.008));
+  lastX = event.clientX;
+  lastY = event.clientY;
+});
+canvas.addEventListener("pointerup", () => { dragging = false; });
+canvas.addEventListener("wheel", (event) => {
+  event.preventDefault();
+  distance = Math.min(radius * 30, Math.max(radius * 0.8, distance * Math.exp(event.deltaY * 0.001)));
+}, { passive: false });
+
+window.addEventListener("resize", () => renderer.resize());
+
+let previousTime = performance.now();
+function frame(now) {
+  const elapsed = Math.min((now - previousTime) / 1000, 0.1);
+  previousTime = now;
+  if (autoRotate) azimuth += AUTO_ROTATE_RADIANS_PER_SECOND * elapsed;
+  const horizontal = Math.cos(elevation) * distance;
+  const eye = [
+    center[0] + Math.sin(azimuth) * horizontal,
+    center[1] + Math.sin(elevation) * distance,
+    center[2] + Math.cos(azimuth) * horizontal,
+  ];
+  renderer.render({ eye, target: center, fov: FIELD_OF_VIEW, far: radius * 200 });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.viewerMagFilter = asset.parts.find((part) => part.material.map)?.material.map.magFilter;
+window.viewerReady = true;
 </script>
 </body>
 </html>

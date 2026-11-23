@@ -1,353 +1,223 @@
-// Pixel pass for three.js: a real 3D scene drawn at a low internal resolution and upscaled with nearest-neighbour
-// sampling, with outlines from depth and normal edges, optional palette quantising, a dither-dissolve material
-// helper and a pixel-snapped orthographic camera. Used by the "pixel diorama" look (references/looks.md).
+// Pixel pass for Crucible: a real 3D scene drawn at full size and then reduced to a low-res pixel grid by one user post
+// pass (docs/user-passes.md in the crucible repo): nearest-neighbour blocks, outlines from depth edges, light crease lines
+// from normal edges, optional palette quantising with Bayer dither. Beside it: toon light as material fields, a
+// dither-dissolve material hook and a camera frame snapped to the pixel grid. Used by the "pixel diorama" look
+// (references/looks.md). No three.js: it imports nothing.
 //
-// Copy this file into an app (src/pixel-pass.js); it only imports "three" (tested with 0.186).
+// Copy this file into an app (src/pixel-pass.js). Needs @codepawlhq/crucible 0.21 or newer.
 //
-//   const pass = new PixelPass(renderer, { pixelScale: 5, outlineColor: 0x1b1722 });
-//   pass.setSize(window.innerWidth, window.innerHeight);           // canvas pixels, pixel ratio 1
-//   const residual = snapOrthographicCamera(camera, { focus, azimuthDegrees: 45, elevationDegrees: 30,
-//       distance: 120, viewHeight: 40, lowResWidth: pass.lowResWidth, lowResHeight: pass.lowResHeight });
-//   pass.render(scene, camera, residual);                            // every frame instead of renderer.render
+//   import { CrucibleRenderer } from '@codepawlhq/crucible';
+//   import { installUserPasses } from '@codepawlhq/crucible/addons/user-pass';
+//   import { installRenderPasses } from '@codepawlhq/crucible/addons/render-passes';   // toon light and the crease
+//   import { installLineArt } from '@codepawlhq/crucible/addons/line-art';             // object list need these two
+//   // A recipe with a material snippet needs: await loadAgentSceneModules(recipe) before createAgentScene.
+//   const renderer = new CrucibleRenderer(canvas, scene.parts, { depth: true, samples: 4, ground: false, pixelRatio: 1 });
+//   installLineArt(installRenderPasses(renderer));
+//   installUserPasses(renderer);
+//   const pixelPass = createPixelPass({ pixelScale: 5, outlineColor: 0x1b1722, palette: [0xf4f1e8, 0x5b8c4a] });
+//   // canvas width and height must be multiples of pixelScale (1920x1080 with 5 gives a 384x216 grid)
+//   const frame = snapOrthographicFrame({ focus: [0, 0, 0], azimuthDegrees: -135, elevationDegrees: 30,
+//       distance: 120, viewHeight: 40, canvasHeight: 1080, pixelScale: 5 });
+//   pixelPass.render(renderer, frame);                    // every frame instead of renderer.render(frame)
+//
+// A recipe works too: put `pixelPass.descriptor(frame)` into `postPasses`.
+// Materials: { color, ...toonMaterialFields(3) } and, for fades, { snippet: dissolve.snippet } (see createDitherDissolve).
 
-import * as THREE from 'three';
+export const MAXIMUM_PALETTE_COLORS = 12;
 
-const MAXIMUM_PALETTE_COLORS = 32;
+// 4096 bytes of code is the limit for a pass, comments not counted. Uniforms (16 at most): edge = (depth threshold in
+// world units, normal threshold 0..2, crease darkness, outline tint), outlineColor, forward (camera view direction),
+// paletteInfo = (colour count, dither strength) and colour0..colour11 for the palette.
+const PIXEL_PASS_FRAGMENT = /* glsl */ `
+const float bayer[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
+const vec2 offsets[4] = vec2[4](vec2(1.0, 0.0), vec2(-1.0, 0.0), vec2(0.0, 1.0), vec2(0.0, -1.0));
 
-const BAYER_FUNCTION_GLSL = /* glsl */ `
-float bayer4(vec2 pixelCoordinate) {
-  vec2 cell = mod(floor(pixelCoordinate), 4.0);
-  float index = cell.x + cell.y * 4.0;
-  // 4x4 Bayer matrix, values 0..15, laid out row by row.
-  float values[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
-  return (values[int(index)] + 0.5) / 16.0;
-}
-`;
-
-const FULLSCREEN_VERTEX_SHADER = /* glsl */ `
-void main() {
-  gl_Position = vec4(position.xy, 0.0, 1.0);
-}
-`;
-
-const COMPOSITE_FRAGMENT_SHADER = /* glsl */ `
-precision highp float;
-uniform sampler2D colorTexture;
-uniform sampler2D depthTexture;
-uniform sampler2D normalTexture;
-uniform vec2 lowResSize;        // size of the render target in texels (includes the 1 px margin)
-uniform vec2 residual;          // sub-pixel camera offset in low-res pixels
-uniform float pixelScale;       // canvas pixels per low-res pixel
-uniform float cameraNear;
-uniform float cameraFar;
-uniform vec3 outlineColor;
-uniform float outlineTint;      // 0 = flat outline colour, 1 = outline takes the darkened colour of the near object
-uniform float depthEdgeThreshold;   // world units
-uniform float normalEdgeThreshold;  // 0..2, difference of unit normals
-uniform float creaseDarkness;       // 0 = no inner lines
-uniform int paletteSize;
-uniform vec3 palette[${MAXIMUM_PALETTE_COLORS}];
-uniform float paletteDither;
-
-${BAYER_FUNCTION_GLSL}
-
-float worldDepth(vec2 texel) {
-  float raw = texture2D(depthTexture, (texel + 0.5) / lowResSize).x;
-  return cameraNear + raw * (cameraFar - cameraNear);
+// Full-size pixel uv at the middle of a low-res cell, so colour, depth and normal all read the same pixel.
+vec2 pixelUv(vec2 cell) {
+  vec2 full = vec2(textureSize(sceneColor, 0));
+  vec2 inside = clamp(cell, vec2(0.0), resolution - 1.0);
+  return (floor((inside + 0.5) * full / resolution) + 0.5) / full;
 }
 
-vec3 normalAt(vec2 texel) {
-  return texture2D(normalTexture, (texel + 0.5) / lowResSize).xyz * 2.0 - 1.0;
+// Distance along the view direction; the background counts as very far.
+float depthOf(vec2 cell) {
+  vec2 uv = pixelUv(cell);
+  if (depthAt(uv) >= 1.0) return 10000.0;
+  return dot(worldPointAt(uv) - cameraEye, forward);
 }
 
-vec3 colorAt(vec2 texel) {
-  return texture2D(colorTexture, (texel + 0.5) / lowResSize).rgb;
-}
-
-vec3 quantise(vec3 color, vec2 lowCoordinate) {
-  if (paletteSize == 0) return color;
-  float bias = (bayer4(lowCoordinate) - 0.5) * paletteDither;
-  vec3 biased = color + bias;
-  float bestDistance = 1e9;
-  vec3 best = palette[0];
-  for (int index = 0; index < ${MAXIMUM_PALETTE_COLORS}; index++) {
-    if (index >= paletteSize) break;
-    vec3 difference = biased - palette[index];
+vec3 snapToPalette(vec3 colour, vec2 cell) {
+  if (paletteInfo.x < 0.5) return colour;
+  vec3 colours[12] = vec3[12](colour0, colour1, colour2, colour3, colour4, colour5, colour6, colour7, colour8, colour9, colour10, colour11);
+  ivec2 corner = ivec2(mod(cell, 4.0));
+  vec3 biased = colour + ((bayer[corner.y * 4 + corner.x] + 0.5) / 16.0 - 0.5) * paletteInfo.y;
+  vec3 best = colours[0];
+  float bestDistance = 1.0e9;
+  for (int index = 0; index < 12; index++) {
+    vec3 difference = biased - colours[index];
     float distanceSquared = dot(difference, difference);
-    if (distanceSquared < bestDistance) {
+    if (float(index) < paletteInfo.x && distanceSquared < bestDistance) {
       bestDistance = distanceSquared;
-      best = palette[index];
+      best = colours[index];
     }
   }
   return best;
 }
 
-void main() {
-  // Canvas pixel -> low-res texel. The +1 skips the margin, the residual slides the image by the camera's
-  // sub-pixel offset so the camera moves smoothly while the pixels themselves never shimmer.
-  vec2 lowCoordinate = gl_FragCoord.xy / pixelScale + residual + 1.0;
-  vec2 texel = floor(lowCoordinate);
-
-  vec3 color = colorAt(texel);
-  float centerDepth = worldDepth(texel);
-  vec3 centerNormal = normalAt(texel);
-
-  vec2 offsets[4] = vec2[4](vec2(1.0, 0.0), vec2(-1.0, 0.0), vec2(0.0, 1.0), vec2(0.0, -1.0));
-  float nearestNeighbourDepth = centerDepth;
-  vec3 nearestNeighbourColor = color;
-  float creaseAmount = 0.0;
+vec4 userPass(vec2 uv) {
+  vec2 cell = floor(gl_FragCoord.xy);
+  vec2 centreUv = pixelUv(cell);
+  vec3 colour = texture(sceneColor, centreUv).rgb;
+  float centreDepth = depthOf(cell);
+  vec3 centreNormal = worldNormalAt(centreUv);
+  float nearestDepth = centreDepth;
+  vec3 nearestColour = colour;
+  float crease = 0.0;
   for (int index = 0; index < 4; index++) {
-    vec2 neighbour = texel + offsets[index];
-    float neighbourDepth = worldDepth(neighbour);
-    if (neighbourDepth < nearestNeighbourDepth) {
-      nearestNeighbourDepth = neighbourDepth;
-      nearestNeighbourColor = colorAt(neighbour);
+    vec2 neighbour = cell + offsets[index];
+    float neighbourDepth = depthOf(neighbour);
+    if (neighbourDepth < nearestDepth) {
+      nearestDepth = neighbourDepth;
+      nearestColour = texture(sceneColor, pixelUv(neighbour)).rgb;
     }
-    if (abs(neighbourDepth - centerDepth) < depthEdgeThreshold) {
-      float normalDifference = length(normalAt(neighbour) - centerNormal);
-      creaseAmount = max(creaseAmount, step(normalEdgeThreshold, normalDifference));
-    }
+    if (abs(neighbourDepth - centreDepth) < edge.x && length(worldNormalAt(pixelUv(neighbour)) - centreNormal) >= edge.y) crease = 1.0;
   }
-
-  // Outline: this pixel lies behind a clearly nearer neighbour, so the line is drawn just outside the silhouette.
-  float isOutline = step(depthEdgeThreshold, centerDepth - nearestNeighbourDepth);
-  vec3 lineColor = mix(outlineColor, nearestNeighbourColor * 0.35, outlineTint);
-  color = mix(color, color * (1.0 - creaseDarkness), creaseAmount);
-  color = quantise(color, lowCoordinate);
-  color = mix(color, lineColor, isOutline);
-
-  gl_FragColor = vec4(color, 1.0);
-  #include <colorspace_fragment>
+  // No creases on the background or on parts listed in the pass's objects (smoke, dust).
+  if (centreDepth > 5000.0 || objectSlotAt(centreUv) >= 0) crease = 0.0;
+  // The outline is the cell behind a clearly nearer neighbour, so it sits just outside the silhouette.
+  float isOutline = step(edge.x, centreDepth - nearestDepth);
+  vec3 lineColour = mix(outlineColor, nearestColour * 0.35, edge.w);
+  colour = snapToPalette(mix(colour, colour * (1.0 - edge.z), crease), cell);
+  return vec4(mix(colour, lineColour, isOutline), 1.0);
 }
 `;
 
-// A stepped gradient map for MeshToonMaterial: "tones" flat bands from dark to light, no smoothing.
-export function createToonGradient(tones = 3, darkest = 0.45) {
-  const data = new Uint8Array(tones * 4);
-  for (let tone = 0; tone < tones; tone++) {
-    const level = tones === 1 ? 1 : darkest + (1 - darkest) * (tone / (tones - 1));
-    const byte = Math.round(level * 255);
-    data.set([byte, byte, byte, 255], tone * 4);
-  }
-  const texture = new THREE.DataTexture(data, tones, 1, THREE.RGBAFormat);
-  texture.minFilter = THREE.NearestFilter;
-  texture.magFilter = THREE.NearestFilter;
-  texture.generateMipmaps = false;
-  texture.needsUpdate = true;
-  return texture;
+function hexToDisplayColor(hex) {
+  return [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
 }
 
-const gradientCache = new Map();
-
-// Flat toon material with 3 to 4 tones. Casts and receives real shadows through the scene's directional light.
-export function createToonMaterial(color, options = {}) {
-  const tones = options.tones ?? 3;
-  const darkest = options.darkest ?? 0.5;
-  const cacheKey = `${tones}:${darkest}`;
-  if (!gradientCache.has(cacheKey)) gradientCache.set(cacheKey, createToonGradient(tones, darkest));
-  return new THREE.MeshToonMaterial({ color, gradientMap: gradientCache.get(cacheKey), ...options.materialOptions });
-}
-
-// Adds an ordered-dither dissolve to any material. The returned object holds `amount` (0 = solid, 1 = gone);
-// materials that share one controller dissolve together. The Bayer pattern is read in low-res pixels because
-// the scene is drawn at the low resolution, so the dither cells are real pixels.
-export function addDitherDissolve(material, controller = { amount: 0 }) {
-  const previousHook = material.onBeforeCompile;
-  material.onBeforeCompile = (shader, renderer) => {
-    if (previousHook) previousHook(shader, renderer);
-    shader.uniforms.ditherAmount = controller.uniform ?? (controller.uniform = { value: controller.amount });
-    shader.fragmentShader = shader.fragmentShader
-      .replace('void main() {', `uniform float ditherAmount;\n${BAYER_FUNCTION_GLSL}\nvoid main() {`)
-      .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>\n  if (bayer4(gl_FragCoord.xy) < ditherAmount) discard;`);
+// Creates the pass. Options: pixelScale (screen pixels per low-res pixel, 1 to 20), outlineColor (hex), outlineTint
+// (0 flat outline colour, 1 the darkened colour of the near object), depthEdgeThreshold (world units),
+// normalEdgeThreshold (0..2), creaseDarkness (0 = no inner lines), palette (up to 12 hex sRGB colours or null),
+// paletteDither (0 off, about 0.1 to 0.3 visible), creaseExcludedParts (up to 16 part names that get no crease lines).
+export function createPixelPass(options = {}) {
+  const pixelScale = options.pixelScale ?? 5;
+  if (!(pixelScale >= 1 && pixelScale <= 20)) throw new RangeError('pixelScale must be between 1 and 20 (a Crucible pass scale is 0.05 to 1).');
+  const pass = {
+    pixelScale,
+    name: 'pixel-pass',
+    scale: 1 / pixelScale,
+    fragment: PIXEL_PASS_FRAGMENT,
+    uniforms: {
+      edge: [options.depthEdgeThreshold ?? 0.55, options.normalEdgeThreshold ?? 0.9, options.creaseDarkness ?? 0.22, options.outlineTint ?? 0.35],
+      outlineColor: hexToDisplayColor(options.outlineColor ?? 0x1b1722),
+      forward: [0, 0, -1],
+      paletteInfo: [0, 0],
+    },
+    ...(options.creaseExcludedParts?.length ? { objects: [...options.creaseExcludedParts] } : {}),
   };
-  material.customProgramCacheKey = () => 'dither-dissolve';
-  material.needsUpdate = true;
-  controller.uniform = controller.uniform ?? { value: controller.amount };
-  controller.set = (amount) => {
-    controller.amount = amount;
-    controller.uniform.value = amount;
+  for (let slot = 0; slot < MAXIMUM_PALETTE_COLORS; slot++) pass.uniforms[`colour${slot}`] = [0, 0, 0];
+
+  // Hex sRGB colours, or null to switch quantising off. Colours past the twelfth are ignored.
+  pass.setPalette = (hexColors, ditherStrength = pass.uniforms.paletteInfo[1]) => {
+    const colors = (hexColors ?? []).slice(0, MAXIMUM_PALETTE_COLORS);
+    colors.forEach((hex, slot) => { pass.uniforms[`colour${slot}`] = hexToDisplayColor(hex); });
+    pass.uniforms.paletteInfo = [colors.length, ditherStrength];
   };
-  return controller;
+  if (options.palette) pass.setPalette(options.palette, options.paletteDither ?? 0);
+
+  // The pass as Crucible takes it (recipe `postPasses` entry or `renderer.userPasses.set` item), with the view direction of `frame`.
+  pass.descriptor = (frame) => {
+    if (frame) pass.uniforms.forward = viewDirection(frame);
+    const { name, scale, fragment, uniforms, objects } = pass;
+    return { name, scale, fragment, uniforms: { ...uniforms }, ...(objects ? { objects } : {}) };
+  };
+
+  // Draws `frame` through the pass. Call it every frame instead of renderer.render(frame).
+  pass.render = (renderer, frame) => {
+    // The pass reads part ids from the object ID pass, which Crucible draws only when asked, and before the beauty frame.
+    if (pass.objects) renderer.render({ ...frame, pass: 'objectId' });
+    renderer.userPasses.set([pass.descriptor(frame)]);
+    renderer.render(frame);
+  };
+  return pass;
 }
 
-// Places an orthographic camera on the low-res pixel grid and returns the sub-pixel residual (in low-res pixels)
-// for PixelPass.render. The camera looks at `focus` from the given compass azimuth and elevation. Snapping the
-// camera to whole low-res pixels along its own right and up axes keeps every texel of the world on a texel of
-// the image while the focus moves continuously, which removes shimmer; the residual is applied when upscaling.
-export function snapOrthographicCamera(camera, settings) {
-  const { focus, azimuthDegrees, elevationDegrees, distance, viewHeight, lowResWidth, lowResHeight } = settings;
-  const azimuth = THREE.MathUtils.degToRad(azimuthDegrees);
-  const elevation = THREE.MathUtils.degToRad(elevationDegrees);
-  const toCamera = new THREE.Vector3(
-    Math.sin(azimuth) * Math.cos(elevation),
-    Math.sin(elevation),
-    Math.cos(azimuth) * Math.cos(elevation),
-  );
-  const worldUp = new THREE.Vector3(0, 1, 0);
-  const right = new THREE.Vector3().crossVectors(worldUp, toCamera).normalize();
-  const up = new THREE.Vector3().crossVectors(toCamera, right).normalize();
-
-  const unitsPerPixel = viewHeight / lowResHeight;
-  const rightCoordinate = focus.dot(right);
-  const upCoordinate = focus.dot(up);
-  const snappedRight = Math.round(rightCoordinate / unitsPerPixel) * unitsPerPixel;
-  const snappedUp = Math.round(upCoordinate / unitsPerPixel) * unitsPerPixel;
-  const snappedFocus = focus
-    .clone()
-    .addScaledVector(right, snappedRight - rightCoordinate)
-    .addScaledVector(up, snappedUp - upCoordinate);
-
-  // The render target has a one pixel margin on every side, so the frustum covers two extra pixels.
-  const halfHeight = ((lowResHeight + 2) * unitsPerPixel) / 2;
-  const halfWidth = ((lowResWidth + 2) * unitsPerPixel) / 2;
-  camera.left = -halfWidth;
-  camera.right = halfWidth;
-  camera.top = halfHeight;
-  camera.bottom = -halfHeight;
-  camera.near = 0.5;
-  camera.far = distance * 2.2;
-  camera.position.copy(snappedFocus).addScaledVector(toCamera, distance);
-  camera.up.set(0, 1, 0);
-  camera.lookAt(snappedFocus);
-  camera.updateProjectionMatrix();
-  camera.updateMatrixWorld(true);
-
-  return new THREE.Vector2(
-    (rightCoordinate - snappedRight) / unitsPerPixel,
-    (upCoordinate - snappedUp) / unitsPerPixel,
-  );
+function viewDirection(frame) {
+  const { eye, target } = frame;
+  const direction = [target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]];
+  const length = Math.hypot(...direction);
+  return direction.map((component) => component / length);
 }
 
-export class PixelPass {
-  constructor(renderer, options = {}) {
-    this.renderer = renderer;
-    this.pixelScale = options.pixelScale ?? 5;
-    this.backgroundColor = new THREE.Color(options.backgroundColor ?? 0xf4f1e8);
-    this.lowResWidth = 1;
-    this.lowResHeight = 1;
+// Toon light is native in Crucible: spread these fields into a material. `tones` flat bands from `darkest` to 1,
+// as grey weights on the light (add a tint with your own toonColors). Raise the ambient light to lift the dark side.
+export function toonMaterialFields(tones = 3, darkest = 0.5) {
+  const levels = Array.from({ length: tones }, (_, tone) => (tones === 1 ? 1 : darkest + (1 - darkest) * (tone / (tones - 1))));
+  return { toon: tones, toonColors: levels.map((level) => [level, level, level]) };
+}
 
-    this.colorTarget = null;
-    this.normalTarget = null;
-    this.normalMaterial = new THREE.MeshNormalMaterial();
+// Ordered 4x4 Bayer dissolve as a material fragment hook. The cell is `pixelScale` screen pixels, so the dither cells
+// line up with the pixel grid. Parts of one group fade together (every material that carries the same code shares
+// one `amount`); give a second fading set its own `group` number. Put `dissolve.snippet` in a material and call
+// dissolve.setAmount(scene, renderer, [materialIds], 0.5) each frame (0 solid, 1 gone; no recompile, about 1 ms).
+// The shadow of a dissolving part dithers on the shadow map's own pixel grid, so it fades softly, not in blocks.
+export function createDitherDissolve({ pixelScale = 5, group = 0 } = {}) {
+  const marker = `dissolveGroup${group}`;
+  const snippet = {
+    uniforms: { amount: 0, cellSize: pixelScale },
+    fragment: `
+const float ${marker} = 1.0;
+const float bayer[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
+void materialHook(inout vec3 color, inout float alpha, vec2 uv, vec3 worldPosition) {
+  ivec2 cell = ivec2(gl_FragCoord.xy / cellSize) & 3;
+  if ((bayer[cell.y * 4 + cell.x] + 0.5) / 16.0 < amount) discard;
+}`,
+  };
+  // Sets the amount on these recipe materials with the scene's own edit and hands the new parts to the renderer. Writing
+  // the uniform on a part in place does nothing: Crucible keeps one value per snippet code, set when a material is made.
+  const setAmount = (scene, renderer, materialIds, amount) => {
+    scene.apply(
+      materialIds.map((id) => ({ type: 'set-material', id, snippet: { ...snippet, uniforms: { ...snippet.uniforms, amount } } })),
+      { expectedRevision: scene.revision },
+    );
+    renderer.replaceParts(scene.parts);
+  };
+  return { snippet, setAmount };
+}
 
-    this.compositeMaterial = new THREE.ShaderMaterial({
-      vertexShader: FULLSCREEN_VERTEX_SHADER,
-      fragmentShader: COMPOSITE_FRAGMENT_SHADER,
-      depthTest: false,
-      depthWrite: false,
-      uniforms: {
-        colorTexture: { value: null },
-        depthTexture: { value: null },
-        normalTexture: { value: null },
-        lowResSize: { value: new THREE.Vector2(1, 1) },
-        residual: { value: new THREE.Vector2() },
-        pixelScale: { value: this.pixelScale },
-        cameraNear: { value: 0.5 },
-        cameraFar: { value: 100 },
-        outlineColor: { value: new THREE.Color(options.outlineColor ?? 0x1b1722) },
-        outlineTint: { value: options.outlineTint ?? 0.35 },
-        depthEdgeThreshold: { value: options.depthEdgeThreshold ?? 0.55 },
-        normalEdgeThreshold: { value: options.normalEdgeThreshold ?? 0.9 },
-        creaseDarkness: { value: options.creaseDarkness ?? 0.22 },
-        paletteSize: { value: 0 },
-        palette: { value: Array.from({ length: MAXIMUM_PALETTE_COLORS }, () => new THREE.Color()) },
-        paletteDither: { value: options.paletteDither ?? 0.0 },
-      },
-    });
-    this.quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.compositeMaterial);
-    this.quad.frustumCulled = false;
-    this.quadScene = new THREE.Scene();
-    this.quadScene.add(this.quad);
-    this.quadCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+// A camera frame for renderer.render(frame): orthographic, looking at `focus` from the compass azimuth and elevation
+// (degrees). The target slides along the camera's own right and up axes onto whole low-res pixels, so every world
+// texel stays on one image texel while `focus` moves continuously, which removes shimmer. The camera therefore steps
+// in whole low-res pixels; unlike the three.js version there is no sub-pixel residual that slides the upscaled image.
+export function snapOrthographicFrame({ focus, azimuthDegrees, elevationDegrees, distance, viewHeight, canvasHeight, pixelScale }) {
+  const azimuth = (azimuthDegrees * Math.PI) / 180;
+  const elevation = (elevationDegrees * Math.PI) / 180;
+  const towardCamera = [Math.sin(azimuth) * Math.cos(elevation), Math.sin(elevation), Math.cos(azimuth) * Math.cos(elevation)];
+  const right = normalise(cross([0, 1, 0], towardCamera));
+  const up = normalise(cross(towardCamera, right));
 
-    if (options.palette) this.setPalette(options.palette);
-  }
+  const unitsPerPixel = viewHeight / Math.round(canvasHeight / pixelScale);
+  const rightOffset = Math.round(dot(focus, right) / unitsPerPixel) * unitsPerPixel - dot(focus, right);
+  const upOffset = Math.round(dot(focus, up) / unitsPerPixel) * unitsPerPixel - dot(focus, up);
+  const target = focus.map((component, axis) => component + right[axis] * rightOffset + up[axis] * upOffset);
+  const eye = target.map((component, axis) => component + towardCamera[axis] * distance);
+  return { eye, target, up: [0, 1, 0], near: 0.5, far: distance * 2.2, projection: 'orthographic', orthoScale: viewHeight };
+}
 
-  // Hex colours (sRGB). Pass null to switch quantising off. At most 32 colours.
-  setPalette(hexColors, ditherStrength = this.compositeMaterial.uniforms.paletteDither.value) {
-    const uniforms = this.compositeMaterial.uniforms;
-    if (!hexColors || hexColors.length === 0) {
-      uniforms.paletteSize.value = 0;
-      return;
-    }
-    const count = Math.min(hexColors.length, MAXIMUM_PALETTE_COLORS);
-    for (let index = 0; index < count; index++) uniforms.palette.value[index].set(hexColors[index]);
-    uniforms.paletteSize.value = count;
-    uniforms.paletteDither.value = ditherStrength;
-  }
+function dot(first, second) {
+  return first[0] * second[0] + first[1] * second[1] + first[2] * second[2];
+}
 
-  setBackground(color) {
-    this.backgroundColor.set(color);
-  }
+function cross(first, second) {
+  return [
+    first[1] * second[2] - first[2] * second[1],
+    first[2] * second[0] - first[0] * second[2],
+    first[0] * second[1] - first[1] * second[0],
+  ];
+}
 
-  // Canvas size in pixels. Keep the renderer's pixel ratio at 1 so the pixel scale is exact.
-  setSize(canvasWidth, canvasHeight) {
-    this.renderer.setPixelRatio(1);
-    this.renderer.setSize(canvasWidth, canvasHeight, false);
-    this.lowResWidth = Math.ceil(canvasWidth / this.pixelScale);
-    this.lowResHeight = Math.ceil(canvasHeight / this.pixelScale);
-    this.colorTarget?.dispose();
-    this.normalTarget?.dispose();
-    const width = this.lowResWidth + 2;
-    const height = this.lowResHeight + 2;
-    this.colorTarget = new THREE.WebGLRenderTarget(width, height, {
-      type: THREE.HalfFloatType,
-      minFilter: THREE.NearestFilter,
-      magFilter: THREE.NearestFilter,
-      depthBuffer: true,
-      samples: 0,
-    });
-    this.colorTarget.depthTexture = new THREE.DepthTexture(width, height);
-    this.colorTarget.depthTexture.minFilter = THREE.NearestFilter;
-    this.colorTarget.depthTexture.magFilter = THREE.NearestFilter;
-    this.normalTarget = new THREE.WebGLRenderTarget(width, height, {
-      type: THREE.UnsignedByteType,
-      minFilter: THREE.NearestFilter,
-      magFilter: THREE.NearestFilter,
-      depthBuffer: true,
-    });
-    this.compositeMaterial.uniforms.lowResSize.value.set(width, height);
-    this.compositeMaterial.uniforms.pixelScale.value = this.pixelScale;
-  }
-
-  // Draws the scene to the canvas. `residual` comes from snapOrthographicCamera.
-  render(scene, camera, residual = new THREE.Vector2()) {
-    const renderer = this.renderer;
-    const previousBackground = scene.background;
-    const previousAutoUpdate = renderer.shadowMap.autoUpdate;
-
-    scene.background = this.backgroundColor;
-    renderer.setRenderTarget(this.colorTarget);
-    renderer.clear();
-    renderer.render(scene, camera);
-
-    // Normal pass for crease lines. Objects flagged userData.skipNormalPass (dissolving smoke) are hidden in it.
-    const hidden = [];
-    scene.traverse((object) => {
-      if (object.visible && object.userData.skipNormalPass) {
-        object.visible = false;
-        hidden.push(object);
-      }
-    });
-    scene.background = new THREE.Color(0x8080ff);
-    scene.overrideMaterial = this.normalMaterial;
-    renderer.shadowMap.autoUpdate = false;
-    renderer.setRenderTarget(this.normalTarget);
-    renderer.clear();
-    renderer.render(scene, camera);
-    renderer.shadowMap.autoUpdate = previousAutoUpdate;
-    scene.overrideMaterial = null;
-    scene.background = previousBackground;
-    for (const object of hidden) object.visible = true;
-
-    const uniforms = this.compositeMaterial.uniforms;
-    uniforms.colorTexture.value = this.colorTarget.texture;
-    uniforms.depthTexture.value = this.colorTarget.depthTexture;
-    uniforms.normalTexture.value = this.normalTarget.texture;
-    uniforms.residual.value.copy(residual);
-    uniforms.cameraNear.value = camera.near;
-    uniforms.cameraFar.value = camera.far;
-    renderer.setRenderTarget(null);
-    renderer.render(this.quadScene, this.quadCamera);
-  }
+function normalise(vector) {
+  const length = Math.hypot(...vector);
+  return vector.map((component) => component / length);
 }

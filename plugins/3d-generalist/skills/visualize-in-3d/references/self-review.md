@@ -16,8 +16,9 @@ measurement or a look at the frames could have found.
 
 ## Each round
 
-1. **Measure.** Copy `{{SKILL_DIR}}/scripts/frame-guard.js` into the project. In the frame function, log
-   `measureSubjects` for each thing the viewer must follow. Examples: actors, the selected unit, a moving vehicle,
+1. **Measure.** Copy `{{SKILL_DIR}}/scripts/frame-guard.js` into the project (it imports
+   `@codepawlhq/crucible/addons/scene-query`). In the frame function, log `measureSubjects(frame, subjects, size)` with the
+   Crucible camera frame and each subject's parts, for each thing the viewer must follow. Examples: actors, the selected unit, a moving vehicle,
    a figure. List smoke, steam, beams, captions and panels that can cover them as occluders. After a fast draft
    render, run `findFaults` and fix every fault outside an `allowed` window (a planned exit, a cut to another place).
 2. **Look.** Render a fast preview (half size, 30 fps, no motion-blur subframes) and make timestamped frame sheets:
@@ -84,6 +85,7 @@ Read always.
 
 Any shot with a moving camera.
 
+- A stiff camera: speed that jumps at keys (linear interpolation, or a per-segment ease mixed with linear) or a channel that swings back and forth (yaw -30, -26, -32). Export the camera as a function of time and run `node scripts/camera-smoothness.mjs <timeline module> --log width --relative targetX:width` before any preview. It must print PASS. Key with a monotone cubic spline (zoom width in log space), turn a channel only at an extreme, and across a big zoom move the target as a zoom about one fixed point, so the pan never whips.
 - A camera that passes through objects or turns abruptly. Fly a smooth curve, and measure the camera's distance to every mesh's bounding box on each frame, including the moves between shots. Any frame inside a box is a fault.
 - A symbol in the frame centre: an emblem at the vanishing point, or wall parts that line up into a cross. A statue's
   raised arm can also read as a salute. Check every documentary shot about a regime for these.
@@ -104,7 +106,7 @@ Interactive apps, dashboards and their films.
 - A stretch of more than about 2 s where the cursor and camera hold still while the script waits for the sim. Speed it up in the edit or wait before recording starts.
 - A sound cue for an event that is off screen. A sim's event log covers the whole site, so check each cue against the frame at its time.
 - A close-up that lands after the action it came for. Trigger the click on the sim's work (first stroke laid, tool on the surface), not on the phase starting, and start it from a pick test so a click on a target behind a moving unit does not select the unit (Paint Studio t1: three wrong selections, knife close-up on nothing).
-- Two materials from one patch function look identical: three.js shares a program when `onBeforeCompile` source matches, so a variant silently renders the first one's shader. Give variants a `customProgramCacheKey` (Paint Studio: the wooden palette read flat brown for hours).
+- Two material variants that read identical: check each material's own fields and snippet uniforms in the part list before blaming the light (Paint Studio, in its three.js days: the wooden palette read flat brown for hours because two variants shared one shader).
 - A step that generates paid assets from a copied script: check the prompts it will send before running, since a text patch can miss on CRLF and generate the old subject (Paint Studio: 20 forklift sounds and 2 music tracks wasted).
 
 - Too many controls on an interactive page: panels in several corners, labels on every object at once, controls over
@@ -203,8 +205,8 @@ Anything that walks, crawls, drives or is simulated.
   own can land on another pose in the next frame. Bake its answers, hold and smooth them, play them back by time, and fail the
   render on travel per frame (above about 12 cm for the pelvis or 22 cm for a hand at 30 fps). Also smooth facing across a path's corners.
 - A hand that floats near what it holds. Every hold, pull or
-  turn gets a socket on the prop, a contact on the hand, two-bone IK and a registered grip: `registerGrip` / `measureGrips`
-  in `scripts/frame-guard.js` fail the render above 1 cm. Then look at the shot: an arm that cannot reach makes the body lunge.
+  turn gets a socket point on the prop (`{ part, localPoint }`), a contact point on the hand (`{ pose, joint, localPoint }`),
+  two-bone IK and a registered grip: `registerGrip` / `measureGrips` in `scripts/frame-guard.js` fail the render above 1 cm. Then look at the shot: an arm that cannot reach makes the body lunge.
   Measure the torso against the prop per frame too: every grip passed while the reach solver walked a chest 17 cm into a cabinet. Use the
   hand on the prop's side, and read a solver's largest reach: a value at its cap means it failed. A held prop rides the hand (`carryProp` in
   `scripts/human-arm.js`); only rails or a slot may lead it until it clears them. Hold things upright in the fist, palm on the long side.
@@ -217,7 +219,7 @@ Anything that walks, crawls, drives or is simulated.
   because a black figure hides this. Ask what holds the prop up: a palm on one side of a box holds nothing, so wrap an edge, or
   put fingers behind and the thumb in front. And which side of a door or panel the body is on before choosing push or pull.
 - Props that collide by keyframe (a book shutting through its cover). Bake a rigid-body sim in Blender and play the
-  transforms back by time, with a per-frame gap probe; the film stays in three.js.
+  transforms back by time, with a per-frame gap probe; the film stays in Crucible.
 - Units that stand still while idle or working. Give each role its own readable work loop with the station's prop (typing, page turns,
   scanning with a magnifier), idle fidgets out of sync (bounce, look around, turn to a neighbour), and a small payoff
   when a task ends. Moving units also leave a path trail, flights included.

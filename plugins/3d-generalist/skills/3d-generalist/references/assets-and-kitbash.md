@@ -48,7 +48,7 @@ tiers, has a 3D viewer Space for search, and keeps the source's licence and cred
 | [codepawl/ct-anatomy-glb](https://huggingface.co/datasets/codepawl/ct-anatomy-glb) ([viewer](https://huggingface.co/spaces/codepawl/ct-anatomy-glb-viewer)) | 7 CT bodies, 20 organs, 115 structures | CC BY 4.0 | Anatomy explainers, medical cutaways |
 | [codepawl/100style-glb](https://huggingface.co/datasets/codepawl/100style-glb) ([viewer](https://huggingface.co/spaces/codepawl/100style-viewer)) | 810 100STYLE mocap clips, 100 walking styles, retargeted onto one free character | CC BY 4.0 | Walks, runs and stylised locomotion |
 
-Load them in the browser with three.js or [Crucible](https://github.com/codepawl/crucible) (`npm install @codepawlhq/crucible meshoptimizer`).
+Load them in the browser with [Crucible](https://github.com/codepawl/crucible) (`npm install @codepawlhq/crucible meshoptimizer`).
 In Blender, Godot, Unity or Unreal, import the `engine/` tier: it keeps PNG and JPEG textures, because Blender cannot read KTX2.
 
 ## 2. Fitting and scaling rules (zero float, real bounds)

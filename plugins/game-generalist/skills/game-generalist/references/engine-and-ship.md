@@ -17,7 +17,7 @@ The engine is a slot in `brief.md`. This file holds only what a game needs on to
 
 | Brief says | Engine |
 |---|---|
-| Others should play it in a browser, or share a link | web: three.js, Phaser or plain canvas |
+| Others should play it in a browser, or share a link | web: Crucible for 3D, Phaser or plain canvas for 2D |
 | Light 2D or 3D game, native build | Godot or Unity: ask the user once, record the answer in `brief.md` |
 | Photoreal look, or the jam requires it | Unreal |
 
