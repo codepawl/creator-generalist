@@ -32,13 +32,21 @@ claude plugin install watch-video@creator-generalist
 claude plugin install design-sound@creator-generalist
 ```
 
-If the `claude` command is not on the PATH, tell the user to type the same five lines as `/plugin ...` in Claude Code.
+Then add Crucible, the 3D engine the 3D skills render in. Its plugin brings the MCP server and the
+`build-crucible-scene` and `render-crucible-media` skills:
+
+```bash
+claude plugin marketplace add codepawl/crucible
+claude plugin install crucible@crucible
+```
+
+If the `claude` command is not on the PATH, tell the user to type the same lines as `/plugin ...` in Claude Code.
 
 **Any other agent.** If Node.js is installed, run `npx skills add codepawl/creator-generalist` and follow its prompts.
 Otherwise:
 
 1. Clone the repository to a temporary folder: `git clone --depth 1 https://github.com/codepawl/creator-generalist`.
-2. Copy these sixteen folders into the skills folder from step 1:
+2. Copy these twenty-one folders into the skills folder from step 1:
    - `plugins/3d-generalist/skills/3d-generalist`
    - `plugins/3d-generalist/skills/3dg`
    - `plugins/3d-generalist/skills/model-characters`
@@ -62,7 +70,10 @@ Otherwise:
    - `plugins/design-sound/skills/design-sound`
 3. Gemini CLI: copy `harness/gemini/3dg.toml`, `harness/gemini/2dg.toml` and `harness/gemini/gameg.toml` to the commands folder.
    OpenCode: copy `harness/opencode/3dg.md`, `harness/opencode/2dg.md` and `harness/opencode/gameg.md` to the commands folder.
-4. Delete the temporary clone.
+4. For Crucible, clone `https://github.com/codepawl/crucible` the same way, copy `skills/build-crucible-scene` and
+   `skills/render-crucible-media`, and add an MCP server to your agent's config that runs
+   `npx -y -p @codepawlhq/crucible crucible-mcp`.
+5. Delete the temporary clones.
 
 Check: each copied folder has a `SKILL.md` at its top.
 
