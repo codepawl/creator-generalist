@@ -53,7 +53,8 @@ when its gate passes, not when the tool finishes. Skills that build assets (`mod
   to a voxel copy (then shrinkwraps onto the high) when the surface result opens edges, leaves zero-area faces or
   strays more than 1% of the diagonal.
 - Surfaces that touch in the high (thighs, arms against the body, fingers) leave a crease no game-density low can
-  follow: a Tripo body kept Hausdorff max 1.5 to 2.7% at the crotch at 9.7k and 12.6k quads. Pose them apart in stage 2.
+  follow: a Tripo body kept Hausdorff max 1.5% at the crotch at 9.7k quads, shrinkwrap or not. Pose them apart in
+  stage 2.
 - With `--high`, non-manifold edges may not exceed the high's own count plus the profile's allowance per 10k
   triangles (a scan often has a few); without it, zero.
 
@@ -65,7 +66,7 @@ when its gate passes, not when the tool finishes. Skills that build assets (`mod
 - Padding: at least 8 px between islands at 2K (16 px at 4K) so mip maps and the bake margin do not bleed.
 - Seams on hard edges and hidden places; straighten islands of hard-surface strips.
 - Smart UV Project angle follows the surface: about 30 degrees for hard-surface (seams on the sharp edges), about 66
-  for organic shapes. At 30 degrees a decimated rock split into thousands of islands that filled 4% of the square.
+  for organic shapes. At 30 degrees a decimated rock's islands filled 4% of the square; 66 degrees gave 18%.
 - Pack with the margin equal to the padding (8 px at 2K is 0.004), concave shapes and rotation: a 0.01 margin left
   a rock at 18% fill, 0.004 doubled it. The gate notes fill under 55%.
 
@@ -75,14 +76,17 @@ when its gate passes, not when the tool finishes. Skills that build assets (`mod
   10% of the asset's size; past that rays hit the wrong surface and the map skews.
 - Size the extrusion by how far the high sits outside the low, not as a share of the ray: a start point above a lip
   or overhang bakes its underside as inward texels. `bake_ai_mesh.py` measures outward and inward gaps separately.
-- A game-ready asset with double-sided, zero-thickness or opposed faces cannot be rebaked: 1.2 to 1.8% of bake rays
-  hit back faces of a CC0 console at any extrusion. Keep its own maps (adapted-scan route) instead.
-- Parts that pass through each other (caps on a nozzle, chain links) cannot bake as one joined low: a CC0 hydrant
-  read 10% back-face hits with every part closed and facing out. Bake exploded or part by part, then reassemble.- Use a cage for hard-surface pieces with split normals; average the cage normals so seams do not split.
+- A game-ready asset built from open, double-sided shells may not rebake: on a CC0 console at least 1.2% of bake
+  rays hit back faces at every extrusion tried. Keep its own maps (adapted-scan route) instead.
+- A multi-part prop joined into one low can fail the same way: a CC0 hydrant (body, caps and chain, every part closed
+  and facing out) read 10% back-face hits after a collapse to 11%. Try baking it part by part before tuning rays.
+- Use a cage for hard-surface pieces with split normals; average the cage normals so seams do not split.
 - Mark hard edges as sharp and split UVs on them, or the normal map fights the vertex normals (gradients on flat faces).
   In Blender: Shade Smooth by Angle 30 degrees, then Smart UV Project at the same angle.
 - Ship the baked normal through a plain Normal Map node into Principled BSDF: custom node groups do not export to glTF.
 - Bake margin at least the UV padding. Save normal maps as 16-bit PNG, Non-Color.
+- The bake's normal angle tracks the low's shape error more than map size: on a scanned rock, Hausdorff p95 0.25,
+  0.18 and 0.15% gave 7.5, 6.0 and 5.1 degrees, while doubling the UV fill moved it 0.04. Add triangles first.
 - The gate renders the high and the low with its map from six views: the normal angle must fall at least 5% against
   the low without its map, and stay inside the profile limits.
 

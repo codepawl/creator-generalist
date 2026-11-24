@@ -362,7 +362,7 @@ def render_only(visible_object, all_objects, path):
 
 def enable_gpu():
     preferences = bpy.context.preferences.addons["cycles"].preferences
-    for device_type in ("OPTIX", "CUDA"):
+    for device_type in ("OPTIX", "CUDA", "METAL"):
         try:
             preferences.compute_device_type = device_type
             preferences.get_devices()
