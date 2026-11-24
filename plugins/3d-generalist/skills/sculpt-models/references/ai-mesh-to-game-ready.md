@@ -61,8 +61,8 @@ short leg stubs or closed sockets, and seat each leg in its socket in the side v
 ## 4. Bake [M]
 
 `blender -b --python scripts/bake_ai_mesh.py -- --glb high.glb --low low.glb --out <folder> [--res 4096]`
-(without `--low` it decimates the high as a stand-in). It sizes the ray distance from the measured low-to-high gap
-(twice the 95th percentile, at least 0.5% of the size), bakes tangent normal and base colour with 8 px padding, prints
+(without `--low` it decimates the high as a stand-in). It sizes the extrusion from how far the high sits outside the
+low and the ray from that plus the inward gap (99th percentile along the normal, 1.25x), warns past 10% of the size, bakes tangent normal and base colour with 8 px padding, prints
 coverage and the share of steep normal pixels, writes the maps, the node group and renders, and saves a .blend.
 
 Measured on a 14.5k-face Tripo postbox with a 3k low: mean error against the high-poly render was 0.049 with colour

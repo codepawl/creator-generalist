@@ -18,7 +18,9 @@ This skill owns the rigging method: skeleton, skinning, controls, face rigs and 
 - A rig must work in Unity (Mecanim), Godot, three.js, Crucible or glTF.
 
 Exact Blender button recipes are in `use-3d-software/references/rigging-and-weights.md`. Read it for those steps.
-This skill adds the method around them and the other tools.
+This skill adds the method around them and the other tools. Rigging is stage 7 of the asset pipeline
+(`use-3d-software/references/asset-pipeline.md`): rig a quad retopo, never raw sculpt or decimated topology, and
+close with `use-3d-software` `scripts/mesh_prep.py gate rig <file.blend>` (weights plus an elbow, knee and spine bend test).
 
 ## Ask first
 

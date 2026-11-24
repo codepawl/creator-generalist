@@ -12,8 +12,10 @@ import json
 import sys
 from pathlib import Path
 
+import bmesh
 import bpy
 from mathutils import Vector
+from mathutils.bvhtree import BVHTree
 
 
 def arguments():
@@ -100,22 +102,88 @@ def quadriflow_on_voxels(item, faces, diagonal):
     raise SystemExit("QuadriFlow did not run on the surface or on a voxel copy; the mesh is not a closed manifold with consistent normals")
 
 
+def shrinkwrap_to_source(item, source_mesh):
+    # Voxels round the surface off by up to a voxel; snapping each vertex to the nearest input surface takes that back
+    # (Tripo body: Hausdorff p95 0.110% to 0.094%). It cannot reach a crease with no low vertex inside it: touching
+    # thighs kept their 1.5% max at the crotch. Part those in the high before retopo.
+    target = bpy.data.objects.new("shrinkwrap_target", source_mesh)
+    target.matrix_world = item.matrix_world.copy()
+    bpy.context.scene.collection.objects.link(target)
+    wrap = item.modifiers.new("shrinkwrap", "SHRINKWRAP")
+    wrap.target = target
+    wrap.wrap_method = "NEAREST_SURFACEPOINT"
+    bpy.context.view_layer.objects.active = item
+    bpy.ops.object.modifier_apply(modifier=wrap.name)
+    bpy.data.objects.remove(target, do_unlink=True)
+
+
+def welded_open_edges(mesh, diagonal, write_back=False):
+    """Non-manifold edges after welding by position, the way the retopo gate counts them on the exported GLB.
+    Coincident vertices also make faces that collapse once an exporter welds, so those are dissolved first."""
+    checked = bmesh.new()
+    checked.from_mesh(mesh)
+    bmesh.ops.remove_doubles(checked, verts=checked.verts, dist=diagonal * 1e-6)
+    bmesh.ops.dissolve_degenerate(checked, dist=diagonal * 1e-6, edges=checked.edges)
+    if write_back:
+        checked.to_mesh(mesh)
+    open_edges = sum(1 for edge in checked.edges if len(edge.link_faces) != 2)
+    slivers = sum(1 for face in checked.faces if face.calc_area() < (diagonal * 1e-5) ** 2)
+    checked.free()
+    return open_edges, slivers
+
+
+def surface_kept(item, source_tree, diagonal, source_open_edges):
+    """QuadriFlow can report success and still leave an invalid, torn mesh: on a 59k Tripo body it gave 25k
+    degenerate triangles and a silhouette IoU of 0.46 (2026-11-24). Accept its result only when the mesh is valid,
+    has no more open edges than the input, no zero-area faces, and 95% of its vertices sit within 1% of the
+    diagonal from the input surface."""
+    if item.data.validate(verbose=False):
+        return False, "invalid mesh"
+    # validate() passes slivers and holes: at 12k faces on the same body QuadriFlow left 30 zero-area faces and 15
+    # non-manifold edges that the retopo gate then failed.
+    open_edges, slivers = welded_open_edges(item.data, diagonal, write_back=True)
+    if open_edges > source_open_edges or slivers:
+        return False, f"{open_edges} non-manifold edges (input {source_open_edges}), {slivers} zero-area faces"
+    distances = []
+    for vertex in item.data.vertices:
+        nearest = source_tree.find_nearest(item.matrix_world @ vertex.co)
+        if nearest[0] is None:
+            return False, "vertex far from the input"
+        distances.append(nearest[3])
+    distances.sort()
+    p95 = distances[int(len(distances) * 0.95)] if distances else 0.0
+    return p95 <= diagonal * 0.01, f"p95 distance {p95 / diagonal:.4f} of the diagonal"
+
+
 def remesh(input_path, output_path, quads_path, method, faces):
     clear_scene()
     item = import_joined(input_path, "remesh_source")
     diagonal = diagonal_of(item)
+    source_mesh = item.data.copy()
+    source_open_edges, _ = welded_open_edges(source_mesh, diagonal)
+    source_tree = BVHTree.FromPolygons([item.matrix_world @ vertex.co for vertex in source_mesh.vertices], [polygon.vertices[:] for polygon in source_mesh.polygons])
     path = method
+    check = ""
     if method == "qremeshify":
         if not hasattr(bpy.ops, "qremeshify") or not hasattr(bpy.ops.qremeshify, "remesh"):
             raise SystemExit("QRemeshify add-on is not enabled in this Blender; use --remesh quadriflow or install it")
         bpy.ops.qremeshify.remesh()
-    elif quadriflow_on_surface(item, faces):
-        # mesh_prep hands over the watertight copy. On a Tripo grenade this kept the pin ring that every voxel pass
-        # loses (Hausdorff max 0.81% against 1.28% through a voxel copy at the same 20k faces).
-        path = "quadriflow on the surface"
     else:
-        path = "quadriflow on a voxel copy"
-        quadriflow_on_voxels(item, faces, diagonal)
+        on_surface = quadriflow_on_surface(item, faces)
+        kept, check = surface_kept(item, source_tree, diagonal, source_open_edges) if on_surface else (False, "cancelled")
+        if kept:
+            # mesh_prep hands over the watertight copy. On a Tripo grenade this kept the pin ring that every voxel
+            # pass loses (Hausdorff max 0.81% against 1.28% through a voxel copy at the same 20k faces).
+            path = "quadriflow on the surface"
+        else:
+            path = f"quadriflow on a voxel copy (surface pass rejected: {check})"
+            item.data = source_mesh.copy()
+            quadriflow_on_voxels(item, faces, diagonal)
+            shrinkwrap_to_source(item, source_mesh)
+            path += ", shrinkwrapped back onto the input"
+            kept, check = surface_kept(item, source_tree, diagonal, source_open_edges)
+            if not kept:
+                path += f"; voxel pass also off the surface: {check}"
     item.data.materials.clear()
     bpy.ops.object.shade_flat()
     quads = sum(1 for polygon in item.data.polygons if len(polygon.vertices) == 4)

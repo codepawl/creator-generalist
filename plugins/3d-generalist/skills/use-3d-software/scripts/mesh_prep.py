@@ -5,6 +5,14 @@ npm into a cache folder for glTF Transform, meshoptimizer and glTF-Validator) an
 Usage:
     uv run --no-project python mesh_prep.py run <in.glb|in.gltf> [options]
     uv run --no-project python mesh_prep.py compare <reference.glb> <candidate.glb> [--out DIR] [--profile NAME]
+    uv run --no-project python mesh_prep.py gate <retopo|uv|bake|texture|rig> <file> [gate options]
+
+Gate options (the stage gates of references/asset-pipeline.md; each writes report.md and exits 0 or 1):
+    retopo  --deforms (quad share and poles are gated) --quad-share 0.9 --budget N; give it the .blend or quad OBJ
+    uv      --uv-mode bake|atlas [bake] --texture-size 2048 --padding 8 --texel-density PX_PER_M
+    bake    --high HIGH --ray-distance D (or read from the .blend); gates gap, normal texels and the render compare
+    texture --channels "Base Color,Normal,Roughness" --max-texture 4096; colour space only from a .blend
+    rig     skin weights and a 70 degree bend test of each elbow, knee and spine bone
 
 Run options (every step is a flag; defaults in brackets):
     --out DIR                output folder [<input stem>.prep next to the input]
@@ -60,6 +68,7 @@ PYTHON_PACKAGES = {
     "topology": ["trimesh", "numpy", "scipy", "manifold3d"],
     "hausdorff": ["trimesh", "numpy", "scipy", "pymeshlab"],
     "uv-metrics": ["trimesh", "numpy", "scipy", "pillow"],
+    "uv-layout": ["trimesh", "numpy", "scipy", "pillow"],
     "uv-unwrap": ["numpy", "xatlas"],
     "watertight": ["trimesh", "numpy", "scipy", "pymeshlab", "manifold3d"],
     "compare-views": ["numpy", "scipy", "pillow"],
@@ -275,7 +284,7 @@ def gate_non_manifold(report, label, input_topology, candidate_topology, thresho
     )
 
 
-def gate_comparison(report, reference, candidate, thresholds, work, render=True, input_topology=None, render_candidate=None):
+def gate_comparison(report, reference, candidate, thresholds, work, render=True, input_topology=None, render_candidate=None, appearance=True):
     """The quality gate: geometry distance, topology and renders. Adds gates to the report."""
     render_candidate = render_candidate or candidate
     distance = geometry("hausdorff", reference, candidate)
@@ -300,6 +309,9 @@ def gate_comparison(report, reference, candidate, thresholds, work, render=True,
     # An empty render would give IoU 1 and SSIM 1 for free; the input must fill part of every view.
     report.gate("render not empty (input coverage min)", views["reference_coverage_min"], 0.01, views["reference_coverage_min"] >= 0.01)
     report.gate("silhouette IoU min", views["silhouette_iou_min"], thresholds["silhouette_iou_min"], views["silhouette_iou_min"] >= thresholds["silhouette_iou_min"])
+    if not appearance:
+        report.note("shape stage: normal angle and albedo are not gated before the bake and texture stages")
+        return candidate_topology
     report.gate("normal angle mean max (deg)", views["normal_angle_mean_deg_max"], thresholds["normal_mean_max"], views["normal_angle_mean_deg_max"] <= thresholds["normal_mean_max"])
     report.gate("normal angle p95 max (deg)", views["normal_angle_p95_deg_max"], thresholds["normal_p95_max"], views["normal_angle_p95_deg_max"] <= thresholds["normal_p95_max"])
     report.gate("albedo SSIM min", views["albedo_ssim_min"], thresholds["albedo_ssim_min"], views["albedo_ssim_min"] >= thresholds["albedo_ssim_min"])
@@ -491,6 +503,180 @@ def run_compare(options):
     return 0 if report.passed() else 1
 
 
+def gate_shape(report, options, thresholds, low_path):
+    """Topology numbers say nothing about shape: a torn QuadriFlow result passed them with a silhouette IoU of 0.46.
+    So the low is always compared with the high it replaces."""
+    if not options.high:
+        report.gate("shape compared with the high (--high)", None, "given", False)
+        return
+    work = report.output_folder / "stages"
+    work.mkdir(parents=True, exist_ok=True)
+    low_gltf = work / "low.glb"
+    if Path(low_path).suffix.lower() in (".glb", ".gltf"):
+        gltf("plain", low_path, low_gltf)
+    else:
+        blender("blender_asset_gates.py", "export", low_path, low_gltf)
+    reference = work / "high.glb"
+    gltf("plain", options.high, reference)
+    gate_comparison(report, reference, low_gltf, thresholds, work, render=not options.no_render, input_topology=geometry("topology", reference), appearance=False)
+
+
+def gate_retopo(report, options, thresholds):
+    measured = blender("blender_asset_gates.py", "retopo", options.input, threads=6)
+    report.step("retopo measure", measured)
+    gate_shape(report, options, thresholds, options.input)
+    if measured["source_is_triangulated_format"]:
+        report.note("glTF is always triangles: run the retopo gate on the .blend or the quad OBJ to measure quads")
+    report.gate("n-gons", measured["ngons"], 0, measured["ngons"] == 0)
+    if not options.high:
+        report.gate("non-manifold edges", measured["non_manifold_edges"], 0, measured["non_manifold_edges"] == 0)
+    report.gate("loose vertices and edges", measured["loose_vertices"] + measured["loose_edges"], 0, measured["loose_vertices"] + measured["loose_edges"] == 0)
+    if options.deforms:
+        report.gate("quad share (deforming mesh)", measured["quad_share"], f">= {options.quad_share}", measured["quad_share"] >= options.quad_share)
+        report.gate("pole share (6+ edges)", measured["pole_share"], "<= 0.03", measured["pole_share"] <= 0.03)
+    else:
+        report.note("static asset: triangles and decimation are allowed, quad share not gated")
+    if options.budget:
+        report.gate("triangle budget", measured["triangle_equivalent"], options.budget, measured["triangle_equivalent"] <= options.budget)
+
+
+def gate_uv(report, options):
+    metrics = geometry("uv-metrics", options.input)
+    report.step("uv metrics", metrics)
+    layout = geometry("uv-layout", options.input, options.texture_size, options.padding)
+    report.step("uv layout", layout)
+    report.gate("primitives without UVs", metrics["primitives_without_uv"], 0, metrics["primitives_without_uv"] == 0)
+    if options.uv_mode == "bake":
+        report.gate("UV overlap % (bake set)", metrics["overlap_percent"], "<= 0.1", (metrics["overlap_percent"] or 0) <= 0.1)
+        report.gate("texel density: area outside 0.5x..2x median %", layout["area_outside_half_to_double_density_percent"], "<= 10", layout["area_outside_half_to_double_density_percent"] <= 10)
+    else:
+        report.note("atlas mode: stacked and mirrored UVs and swatch-mapped faces are intended, overlap and density spread not gated")
+    report.gate("flipped UV faces %", metrics["flipped_faces_percent"], "<= 1", (metrics["flipped_faces_percent"] or 0) <= 1)
+    report.gate("area stretched beyond 0.5x..2x %", metrics["area_outside_half_to_double_percent"], "<= 10", (metrics["area_outside_half_to_double_percent"] or 0) <= 10)
+    report.gate(f"island pairs closer than {options.padding} px at {options.texture_size}", layout["island_pairs_closer_than_padding"], 0, layout["island_pairs_closer_than_padding"] == 0)
+    if options.texel_density:
+        low, high = options.texel_density * 0.75, options.texel_density * 1.25
+        median = layout["texel_density_median_px_per_m"]
+        report.gate("texel density median px/m", median, f"{low:.0f}..{high:.0f}", low <= median <= high)
+    if layout["uv_space_used_percent"] < 55:
+        report.note(f"islands fill {layout['uv_space_used_percent']}% of the UV square: pack tighter (UVPackmaster, or pack with rotation) to raise texel density for free")
+    if layout["texels_in_border_margin"]:
+        report.note(f"{layout['texels_in_border_margin']} texels sit inside the {options.padding} px border margin")
+
+
+def gate_bake(report, options, thresholds):
+    if not options.high:
+        raise ToolError("the bake gate needs --high <high-poly file>")
+    work = report.output_folder / "stages"
+    work.mkdir(parents=True, exist_ok=True)
+    flat = work / "low_without_normal_map.glb"
+    arguments = ["bake", options.input, options.high, flat] + ([options.ray_distance] if options.ray_distance else [])
+    measured = blender("blender_asset_gates.py", *arguments, threads=6)
+    report.step("bake measure", measured)
+    report.gate("low mesh has a normal map", measured["has_normal_map"], True, measured["has_normal_map"])
+    missing = measured["faces_without_high_surface"] / max(measured["face_count"], 1)
+    report.gate("low faces with no high surface in reach %", round(100 * missing, 2), "<= 1", missing <= 0.01)
+    ray_distance = measured.get("ray_distance")
+    if ray_distance:
+        report.gate("ray distance covers gap p99", ray_distance, f">= {measured['gap_p99']}", ray_distance >= measured["gap_p99"])
+        report.gate("ray distance not past 10% of size (skew, wrong surface)", ray_distance, f"<= {round(measured['size'] * 0.1, 4)}", ray_distance <= measured["size"] * 0.1)
+    else:
+        report.gate("ray distance recorded (--ray-distance or the .blend bake settings)", None, f">= gap p99 {measured['gap_p99']}", False)
+    if measured["has_normal_map"]:
+        report.gate("normal texels pointing inward %", round(100 * measured.get("inward_texel_share", 0), 3), "<= 0.5", measured.get("inward_texel_share", 0) <= 0.005)
+        report.gate("normal texels not unit length %", round(100 * measured.get("bad_length_texel_share", 0), 3), "<= 1", measured.get("bad_length_texel_share", 0) <= 0.01)
+        if Path(options.input).suffix.lower() == ".blend":
+            colour_space = measured["normal_map_colour_space"]
+            report.gate("normal map colour space", colour_space, "Non-Color", colour_space in ("Non-Color", "Raw"))
+    gltf_input = work / "low.glb"
+    if Path(options.input).suffix.lower() == ".blend":
+        blender("blender_asset_gates.py", "export", options.input, gltf_input)
+    else:
+        gltf("plain", options.input, gltf_input)
+    reference = work / "high.glb"
+    gltf("plain", options.high, reference)
+    gate_comparison(report, reference, gltf_input, thresholds, work, render=not options.no_render)
+    if options.no_render:
+        report.note("--no-render: the render compare and the 'bake improves shading' gate did not run; never sign off a bake this way")
+        return
+    baked_views = report.data["steps"][-1]
+    flat_views = geometry("compare-views", work / "views_reference", render_views(flat, work / "views_flat", work / "framing.json"), work / "sheet_flat.png")
+    report.step("views without normal map", flat_views)
+    baked_angle = baked_views["normal_angle_mean_deg_max"]
+    flat_angle = flat_views["normal_angle_mean_deg_max"]
+    report.gate("bake improves shading (normal angle mean, baked vs none)", baked_angle, f"<= {round(flat_angle * 0.95, 2)}", baked_angle <= flat_angle * 0.95)
+
+
+def render_views(path, folder, framing):
+    blender("blender_views.py", path, folder, framing, 512, render=True)
+    return folder
+
+
+def gate_texture(report, options):
+    measured = blender("blender_asset_gates.py", "texture", options.input, threads=6)
+    report.step("texture measure", measured)
+    required = [name.strip() for name in options.channels.split(",") if name.strip()]
+    if not measured["colour_space_checkable"]:
+        report.note("glTF fixes colour space by slot: colour space is NOT checked here, run this gate on the .blend")
+    report.gate("materials found", len(measured["materials"]), ">= 1", len(measured["materials"]) >= 1)
+    for material in measured["materials"]:
+        name = material["material"]
+        if material.get("error"):
+            report.gate(f"{name}: {material['error']}", None, "Principled BSDF", False)
+            continue
+        channels = material["channels"]
+        missing = [channel for channel in required if channel not in channels]
+        report.gate(f"{name}: required channels", ",".join(channels) or "none", ",".join(required), not missing)
+        for channel, info in channels.items():
+            width, height = info["size"]
+            power_of_two = width > 0 and height > 0 and width & (width - 1) == 0 and height & (height - 1) == 0
+            report.gate(f"{name} {channel}: size", f"{width}x{height}", f"power of two, <= {options.max_texture}", power_of_two and max(width, height) <= options.max_texture)
+            if info["colour_space_ok"] is not None:
+                report.gate(f"{name} {channel}: colour space", info["colour_space"], info["expected"], info["colour_space_ok"])
+            if info["flat"]:
+                report.note(f"{name} {channel}: image is one flat value; use a number instead and save the memory")
+
+
+def gate_rig(report, options):
+    measured = blender("blender_asset_gates.py", "rig", options.input, threads=6)
+    report.step("rig measure", {key: value for key, value in measured.items() if key != "bends"})
+    report.gate("armature present", measured["armatures"], ">= 1", measured["armatures"] >= 1)
+    report.gate("skinned meshes", measured["skinned_objects"], ">= 1", measured["skinned_objects"] >= 1)
+    report.gate("unweighted vertices", measured["unweighted_vertices"], 0, measured["unweighted_vertices"] == 0)
+    report.gate("vertices with more than 4 influences", measured["over_four_influences"], 0, measured["over_four_influences"] == 0)
+    report.gate("vertices with weights not summing to 1", measured["unnormalised_vertices"], 0, measured["unnormalised_vertices"] == 0)
+    if measured["deform_bones_without_weights_count"]:
+        report.note(f"{measured['deform_bones_without_weights_count']} deform bones carry no weights (end and twist bones are fine): {', '.join(measured['deform_bones_without_weights'][:8])}")
+    report.gate("bend test bones found (elbows, knees, spine)", len(measured["bends"]), ">= 1", len(measured["bends"]) >= 1)
+    for bend in measured["bends"]:
+        report.step(f"bend {bend['bone']}", bend)
+        report.gate(f"bend {bend['bone']} {measured['bend_degrees']:.0f} deg: collapsed faces %", round(100 * bend["collapsed_share"], 3), "<= 2", bend["collapsed_share"] <= 0.02)
+        report.gate(f"bend {bend['bone']}: stray vertices (move, but far from every bent bone)", bend["jumped_vertices"], 0, bend["jumped_vertices"] == 0)
+
+
+def run_gate(options):
+    source = Path(options.input).resolve()
+    output_folder = Path(options.out).resolve() if options.out else source.parent / f"{source.stem}.gate-{options.stage}"
+    output_folder.mkdir(parents=True, exist_ok=True)
+    thresholds = thresholds_for(options.profile, options.threshold)
+    if options.object:
+        os.environ["MESH_PREP_GATE_OBJECTS"] = options.object
+    report = Report(output_folder, f"{options.stage} gate, {options.profile}", thresholds)
+    if options.stage == "retopo":
+        gate_retopo(report, options, thresholds)
+    elif options.stage == "uv":
+        gate_uv(report, options)
+    elif options.stage == "bake":
+        gate_bake(report, options, thresholds)
+    elif options.stage == "texture":
+        gate_texture(report, options)
+    elif options.stage == "rig":
+        gate_rig(report, options)
+    report.write()
+    print(f"{'PASS' if report.passed() else 'FAIL'}: {output_folder / 'report.md'}")
+    return 0 if report.passed() else 1
+
+
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -522,13 +708,37 @@ def build_parser():
     compare.add_argument("--profile", choices=list(PROFILES), default="prop")
     compare.add_argument("--threshold", action="append")
     compare.add_argument("--no-render", action="store_true")
+    gate = commands.add_parser("gate")
+    gate.add_argument("stage", choices=["retopo", "uv", "bake", "texture", "rig"])
+    gate.add_argument("input")
+    gate.add_argument("--high")
+    gate.add_argument("--out")
+    gate.add_argument("--profile", choices=list(PROFILES), default="prop")
+    gate.add_argument("--threshold", action="append")
+    gate.add_argument("--deforms", action="store_true")
+    gate.add_argument("--quad-share", type=float, default=0.9)
+    gate.add_argument("--budget", type=int)
+    gate.add_argument("--uv-mode", choices=["bake", "atlas"], default="bake")
+    gate.add_argument("--texture-size", type=int, default=2048)
+    gate.add_argument("--padding", type=int, default=8)
+    gate.add_argument("--texel-density", type=float)
+    gate.add_argument("--ray-distance", type=float)
+    gate.add_argument("--channels", default="Base Color,Normal,Roughness")
+    gate.add_argument("--max-texture", type=int, default=4096)
+    gate.add_argument("--no-render", action="store_true")
+    gate.add_argument("--object", help="comma list of mesh objects to gate in a .blend (e.g. the low poly); default all")
     return parser
 
 
 def main():
     options = build_parser().parse_args()
     try:
-        code = run_pipeline(options) if options.command == "run" else run_compare(options)
+        if options.command == "run":
+            code = run_pipeline(options)
+        elif options.command == "gate":
+            code = run_gate(options)
+        else:
+            code = run_compare(options)
     except ToolError as error:
         print(f"mesh_prep error: {error}", file=sys.stderr)
         code = 2

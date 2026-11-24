@@ -43,7 +43,7 @@ def clear_scene():
 def import_joined(glb_path, name):
     before = set(bpy.context.scene.objects)
     bpy.ops.import_scene.gltf(filepath=glb_path)
-    meshes = [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj not in before]
+    meshes = [item for item in bpy.context.scene.objects if item.type == "MESH" and item not in before]
     bpy.ops.object.select_all(action="DESELECT")
     for mesh_object in meshes:
         mesh_object.select_set(True)
@@ -103,10 +103,37 @@ def measure_gap(low, high):
             distances.append(hit[3])
     distances = numpy.array(distances)
     size = max(high.dimensions)
+    # Bake rays travel along the low's normal, which can be much further than the nearest point: on a decimated
+    # console the nearest p95 was 0.009 m and the along-normal p99 0.24 m (2026-11-24). Measure what the rays need.
+    # Outward (high outside the low) sizes the extrusion; inward sizes the rest of the ray. One shared extrusion of
+    # half the ray put ray starts above lips and overhangs on a console, which then baked their undersides as
+    # inward-pointing texels (3.3% of the map).
+    along_normal = []
+    outward = [0.0]
+    inward = [0.0]
+    # Face centres along face normals, as the bake rays leave flat faces: vertex normals average across hard edges and
+    # their diagonal misses bevels (a hydrant read a 16% gap where the low sat within 0.7%).
+    for polygon in low.data.polygons:
+        origin = low.matrix_world @ polygon.center
+        normal = (low.matrix_world.to_3x3() @ polygon.normal).normalized()
+        best = None
+        best_is_outward = True
+        for direction, is_outward in ((normal, True), (-normal, False)):
+            hit = tree.ray_cast(origin - direction * 1e-5, direction, size * 0.25)
+            if hit[0] is not None and (best is None or hit[3] < best):
+                best = hit[3]
+                best_is_outward = is_outward
+        if best is not None:
+            along_normal.append(best)
+            (outward if best_is_outward else inward).append(best)
+    along_normal = numpy.array(along_normal) if along_normal else numpy.zeros(1)
     return {
         "mean": float(distances.mean()),
         "p95": float(numpy.percentile(distances, 95)),
         "max": float(distances.max()),
+        "along_normal_p99": float(numpy.percentile(along_normal, 99)),
+        "outward_p99": float(numpy.percentile(outward, 99)),
+        "inward_p99": float(numpy.percentile(inward, 99)),
         "object_size": float(size),
     }
 
@@ -136,7 +163,7 @@ def set_bake_target(low, image):
     return material
 
 
-def bake(low, high, bake_type, image, ray_distance):
+def bake(low, high, bake_type, image, ray_distance, extrusion):
     scene = bpy.context.scene
     set_bake_target(low, image)
     bpy.ops.object.select_all(action="DESELECT")
@@ -147,7 +174,7 @@ def bake(low, high, bake_type, image, ray_distance):
     bake_settings.use_selected_to_active = True
     bake_settings.use_cage = False
     bake_settings.max_ray_distance = ray_distance
-    bake_settings.cage_extrusion = ray_distance * 0.5
+    bake_settings.cage_extrusion = extrusion
     bake_settings.margin = 8
     bake_settings.margin_type = "EXTEND"
     if bake_type == "NORMAL":
@@ -355,8 +382,13 @@ def main():
     high = import_joined(arguments.glb, "high")
     low = make_low(high, arguments.faces, arguments.low)
     gap = measure_gap(low, high)
-    ray_distance = max(gap["p95"] * 2.0, gap["object_size"] * 0.005)
-    print(f"faces high={len(high.data.polygons)} low={len(low.data.polygons)} gap={gap} ray={ray_distance:.4f} device={device}")
+    floor = gap["object_size"] * 0.0025
+    extrusion = max(gap["outward_p99"] * 1.25, floor)
+    # Blender measures max ray distance from the extruded start, so it spans the extrusion plus the inward reach.
+    ray_distance = max(extrusion + max(gap["inward_p99"] * 1.25, floor), gap["along_normal_p99"] * 1.25)
+    if ray_distance > gap["object_size"] * 0.1:
+        print(f"WARN ray distance {ray_distance:.4f} is over 10% of the size: the low strays from the high, fix the retopo (asset-pipeline bake gate fails this)")
+    print(f"faces high={len(high.data.polygons)} low={len(low.data.polygons)} gap={gap} ray={ray_distance:.4f} extrusion={extrusion:.4f} device={device}")
     if gap["mean"] > gap["object_size"] * 0.01:
         print("WARN low and high do not overlap (mean gap over 1% of size): Tripo retopo resets each part's "
               "position and scale, so align the low to the high before baking")
@@ -366,9 +398,9 @@ def main():
 
     resolution = arguments.res
     normal_image = new_image("baked_normal", resolution, True)
-    bake(low, high, "NORMAL", normal_image, ray_distance)
+    bake(low, high, "NORMAL", normal_image, ray_distance, extrusion)
     color_image = new_image("baked_color", resolution, False)
-    bake(low, high, "DIFFUSE", color_image, ray_distance)
+    bake(low, high, "DIFFUSE", color_image, ray_distance, extrusion)
 
     color_array = image_to_array(color_image)[..., :3]
     normal_array = image_to_array(normal_image)[..., :3]

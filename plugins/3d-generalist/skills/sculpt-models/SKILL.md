@@ -33,8 +33,10 @@ machined parts at exact dimensions (`model-parts-in-cad`), drawing anatomy in 2D
 4. **Secondary forms:** planes, landmarks, muscle groups, folds, fracture planes (`references/form-and-anatomy.md`,
    `references/surfaces-environment-and-hard-surface.md`).
 5. **Break symmetry** for anything alive, then **Multires** for tertiary detail in distinct layers by scale.
-6. **Retopologise or decimate, then bake** normals (and displacement where detail changes the silhouette).
-   Scripted route and the before/after numbers: `use-3d-software` `scripts/mesh_prep.py` (`references/mesh-prep.md`).
+6. **Retopologise or decimate, UV, then bake** normals (and displacement where detail changes the silhouette).
+   This sculpt is stage 2 of the asset pipeline: `use-3d-software` `references/asset-pipeline.md` gives the later
+   stages and their gates (`scripts/mesh_prep.py gate retopo|uv|bake|texture|rig`). Deforming means quads with
+   loops at the joints; Decimate only for static assets. Scripted remesh and bake: `references/mesh-prep.md`.
 7. **Check again** (below) at the final camera distance, then hand the asset to `rig-characters` or the scene.
 
 ## Hard rules

@@ -41,6 +41,10 @@ human from nothing. Credit it.
 
 ## Steps for every route
 
+The steps follow the asset pipeline in the `use-3d-software` skill, `references/asset-pipeline.md` (stage table,
+routes, gate limits). Each step ends at its gate; `mesh_prep.py` below is that skill's `scripts/mesh_prep.py`. The
+low-poly route models low directly: it skips retopology and bake and runs the UV gate with `--uv-mode atlas`.
+
 1. **Measure the reference.** For a turnaround or front view, run
    `uv run --no-project {{SKILL_DIR}}/scripts/read_character_ref.py ref.png --height 1.70 --out cal`.
    It gives head count, joint heights, width and depth profiles and a colour palette. For a single sketch, set the
@@ -49,15 +53,22 @@ human from nothing. Credit it.
    against the reference before any detail. Read `references/head-and-face.md` before the head.
 3. **Build the route.** Follow the route file. Keep scale applied, mirror on the centre line, and parts separate
    where clothing or hair makes a step in the silhouette.
-4. **Topology for motion.** Add loops at the knees, elbows, shoulders, mouth and eyes when the character will bend.
-   A sculpt that must animate is retopologized or decimated first.
-5. **UV and texture.** `references/uv-and-texturing.md` for atlases, unlit colour and ramps. Hand-painted and
-   stylized painting craft is in `draw-and-paint-art`.
-6. **Rig and animate.** Hand off to `rig-characters` and `animate-characters`. The short low-poly rig notes are in
-   `references/rigging-and-animation.md`.
-7. **Check.** Run `uv run --no-project {{SKILL_DIR}}/scripts/check_character.py character.glb --max-tris <budget>`
-   on the export, then render a turnaround still and compare it with the reference side by side. A static mesh
-   that was repaired, remeshed or decimated also passes `use-3d-software` `scripts/mesh_prep.py compare` against its source.
+4. **Retopology.** A sculpt or generator mesh gets a quad, game-ready low poly: three or more edge loops at elbows,
+   knees, shoulders, hips and wrists, rings around eyes and mouth, poles off the joints, triangle budget from the
+   brief. Never Decimate a character that deforms (that is for static props). Gate: `mesh_prep.py gate retopo
+   low.blend --high high.glb --deforms --budget <tris>` (topology and shape against the high in one gate).
+5. **UV.** One bake UV set with no overlap, texel density within 0.5x..2x of the median (face and hands larger on
+   purpose), 8 px padding at 2K. Gate: `mesh_prep.py gate uv low.glb --texture-size 2048 --padding 8`. Atlases,
+   ramps and swatch mapping: `references/uv-and-texturing.md`.
+6. **Bake.** Normal (and AO, base colour from a textured high) from the high onto the low, ray distance above the
+   measured gap: `sculpt-models` `scripts/bake_ai_mesh.py --low low.glb`. Gate: `mesh_prep.py gate bake low.blend
+   --high high.glb` (ray reach, inward texels, render compare against the high).
+7. **Texture.** PBR set: base colour sRGB, normal, roughness and metallic Non-Color, power-of-two sizes in budget.
+   Gate: `mesh_prep.py gate texture low.blend`. Hand-painted and stylized craft: `draw-and-paint-art`.
+8. **Rig and animate.** Hand off to `rig-characters` and `animate-characters` (low-poly notes:
+   `references/rigging-and-animation.md`). Gate: `mesh_prep.py gate rig character.blend` (weights, bend test).
+9. **Check.** Run `uv run --no-project {{SKILL_DIR}}/scripts/check_character.py character.glb --max-tris <budget>`
+   on the export, then render a turnaround still and compare it with the reference side by side.
 
 ## More references
 

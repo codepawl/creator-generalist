@@ -5,12 +5,14 @@ packages that command needs. Every command prints one JSON object on stdout.
     mesh_geometry.py topology   <in.glb>
     mesh_geometry.py hausdorff  <reference.glb> <candidate.glb> [samples]
     mesh_geometry.py uv-metrics <in.glb>
+    mesh_geometry.py uv-layout  <in.glb> <texture_size> <padding_px>
     mesh_geometry.py uv-unwrap  <folder from mesh_gltf.mjs uv-export>
     mesh_geometry.py watertight <in.glb> <out.glb>
     mesh_geometry.py compare-views <reference_views_dir> <candidate_views_dir> <sheet.png>
 """
 
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -141,6 +143,40 @@ def hausdorff(reference_path, candidate_path, samples):
     })
 
 
+def load_with_uvs(path):
+    """trimesh drops TEXCOORD_0 from primitives that have no material, so a freshly unwrapped mesh would read as
+    UV-less. Give such primitives an empty default material in a temporary copy, then load that."""
+    import struct
+    import tempfile
+
+    import trimesh
+
+    path = Path(path)
+    raw = path.read_bytes()
+    if raw[:4] != b"glTF":
+        return trimesh.load(path, force="scene", process=False)
+    json_length = struct.unpack("<I", raw[12:16])[0]
+    document = json.loads(raw[20:20 + json_length])
+    primitives = [primitive for mesh in document.get("meshes", []) for primitive in mesh.get("primitives", [])]
+    missing = [primitive for primitive in primitives if "material" not in primitive and "TEXCOORD_0" in primitive.get("attributes", {})]
+    if not missing:
+        return trimesh.load(path, force="scene", process=False)
+    document.setdefault("materials", []).append({"name": "uv_probe_default"})
+    for primitive in missing:
+        primitive["material"] = len(document["materials"]) - 1
+    encoded = json.dumps(document).encode("utf-8")
+    encoded += b" " * ((4 - len(encoded) % 4) % 4)
+    rest = raw[20 + json_length:]
+    body = struct.pack("<II", len(encoded), 0x4E4F534A) + encoded + rest
+    with tempfile.NamedTemporaryFile(suffix=".glb", delete=False) as handle:
+        handle.write(b"glTF" + struct.pack("<II", 2, 12 + len(body)) + body)
+        temporary = handle.name
+    try:
+        return trimesh.load(temporary, force="scene", process=False)
+    finally:
+        Path(temporary).unlink(missing_ok=True)
+
+
 def triangle_areas_2d(points):
     edge_one = points[:, 1] - points[:, 0]
     edge_two = points[:, 2] - points[:, 0]
@@ -155,7 +191,7 @@ def uv_metrics(path):
     import trimesh
     from PIL import Image, ImageDraw
 
-    scene = trimesh.load(path, force="scene", process=False)
+    scene = load_with_uvs(path)
     resolution = 2048
     rows = []
     for geometry in scene.geometry.values():
@@ -212,6 +248,101 @@ def uv_metrics(path):
         "stretch_p95": max((row["stretch_p95"] for row in with_uv if row.get("stretch_p95")), default=None),
         "area_outside_half_to_double_percent": weighted("area_outside_half_to_double_percent"),
         "triangles_with_uv": total if with_uv else 0,
+    })
+
+
+def uv_layout(path, texture_size, padding):
+    """Texel density and island padding of TEXCOORD_0, the UV gate of the asset pipeline.
+    Islands are faces joined through shared vertices (glTF splits UV seams into separate vertices).
+    Density per island, in pixels per metre at texture_size: sqrt(UV area * size^2 / world surface area), in world
+    space so node scale counts. Padding: texels of two different islands closer than `padding` pixels."""
+    import numpy
+    import trimesh
+    from PIL import Image, ImageDraw
+    from scipy.sparse import coo_matrix
+    from scipy.sparse.csgraph import connected_components
+
+    scene = load_with_uvs(path)
+    densities = []
+    island_areas = []
+    island_polygons = []
+    for node_name in scene.graph.nodes_geometry:
+        transform, geometry_name = scene.graph[node_name]
+        geometry = scene.geometry[geometry_name]
+        uv = getattr(getattr(geometry, "visual", None), "uv", None)
+        if not isinstance(geometry, trimesh.Trimesh) or uv is None or len(uv) != len(geometry.vertices):
+            continue
+        world = geometry.copy()
+        world.apply_transform(transform)
+        faces = geometry.faces
+        face_count = len(faces)
+        # Exporters also split vertices at normal seams, so weld by position and UV: two faces belong to one island
+        # when they share a corner with the same position and the same UV. Measured 2026-11-24: without the weld a
+        # smooth-shaded body read as 6,526 one-face islands and thousands of false padding clashes.
+        corner_keys = numpy.hstack([numpy.round(geometry.vertices * 1e5), numpy.round(uv * 1e6)]).astype(numpy.int64)
+        _, welded = numpy.unique(corner_keys, axis=0, return_inverse=True)
+        welded = welded.reshape(-1)
+        rows = numpy.repeat(numpy.arange(face_count), 3)
+        incidence = coo_matrix((numpy.ones(face_count * 3), (rows, welded[faces].reshape(-1))), shape=(face_count, int(welded.max()) + 1)).tocsr()
+        adjacency = incidence @ incidence.T
+        _, labels = connected_components(adjacency, directed=False)
+        uv_area = numpy.abs(triangle_areas_2d(uv[faces]))
+        surface_area = world.area_faces
+        for label in numpy.unique(labels):
+            members = labels == label
+            area = float(surface_area[members].sum())
+            mapped = float(uv_area[members].sum())
+            if area <= 0 or mapped <= 0:
+                continue
+            densities.append(math.sqrt(mapped * texture_size * texture_size / area))
+            island_areas.append(area)
+            island_polygons.append(uv[faces[members]])
+    if not densities:
+        emit({"islands": 0})
+        return
+    densities = numpy.array(densities)
+    weights = numpy.array(island_areas) / sum(island_areas)
+    order = numpy.argsort(densities)
+    cumulative = numpy.cumsum(weights[order])
+    median = float(densities[order][numpy.searchsorted(cumulative, 0.5)])
+    outside = (densities < median / 2.0) | (densities > median * 2.0)
+    ids = Image.new("I", (texture_size, texture_size), 0)
+    drawer = ImageDraw.Draw(ids)
+    for island_number, triangles in enumerate(island_polygons, start=1):
+        for corner_set in triangles:
+            wrapped = numpy.mod(corner_set, 1.0) if (corner_set.max(axis=0) - corner_set.min(axis=0)).max() < 1.0 else None
+            if wrapped is None:
+                continue
+            drawer.polygon([(float(x) * texture_size, float(1.0 - y) * texture_size) for x, y in wrapped], fill=island_number)
+    grid = numpy.asarray(ids, dtype=numpy.int64)
+    close_texels = numpy.zeros(grid.shape, dtype=bool)
+    close_pairs = set()
+    for shift_y in range(-padding, padding + 1):
+        for shift_x in range(-padding, padding + 1):
+            if (shift_x == 0 and shift_y == 0) or shift_x * shift_x + shift_y * shift_y > padding * padding:
+                continue
+            height, width = grid.shape
+            source = grid[max(0, -shift_y):height - max(0, shift_y), max(0, -shift_x):width - max(0, shift_x)]
+            target = grid[max(0, shift_y):height - max(0, -shift_y), max(0, shift_x):width - max(0, -shift_x)]
+            clash = (source > 0) & (target > 0) & (source != target)
+            if clash.any():
+                close_texels[max(0, -shift_y):height - max(0, shift_y), max(0, -shift_x):width - max(0, shift_x)] |= clash
+                pairs = numpy.unique(numpy.minimum(source[clash], target[clash]) * 1_000_000 + numpy.maximum(source[clash], target[clash]))
+                close_pairs.update(int(pair) for pair in pairs[:2000])
+    border = numpy.zeros(grid.shape, dtype=bool)
+    border[:padding, :] = border[-padding:, :] = border[:, :padding] = border[:, -padding:] = True
+    emit({
+        "islands": len(densities),
+        "texture_size": texture_size,
+        "padding_px": padding,
+        "texel_density_median_px_per_m": round(median, 2),
+        "texel_density_p5_px_per_m": round(float(numpy.percentile(densities, 5)), 2),
+        "texel_density_p95_px_per_m": round(float(numpy.percentile(densities, 95)), 2),
+        "area_outside_half_to_double_density_percent": round(100.0 * float(weights[outside].sum()), 2),
+        "island_pairs_closer_than_padding": len(close_pairs),
+        "texels_closer_than_padding": int(close_texels.sum()),
+        "texels_in_border_margin": int(((grid > 0) & border).sum()),
+        "uv_space_used_percent": round(100.0 * float((grid > 0).mean()), 2),
     })
 
 
@@ -372,6 +503,8 @@ def main():
         hausdorff(arguments[0], arguments[1], int(arguments[2]) if len(arguments) > 2 else 200000)
     elif command == "uv-metrics":
         uv_metrics(arguments[0])
+    elif command == "uv-layout":
+        uv_layout(arguments[0], int(arguments[1]), int(arguments[2]))
     elif command == "uv-unwrap":
         uv_unwrap(arguments[0])
     elif command == "watertight":

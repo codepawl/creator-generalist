@@ -1,11 +1,17 @@
 # Mesh prep: repair, remesh, UV, LOD, compress, and prove it still looks right
 
-Reading map:
-- What the tools can and cannot promise: "What is guaranteed"
-- Running it: "Run" and "Profiles"
-- Reading the result: "The gate"
-- Choosing steps per job: "Recipes"
-- Tools and licences: "Tools"
+<!-- skill-navigation:start -->
+## Reading Map
+
+- [Mesh prep](#mesh-prep-repair-remesh-uv-lod-compress-and-prove-it-still-looks-right): what `mesh_prep.py` runs
+- [What is guaranteed](#what-is-guaranteed): what the tools can and cannot promise
+- [Run](#run) and [Profiles](#profiles): running it
+- [The gate](#the-gate): reading the result
+- [Recipes](#recipes): choosing steps per job
+- [Tools](#tools): tools and licences
+- [Measured](#measured): test runs and numbers
+- Per-stage gates of an asset (retopo, UV, bake, texture, rig: `mesh_prep.py gate`): `asset-pipeline.md`
+<!-- skill-navigation:end -->
 
 `scripts/mesh_prep.py` (next to this skill) runs one asset through validate, repair, optional remesh, UV unwrap when
 missing, simplify and LOD, compression, validate again, then a before/after gate. Every step is a flag. A run that
