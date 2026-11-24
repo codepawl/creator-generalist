@@ -284,6 +284,20 @@ def gate_non_manifold(report, label, input_topology, candidate_topology, thresho
     )
 
 
+def note_contact_crease(report, distance, thresholds):
+    """Explain a Hausdorff max failure that comes from one small region while the rest of the surface fits."""
+    if distance["max_percent"] <= thresholds["hausdorff_max"] or distance.get("p99_percent") is None:
+        return
+    report.note(f"hausdorff p99 {distance['p99_percent']}% of the diagonal (max {distance['max_percent']}%)")
+    if distance["p99_percent"] <= thresholds["hausdorff_p95"] and (distance["worst_share_near_max_percent"] or 0) >= 60:
+        report.note(
+            f"contact crease likely: {distance['worst_share_near_max_percent']}% of the {distance['worst_samples']} "
+            f"worst samples sit within 5% of the diagonal of {distance['worst_point']}. Where the high "
+            "touches itself (crotch, armpits, fingers) no low can follow: pose the high apart (A-pose, legs apart) or "
+            "separate the contact before retopo. The limit stays."
+        )
+
+
 def gate_comparison(report, reference, candidate, thresholds, work, render=True, input_topology=None, render_candidate=None, appearance=True):
     """The quality gate: geometry distance, topology and renders. Adds gates to the report."""
     render_candidate = render_candidate or candidate
@@ -291,6 +305,7 @@ def gate_comparison(report, reference, candidate, thresholds, work, render=True,
     report.step("hausdorff", distance)
     report.gate("hausdorff max %diag", distance["max_percent"], thresholds["hausdorff_max"], distance["max_percent"] <= thresholds["hausdorff_max"])
     report.gate("hausdorff p95 %diag", distance["p95_percent"], thresholds["hausdorff_p95"], distance["p95_percent"] <= thresholds["hausdorff_p95"])
+    note_contact_crease(report, distance, thresholds)
     candidate_topology = geometry("topology", candidate)
     report.step("topology output", candidate_topology)
     report.gate("degenerate faces", candidate_topology["degenerate_faces"], 0, candidate_topology["degenerate_faces"] == 0)

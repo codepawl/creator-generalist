@@ -34,6 +34,10 @@ expect 0 retopo_good "" retopo "$F/retopo_good.blend" --deforms $H
 expect 1 retopo_bad "quad share" retopo "$F/retopo_bad.blend" --deforms $H
 expect 0 retopo_bad_static "" retopo "$F/retopo_bad.blend" $H
 expect 1 retopo_torn "hausdorff max" retopo "$F/retopo_torn.blend" --deforms $H
+if grep -q "contact crease" "$WORK/retopo_torn/report.md"; then
+  echo "FAIL retopo_torn: a torn mesh was explained as a contact crease"
+  status=1
+fi
 expect 1 retopo_no_high "shape compared" retopo "$F/retopo_good.blend" --deforms
 expect 0 uv_good "" uv "$F/uv_good.glb" --texture-size 1024 --padding 4
 expect 1 uv_overlap "UV overlap" uv "$F/uv_overlap.glb" --texture-size 1024 --padding 4

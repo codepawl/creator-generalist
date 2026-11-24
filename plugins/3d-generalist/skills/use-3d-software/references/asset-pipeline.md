@@ -52,9 +52,11 @@ when its gate passes, not when the tool finishes. Skills that build assets (`mod
   `--high`. A QuadriFlow result can be valid topology and still a torn shape; `blender_remesh_bake.py` falls back
   to a voxel copy (then shrinkwraps onto the high) when the surface result opens edges, leaves zero-area faces or
   strays more than 1% of the diagonal.
-- Surfaces that touch in the high (thighs, arms against the body, fingers) leave a crease no game-density low can
-  follow: a Tripo body kept Hausdorff max 1.5% at the crotch at 9.7k quads, shrinkwrap or not. Pose them apart in
-  stage 2.
+- Known limit: where the high touches itself (crotch, armpits, fingers) no game-density low can follow the crease,
+  and Hausdorff max fails while the rest fits. A Tripo body with touching thighs kept max 1.53% (p95 0.09%, p99
+  0.26%) at 9.7k quads, shrinkwrap or not. The gate then prints p99 and a "contact crease likely" note with the
+  spot. Fix the input, not the limit: generate or pose the high in A-pose with legs apart, or separate the contact
+  (move the parts apart, or cut and cap) before retopo.
 - With `--high`, non-manifold edges may not exceed the high's own count plus the profile's allowance per 10k
   triangles (a scan often has a few); without it, zero.
 
@@ -118,7 +120,7 @@ uv run --no-project python scripts/mesh_prep.py gate rig     character.blend
 
 | Gate | Fails when |
 |---|---|
-| retopo | no `--high` given; Hausdorff or silhouette off the high (profile limits); n-gons; more non-manifold edges than the high; loose geometry; with `--deforms` quad share under 0.9 or poles over 3%; over `--budget` |
+| retopo | no `--high` given; Hausdorff or silhouette off the high (profile limits; a failing max also prints p99 and a contact-crease note when one spot causes it); n-gons; more non-manifold edges than the high; loose geometry; with `--deforms` quad share under 0.9 or poles over 3%; over `--budget` |
 | uv | missing UVs; overlap over 0.1% (bake mode); more than 10% of area outside 0.5x..2x median density (bake mode); flipped faces over 1%; stretch over 10%; any island pair closer than the padding; median off the target by 25% |
 | bake | no normal map; low faces with no high surface in reach; ray distance under gap p99 or over 10% of size; normal texels pointing inward or off unit length; normal map not Non-Color; Hausdorff, silhouette or normal-angle limits of the profile; bake not improving shading |
 | texture | a required channel missing; a map not a power of two or over the budget; a colour map not sRGB or a data map not Non-Color |

@@ -112,7 +112,8 @@ def sampled_distances(mesh_set, sampled_index, target_index, samples):
     # savesample adds two meshes: the samples (quality = distance) and their closest points.
     sample_mesh = mesh_set.mesh(mesh_set.mesh_number() - 2)
     distances = numpy.asarray(sample_mesh.vertex_scalar_array(), dtype="float64")
-    return summary, distances
+    positions = numpy.asarray(sample_mesh.vertex_matrix(), dtype="float64")
+    return summary, distances, positions
 
 
 def hausdorff(reference_path, candidate_path, samples):
@@ -125,18 +126,30 @@ def hausdorff(reference_path, candidate_path, samples):
     mesh_set = pymeshlab.MeshSet()
     mesh_set.add_mesh(pymeshlab.Mesh(reference.vertices, reference.faces), "reference")
     mesh_set.add_mesh(pymeshlab.Mesh(candidate.vertices, candidate.faces), "candidate")
-    forward_summary, forward = sampled_distances(mesh_set, 1, 0, samples)
-    backward_summary, backward = sampled_distances(mesh_set, 0, 1, samples)
+    forward_summary, forward, forward_positions = sampled_distances(mesh_set, 1, 0, samples)
+    backward_summary, backward, backward_positions = sampled_distances(mesh_set, 0, 1, samples)
     both = numpy.concatenate([forward, backward])
+    positions = numpy.concatenate([forward_positions, backward_positions])
 
     def percent(value):
         return round(100.0 * float(value) / diagonal, 4)
+
+    # Where the worst samples sit: of the samples past 75% of the max, the share within 5% of the diagonal of the
+    # single worst one. A high share is one region the low cannot follow, such as a crease where the high touches
+    # itself (a Tripo body's thighs). A bounding-box spread was thrown off by one stray sample.
+    worst = positions[both >= 0.75 * both.max()] if len(both) else positions[:0]
+    worst_point = positions[int(numpy.argmax(both))] if len(both) else None
+    near_worst = numpy.linalg.norm(worst - worst_point, axis=1) <= 0.05 * diagonal if len(worst) else numpy.zeros(0, bool)
 
     emit({
         "diagonal": diagonal,
         "samples_each_way": samples,
         "max_percent": percent(max(forward_summary["max"], backward_summary["max"])),
         "p95_percent": percent(numpy.percentile(both, 95)) if len(both) else None,
+        "p99_percent": percent(numpy.percentile(both, 99)) if len(both) else None,
+        "worst_samples": int(len(worst)),
+        "worst_share_near_max_percent": round(100.0 * float(near_worst.mean()), 1) if len(worst) else None,
+        "worst_point": [round(float(value), 4) for value in worst_point] if worst_point is not None else None,
         "mean_percent": percent(numpy.mean(both)) if len(both) else None,
         "candidate_to_reference_max_percent": percent(forward_summary["max"]),
         "reference_to_candidate_max_percent": percent(backward_summary["max"]),
