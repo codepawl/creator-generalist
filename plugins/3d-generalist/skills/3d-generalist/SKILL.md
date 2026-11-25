@@ -1,6 +1,6 @@
 ---
 name: 3d-generalist
-description: "3D generalist studio for creators: source and kitbash scanned assets, build or rig characters, dress worlds and perspective cutaways, animate character acting, light and shoot, sync narration and foley, and pass automated QA gates across Blender, three.js and Crucible. Use for 3D Shorts, explainers, story animations, cutaway builds, 3D worlds or character animation (\"3d generalist\", \"3D shorts\", \"cutaway 3D\")."
+description: "3D generalist studio for creators: source and kitbash scanned assets, build or rig characters, dress worlds and perspective cutaways, animate character acting, light and shoot, sync narration and foley, and pass automated QA gates across Blender, three.js and Crucible. Use for 3D Shorts, explainers, story animations, cutaway builds, 3D worlds, character animation, or a film where code builds the scene step by step (\"code build-up video\", \"how it's made from code\", \"watch the code build this\", \"technique explainer\", \"generative art reveal\", \"3d generalist\", \"3D shorts\", \"cutaway 3D\")."
 license: MIT
 ---
 
@@ -21,6 +21,7 @@ Paths use `{{WORK_DIR}}` for the project folder and `{{SKILL_DIR}}` for this ski
 | `world` | A rich 3D environment or diorama with period details, scanned PBR materials, grass, water, fire and ambient life | `references/assets-and-kitbash.md`, `references/worlds-and-cutaways.md`, `references/camera-and-lighting.md`; shown as render, then clay model, then render: `references/clay-reveal.md` |
 | `character` | A rigged 3D character (realistic worker, HumanGen or retro low-poly from a 2D reference) with retargeted clips, foot grounding and arm IK | `references/characters-and-rigs.md`, `references/acting-and-motion.md`, `../model-characters/SKILL.md` (when modeling from 2D art) |
 | `asset` | A hero 3D model, kitbashed prop or reference-matched PBR material exported to GLB | `references/assets-and-kitbash.md` |
+| `build-up` | A code build-up film: code blocks and number drags on one side build the scene on the other, one rule per beat, ending on a payoff | `references/code-build-up.md`; sound: `design-sound` `references/foley.md`, "Motion graphics weight" |
 
 For any step done in Blender (geometry nodes, shaders, rigging, weight paint, NLA, bpy), load the `use-3d-software` skill for the exact nodes and current 5.x names. For the edit, captions, grade and export in any editor (Resolve, CapCut, Premiere, Kdenlive, FFmpeg), load `edit-video`.
 Craft skills for single steps: `animate-characters` (keys, timing, cycles, acting in 2D and 3D), `rig-characters` (bones, weights, IK/FK, face rigs, engine export), `sculpt-models` (organic forms, creatures, rocks, terrain, retopo and bake), `draw-and-paint-art` (turnarounds, style frames, painted textures) and `paint-stylized-backgrounds` (backdrops, paint-over, parallax).
@@ -63,3 +64,6 @@ which steps shrink per mode.
   `references/assets-and-kitbash.md`, "Variation and imperfection".
 - **Clean enters and exits:** nothing pops on or vanishes in 1 frame. Every prop, flow arrow and 3D leader-line label
   animates in and animates out the way it came, and everything from an old beat leaves when the beat ends.
+- **Subject before shots:** "make it realistic" redesigns the subject (proportions, real model), not just its light.
+  If a style-frame round draws a complaint about the subject ("it looks silly"), fix it and reshow before any script or
+  shot.

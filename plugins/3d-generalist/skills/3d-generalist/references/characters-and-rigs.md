@@ -7,7 +7,9 @@ elbows and readable facial or head expressions.
 
 - **Realistic Cutaway Worker:** a realistic human at 1.8 m scale wearing a high-contrast
   yellow hard hat, bright orange hi-vis jacket with grey reflective bands, dark trousers, work boots and gloves. The
-  loud orange/yellow colour pops immediately against calm snow, brown soil, grey stone or blue water.
+  loud orange/yellow colour pops immediately against calm snow, brown soil, grey stone or blue water. Never a cartoon
+  villager. Check the eyes on a face close-up before every preview: a flat dark-brown eye mesh reads as empty sockets,
+  so add a white eyeball and pupil on load.
 - **Realistic Storytelling Cast:** generated in Blender with **Human Generator
   (HumGen3D)**, slightly muscular build (very skinny limbs look goofy when bent), 1-click **Rigify** rig, and built-in
   facial expression shape keys.

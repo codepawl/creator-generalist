@@ -3,6 +3,14 @@
 Even simple kitbashed scenes look like a high-budget studio animation when the camera, character lighting, Depth of
 Field and shutter motion blur work together.
 
+<!-- skill-navigation:start -->
+[Camera, Lighting and Cinematic Finish (`camera-and-lighting.md`)](#camera-lighting-and-cinematic-finish-camera-and-lightingmd): read only the section for the step in front of you, whole:
+- [1. Camera rules for 3D Shorts and explainers](#1-camera-rules-for-3d-shorts-and-explainers)
+- [2. Bright daylight + Spine-tracked character fill light](#2-bright-daylight--spine-tracked-character-fill-light)
+- [3. Depth of Field (DoF) and the Finish Pass](#3-depth-of-field-dof-and-the-finish-pass)
+- [4. Framing for narrated builds](#4-framing-for-narrated-builds)
+<!-- skill-navigation:end -->
+
 ## 1. Camera rules for 3D Shorts and explainers
 
 - **One set, one continuous camera on cutaway builds:** keep under **1 hard cut per 10 seconds** (0 to 0.4 cuts/10 s).
@@ -94,6 +102,16 @@ Lessons from a 10 s elevated-metro shot that took three preview rounds before it
   passing vehicles, instantly removing the flat "raw OpenGL viewport" look.
 - **180-degree shutter Finish Pass (`ShutterPass`):** render final outputs with:
   1. **Motion blur:** accumulate **6 sub-frames** across a 180-degree shutter (`ONE / ONE` linear accumulation on RGB
-     only—never `THREE.AdditiveBlending` with alpha weight, which squares the weight and darkens the frame by half).
+     only, never `THREE.AdditiveBlending` with alpha weight, which squares the weight and darkens the frame by half).
   2. **Bloom:** thresholded strictly above linear `1.6` so only sun glints, fire and glowing air pockets bloom.
   3. **Vignette & Film Grain:** a light vignette and fine frame-seeded noise to prevent 8-bit MP4 banding.
+
+## 4. Framing for narrated builds
+
+- **Frame the build large, and the worker beside it, never in front of it.** Ground-level work is filmed from above (pitch
+  about 0.3) so his body never sits over the mouth of what he works on; hands at frame centre push the caption down.
+- **A shot that looks away on purpose is listed in the shot table;** otherwise head, hands and feet stay inside the frame.
+- **A whip pan slides sideways and never turns** (a 1.5 rad turn showed the back of the cutaway slab).
+- **Finish-pass traps:** a half-float finish pass (motion blur, grade) turns any NaN pixel pure black, and one hand-built
+  geometry with no normals made half the frame black after the pass. Give every built geometry normals; compare one still
+  before and after the pass.

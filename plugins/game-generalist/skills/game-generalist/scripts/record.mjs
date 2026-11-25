@@ -334,7 +334,7 @@ function findMarkerFlash({ videoPath }) {
 async function captureFiles(chromium, workFolder, botAct) {
   const launchArguments = values.software
     ? ["--use-gl=swiftshader", "--mute-audio", "--autoplay-policy=no-user-gesture-required"]
-    : ["--use-angle=d3d11", "--enable-gpu", "--ignore-gpu-blocklist", "--mute-audio", "--autoplay-policy=no-user-gesture-required"];
+    : ["--use-angle=d3d11", "--enable-gpu", "--ignore-gpu-blocklist", "--disable-audio-output", "--autoplay-policy=no-user-gesture-required"];
   const browser = await chromium.launch({ headless: true, args: launchArguments });
   const context = await browser.newContext({
     viewport: { width: videoWidth, height: videoHeight },

@@ -39,7 +39,7 @@ and underground section) needs real depth and subtle motion.
   in both legs, never clinging to a falling outlet slope. Underground water pockets look carved in rough PBR rock with a
   dark wet band along the wall, never a smooth blue sphere.
 - **Standing in water:** place the character's feet on the stream or sea bed (or a flat bed shelf under both feet), with
-  water at ankle or shin height and ripples around the legs—never walking on top of the water surface.
+  water at ankle or shin height and ripples around the legs, never walking on top of the water surface.
 - **Realistic fire:** use a sourced CC0 fire flipbook or clip on camera-facing planes with additive blending, rising
   embers, soft smoke and a warm flickering point light. Never use an orange cone or falling orange spheres.
 - **Weather and air lines:** wind, mist, rain and sun rays are a faint atmospheric hint (soft-edged, low opacity,
@@ -50,3 +50,35 @@ and underground section) needs real depth and subtle motion.
     growing spoil mound (`mound` surface) with its own dig sound. Holes never sink or fade smoothly on their own.
   - Masonry and timber assemblies seat piece by piece from the character's hands with a small settle and contact SFX,
     with zero gap (within 1 cm) between courses.
+
+## 4. Layers, horizon and small effects
+
+- **Never an empty void:** build a wide area around the set in layers (near ground cover and props, middle trees and huts,
+  far hills or forest) with depth fog, ambient occlusion and a few foreground occluders, so every camera angle has depth
+  behind the work. Dress every layer with small moving details: fish and caustics under water, shells and bushes on the
+  shore, birds and clouds in the sky. Real CC0 or CC BY models; anything on screen reads at a glance as a real thing, so
+  replace an unreadable prop with a sourced model or remove it.
+- **Horizon haze:** fog does not touch the scene background, so fogged ground meeting an HDR sky ends in a hard straight line.
+  Add a camera-centred sphere in the fog colour, solid at the horizon and fading out by direction.y about 0.16, and end the sea
+  inside it, short of the camera far plane (a clipped sea edge drew a bright line through the bloom). Check with a
+  row-brightness scan.
+- **Grass:** a free Blender grass add-on baked to GLB and instanced, never a handful of tufts. Use a flat shelf of bed for
+  standing in water.
+- **Small effects are many faint particles:** drips, sparks and dust start at points spread along the source with a seeded
+  random start, size and speed, denser and sparser in turns, ending in a tiny splash or fade; never one drop looping on a
+  fixed beat. Particles that carry an action the voice names (salt thrown over a rack) are 2 cm or more and number in the
+  hundreds, so the action reads at phone size; a tint change with 8 mm grains is invisible.
+- **A failure beat shows its problem with a small real detail:** rot gives faint stink wisps, wet fish drip, cooking fish drip
+  fat into the fire. Soft vapour sprites and drops, never cartoon stink lines.
+- **Building moves like real work:** show what is being reached (water, bedrock) in the cutaway from the start, then dig to
+  it layer by layer, never a smooth linear sink; water appears only when the dig reaches it. Dig the named hole itself.
+- **Built things are square and even:** a hood, flue or tunnel is symmetric about its axis, courses the same height, walls the
+  same thickness on both sides; check a close still from above and from the front. Joined parts (tunnel, porch, wing) run
+  into the shell wall with no slot of sky or ground between them. A pipe or post beside a wall stands 5 cm or more clear of it
+  with brackets, never sharing space with a corner post.
+- **Rigging follows the real rig, checked against a reference** (a crab-claw sail's tack sits at the bow by the mast foot).
+- **Failure of a structure takes everything attached with it** (a ramp stays standing after the hut falls reads as a bug); a
+  storm stays readable, never black; wind moves leaves and trees with weight and lag, never a fast jitter; a key moment far
+  away gets a closer camera.
+- **Machines read the right way at a glance:** a pump's intake in the source, its spout toward the tank, the handle on the
+  worker's side, the flow visible when it works.

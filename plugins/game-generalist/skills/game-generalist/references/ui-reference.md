@@ -40,7 +40,7 @@ suggestion for text in the image. Use the colour-blind filters to check that a H
 
 ## Reading the site
 
-WebFetch gets HTTP 403 from this site. Open it in the built-in browser and read it with `get_page_text` or a short
+WebFetch gets HTTP 403 from this site. Open it in a real browser (Claude in Chrome) and read it with `get_page_text` or a short
 `javascript_tool` query of the links. When you must look at more than about 5 screenshots, hand them to a subagent
 that reads images and returns text, and work from that text.
 

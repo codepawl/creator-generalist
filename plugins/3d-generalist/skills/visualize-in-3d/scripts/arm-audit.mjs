@@ -29,7 +29,7 @@ function virtualClock() {
   }
 }
 
-const browser = await chromium.launch({ headless: true, args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist'] })
+const browser = await chromium.launch({ headless: true, args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist', '--disable-audio-output'] })
 const page = await browser.newPage({ viewport: { width: 320, height: 180 } })
 await page.addInitScript(virtualClock)
 await page.goto('http://localhost:5441/film.html', { timeout: 120000 })

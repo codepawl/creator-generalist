@@ -72,11 +72,12 @@ Scripts live in `scripts/` next to this file; run them with absolute paths and n
 
 - Sounds are made by code from learned recordings or designs, never by a generation model unless the owner names it:
   models sound good but come out different every call. Any licence is allowed:
-  warn about `restricted`, `other` and `unknown` files, never drop them. Credit CC BY authors in the
+  warn about `restricted`, `other` and `unknown` files, never drop them. Keep CC BY authors in the project's CREDITS.md; on X posts no credit reply, elsewhere credit them in the
   post or description (`sources.json`, field `credit`). A project's own sound rule wins.
 - Every visible event gets its own sound at its own frame, placed from the event time, within one frame.
 - No recording shared between two cues in a scene, and no one merged sound covering several actions; no filler
   sounds that no action makes. Only room tone and ambience run under everything. No reverb unless asked.
+- A repeat never sounds the same: new seed and the next pitch step, runs climb.
 - Voice is mixed first, at least 10 LU over the music while it speaks; beds 15 LU under it, in their own band and 6 dB
   or more under the cues in their dominant band.
 - Keep the top of the mix soft: cut shrill 2 to 6 kHz build-up. UI sounds: ask the owner's taste once (make.md, "UI").
@@ -97,5 +98,4 @@ Scripts live in `scripts/` next to this file; run them with absolute paths and n
 - `references/music.md` the music library, mood search, `fit_music.py`, credits, the `score.json` sketch.
 - `references/mix.md` mix.json, carving, ducking, phone bass, the whole-mix checks, mixing practice and Evidence.
 - `references/video-foley.md` foley generated from a silent film: install, resources, when it hears nothing, licence.
-- `references/cinematic-trailer.md` trailers and re-scores: heavy explosions, tails through cuts, punch,
-  reference match, trailer music.
+- `references/cinematic-trailer.md` trailers, re-scores, explosions, tails through cuts, punch, trailer music.

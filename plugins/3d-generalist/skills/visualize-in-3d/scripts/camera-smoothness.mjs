@@ -13,13 +13,15 @@
 // seconds. If you do not pass --duration, the script reads DURATION from the module.
 //   --log <channel>          measure the channel in decades (zoom width, for example)
 //   --relative <a>:<b>       measure channel a in units of channel b (pan in frame widths)
+//   --max <channel>:<speed>  fail when the channel's peak speed is over the limit. Defaults for a calm film:
+//                            width 1.2 (decades/s, with --log), targetX 1.5 (frame widths/s, with --relative)
 // Fix hints are printed with each failure.
 
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 function parseArguments(argv) {
-  const options = { exportName: 'cameraAt', logChannels: [], relative: {}, minDwell: 1.5, duration: null, module: null };
+  const options = { exportName: 'cameraAt', logChannels: [], relative: {}, maxSpeed: {}, minDwell: 1.5, duration: null, module: null };
   for (let index = 0; index < argv.length; index++) {
     const argument = argv[index];
     if (argument === '--export') options.exportName = argv[++index];
@@ -28,6 +30,9 @@ function parseArguments(argv) {
     else if (argument === '--relative') {
       const [channel, scale] = argv[++index].split(':');
       options.relative[channel] = scale;
+    } else if (argument === '--max') {
+      const [channel, limit] = argv[++index].split(':');
+      options.maxSpeed[channel] = Number(limit);
     } else if (argument === '--min-dwell') options.minDwell = Number(argv[++index]);
     else options.module = argument;
   }
@@ -100,12 +105,15 @@ for (const channel of channels) {
     lastMovingTime = sample.time;
   }
 
-  const status = kinkTimes.length === 0 && zigzags.length === 0 ? 'PASS' : 'FAIL';
+  const limit = options.maxSpeed[channel];
+  const tooFast = limit !== undefined && peakSpeed > limit;
+  const status = kinkTimes.length === 0 && zigzags.length === 0 && !tooFast ? 'PASS' : 'FAIL';
   if (status === 'FAIL') failures++;
   const format = (times) => times.slice(0, 12).map((time) => time.toFixed(2)).join(', ') + (times.length > 12 ? ', ...' : '');
   console.log(`${status} ${channel}: peak speed ${peakSpeed.toPrecision(3)}/s at ${peakTime.toFixed(2)} s, ${kinkTimes.length} kinks, ${zigzags.length} zigzags`);
   if (kinkTimes.length) console.log(`  kinks at ${format(kinkTimes)} s`);
   if (zigzags.length) console.log(`  zigzags at ${format(zigzags)} s`);
+  if (tooFast) console.log(`  peak speed is over the limit of ${limit}/s`);
 }
 
 if (failures) {
@@ -113,6 +121,7 @@ if (failures) {
   console.log('- Kinks: interpolate keys with a C1 spline (monotone cubic Hermite, Fritsch-Carlson), never linear or a per-segment ease mixed with linear.');
   console.log('- Zigzags: remove keys that turn a channel back within a short time. One direction per move, then settle.');
   console.log('- Zoom width is keyed in log space, so its speed in decades per second stays smooth.');
+  console.log('- Too fast a pan while zooming out: keep the target on the subject as it moves (follow the part), instead of panning to a fixed end point.');
   process.exit(1);
 }
 console.log('\nPASS: camera speed is continuous and no channel zigzags.');

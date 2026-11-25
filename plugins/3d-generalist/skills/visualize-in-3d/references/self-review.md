@@ -85,7 +85,7 @@ Read always.
 
 Any shot with a moving camera.
 
-- A stiff camera: speed that jumps at keys (linear interpolation, or a per-segment ease mixed with linear) or a channel that swings back and forth (yaw -30, -26, -32). Export the camera as a function of time and run `node scripts/camera-smoothness.mjs <timeline module> --log width --relative targetX:width` before any preview. It must print PASS. Key with a monotone cubic spline (zoom width in log space), turn a channel only at an extreme, and across a big zoom move the target as a zoom about one fixed point, so the pan never whips.
+- A stiff camera: speed that jumps at keys (linear interpolation, or a per-segment ease mixed with linear) or a channel that swings back and forth (yaw -30, -26, -32). Export the camera as a function of time and run `node scripts/camera-smoothness.mjs <timeline module> --log width --relative targetX:width --max width:1.2 --max targetX:1.5` before any preview. It must print PASS. Key with a monotone cubic spline (zoom width in log space), turn a channel only at an extreme, and across a big zoom move the target as a zoom about one fixed point, so the pan never whips.
 - A camera that passes through objects or turns abruptly. Fly a smooth curve, and measure the camera's distance to every mesh's bounding box on each frame, including the moves between shots. Any frame inside a box is a fault.
 - A symbol in the frame centre: an emblem at the vanishing point, or wall parts that line up into a cross. A statue's
   raised arm can also read as a salute. Check every documentary shot about a regime for these.

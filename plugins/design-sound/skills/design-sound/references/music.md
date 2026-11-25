@@ -28,6 +28,8 @@ Confirmed again on 2026-11-19 (Godzilla re-score): a full sampled orchestra re-c
    sheet (energy curve, ticks = bars, dashed = sections), read the rows (tempo, time signature, licence, page).
 2. `fit_music.py <track> --duration <film seconds> [--cues cues.json] --out music.wav` edits it to the cut (below).
 3. Mix `music.wav` as a `duck` stem (`references/mix.md`), then write the credit line (Credits below).
+4. Unless the owner named the track, fit 2 or 3 options and send one preview per option for the owner to pick: one
+   pick by mood words came out creepy twice in a row. Dark or hazy ambient tracks read as creepy under a bright explainer.
 
 ## The library
 
@@ -117,6 +119,9 @@ scipy, soundfile, psutil only. Instruments are the CC0 Versilian recordings thro
 6. Render, open `music.mid` if the melody needs checking, then mix.
 
 ## Owner verdicts that apply here
+
+A piece made from a reference video uses that video's own track when its licence allows: read the music credit in
+the description, fetch it, fit it with fit_music.py and credit it.
 
 No synthesised drones; no reverb; note answers on events sound scary (the music may be music, the events get object
 sounds); a launch or trailer with a licensed track skips this script entirely.

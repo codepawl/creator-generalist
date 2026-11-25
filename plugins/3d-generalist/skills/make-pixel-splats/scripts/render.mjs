@@ -32,7 +32,7 @@ const platformArgs = process.platform === 'win32'
   : ['--use-angle=vulkan', '--enable-features=Vulkan', '--no-sandbox'];
 const browser = await chromium.launch({
   ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : { channel: 'chrome' }),
-  args: [...platformArgs, '--enable-gpu', '--ignore-gpu-blocklist', '--disable-gpu-sandbox'],
+  args: [...platformArgs, '--enable-gpu', '--ignore-gpu-blocklist', '--disable-audio-output', '--disable-gpu-sandbox'],
 });
 const page = await browser.newPage({ viewport: { width: 1200, height: 1200 } });
 page.on('pageerror', error => console.error('page error:', error.message));

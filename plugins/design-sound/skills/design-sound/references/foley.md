@@ -102,6 +102,10 @@ One CSV row per event: `index, t, what, material, layers` (per layer: file, pitc
   sounded like 4 sounds in a run. A dark tilt on a bright key press moved 83 % of its energy under 300 Hz, so it
   sounded like a gunshot. A 443 ms swish was too long for an arrow. Check each take has one onset, high-pass dark
   takes of bright sources at about 220 Hz, and keep UI transitions under about 100 ms, or use short OS-style ones.
+- Splashes for things appearing in water and tick runs on dragged numbers in a chill piece. A spawn gets one tiny, deep, low-passed pop per item, each
+  quieter as more land together (1 over the square root of the crowd), so the texture follows the count. Mouse
+  clicks, drags and drops in an on-screen code or UI view still get soft motion-graphics sounds; leaving them
+  silent was the next note.
 
 ## Memes
 
@@ -132,6 +136,24 @@ Every cue gives its reason (`why`), and the cut decides whether to keep it. A pr
 On a scripted test of 10 known moments, detect placed 8. The other 2 were dropped by the
 gap rule. A 1,500-word tech talk got 1 cue, which is the right density for talk without jokes. Meme files have no
 licence (`unknown`), so give the licence warning once.
+
+## Motion graphics weight
+
+The owner heard a soft, all-designed set (blips, ticks, plain sub drops) under a code-view film as weak, and the same
+tick or pop at one pitch as boring. For motion graphics and code-view pieces:
+
+- Real-sounding hits come from learned models through `hit.py` layers (transient, body, a sub only on the 2 or 3
+  biggest), never a lone designed blip or kick.
+- Every change has a lead-in (riser or whoosh, `align` to its end) that lands on its hit.
+- Code-view pieces: no UI sounds (block pick-ups, drags, ticks); SFX only where the subject transforms, over music.
+  Parts snapping together get small, dense metal clamps and latches, a few heavy clunks among many light clicks
+  (a suit of armour assembling itself), never one big hit.
+- A lock or landing sound goes where the piece *looks* settled, about 80% through a smoothstep move (90% of the
+  distance), not at the end of the ease: the end is 0.3 s or more late and reads as out of sync. Check one frame sheet with timestamps against the cue times.
+- A low bed (designed `rumble` plus `air`) runs from the first frame to the climax, so no stretch goes silent;
+  `listen.py` silence gaps over 0.5 s are a fault, not a pause.
+- Repeats: a new seed and the next step of the pitch cycle each time; runs that build (dots, ticks, power steps) climb.
+- The climax is the loudest window of the film (check with `listen.py --expect`), and the bed cuts out on it.
 
 ## UI kits (ui_kit.py)
 
