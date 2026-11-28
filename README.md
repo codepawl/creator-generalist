@@ -60,6 +60,7 @@ those on its own too.
 |---|---|---|
 | **[visualize-in-3d](plugins/3d-generalist/skills/visualize-in-3d/SKILL.md)** | a place, a working system, an event on real land or how a thing works, shown in 3D | A live three.js app, film, lesson, documentary, action short or web game built from sourced models, each checked by its own frame review |
 | **[make-pixel-splats](plugins/3d-generalist/skills/make-pixel-splats/SKILL.md)** | pixel art dioramas from gaussian splats, or a video of how they are made | Scenes written as code (distance functions, baked light) rendered in [Crucible](https://crucible.codepawl.com), a crisp ink look with palette and contours, film plans and a "how it's made" explainer compositor |
+| **[render-3d-as-anything](plugins/3d-generalist/skills/render-3d-as-anything/SKILL.md)** | a live 3D scene rendered as typography, sheet music, blueprints, terminal logs, embroidery, circuit traces or contours | A dual Crucible lit+depth pass with world-space vector pouring, a pixel-aligned Split comparison wipe, zero-flicker orbit stabilization and 1080p60 capture |
 | **[build-house-from-plan](plugins/3d-generalist/skills/build-house-from-plan/SKILL.md)** | a floor plan or blueprint turned into a real-looking house | A Blender Cycles house checked by overlaying the build on the drawing, stills, a film of the walls rising, streets, and shop or kitchen fit-outs with clearance checks |
 | **[build-minecraft-model-from-image](plugins/3d-generalist/skills/build-minecraft-model-from-image/SKILL.md)** | a photo of an object turned into a Minecraft-style model | A few clean cuboids with pixel textures, exported to GLB with a viewer and renders |
 
@@ -94,7 +95,7 @@ those on its own too.
 |---|---|---|
 | **[design-sound](plugins/design-sound/skills/design-sound/SKILL.md)** | SFX, foley, music or a mix for a video, game or reel | A sound library searched by meaning (CLAP) with sheets to look at before choosing, web and ElevenLabs fetching, foley generated from a silent film with a local video-to-audio model (HunyuanVideo-Foley), an effects stem placed from an event list, music fitted to the cut, and a mix to platform loudness checked for sync, masking and phone audibility |
 
-`model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters`, `rig-characters`, `visualize-in-3d`, `make-pixel-splats`, `build-house-from-plan` and `build-minecraft-model-from-image` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art`, `paint-stylized-backgrounds` and `paint-with-code` come with the 2d-generalist plugin. `watch-video`, `design-sound` and `game-generalist` are their own plugins.
+`model-characters`, `sculpt-models`, `use-3d-software`, `animate-characters`, `rig-characters`, `visualize-in-3d`, `make-pixel-splats`, `render-3d-as-anything`, `build-house-from-plan` and `build-minecraft-model-from-image` come with the 3d-generalist plugin. `edit-video`, `draw-and-paint-art`, `paint-stylized-backgrounds` and `paint-with-code` come with the 2d-generalist plugin. `watch-video`, `design-sound` and `game-generalist` are their own plugins.
 Install all five plugins to get every skill. `2d-generalist` ships its own copy of the production spine and of
 `compare_look.py`, so each of the two plugins also works installed alone.
 
